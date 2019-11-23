@@ -1291,7 +1291,7 @@ var jqxhr = $.post('/path/to/resource', {
 <form id="test-form" action="test">
     <legend>请选择想要学习的编程语言：</legend>
     <fieldset>
-        <p><label class="selectAll"><input type="checkbox"> <span class="selectAll">全选</span><span class="deselectAll">全不选</span></label> 
+        <p><label class="selectAll"><input type="checkbox"> <span class="selectAll">全选</span><span class="deselectAll"><input type="checkbox">全不选</span></label> 
         <p><label><input type="checkbox" name="lang" value="javascript"> JavaScript</label></p>
         <p><label><input type="checkbox" name="lang" value="python"> Python</label></p>
         <p><label><input type="checkbox" name="lang" value="ruby"> Ruby</label></p>
