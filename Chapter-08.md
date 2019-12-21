@@ -72,7 +72,7 @@ def index(request):
 </html>
 ```
 
-这里，我们使用 Django 模板语言提供的 if 和 for 控制语句呈现数据。在页面的 <body> 元素中，我们判断 categories（包含分类列表的上下文变量）中有没有分类`{% if categories %}`。如果有分类，构建一个 HTML 无序列表` <ul>` 。 for 循环迭代分类列表` {% for category in categories %}`，在列表项目` <li> `标签中输出各分类的名称`{{ category.name }}`。
+这里，我们使用 Django 模板语言提供的 if 和 for 控制语句呈现数据。在页面的 `<body> `元素中，我们判断 categories（包含分类列表的上下文变量）中有没有分类`{% if categories %}`。如果有分类，构建一个 HTML 无序列表` <ul>` 。 for 循环迭代分类列表` {% for category in categories %}`，在列表项目` <li> `标签中输出各分类的名称`{{ category.name }}`。
 如果没有分类，显示一个消息，指明没有分类。从上述代码片段可以看出， Django 模板语言中的命令放在 {% 和 %} 之间，而变量放在 {{ 和 }} 之间。
 
 现在访问 navigation 的主页应该会看到页面标题下方显示着分类列表
@@ -161,7 +161,7 @@ python populate.py
 
 #### 创建分类页面的步骤
 
-为了实现可通过 /rango/category/<category-name-slug>/ 访问的分类页面，我们要做几处修改。基
+为了实现可通过 /navigation/category/<category-name-slug>/ 访问的分类页面，我们要做几处修改。基
 本步骤如下：
 1. 把 Page 模型导入 navigation/views.py 模块。
 2. 在 navigation/views.py 模块中定义一个新视图，命名为 show_category()。这个视图有个额外的参数， category_name_slug，用于传入编码后的分类名称。为了编码和解码category_name_slug，要定义两个辅助函数。

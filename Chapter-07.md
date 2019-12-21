@@ -14,7 +14,7 @@ Django 特点
 
 使用pip
 ```
-pip install django
+pip install django -i https://pypi.douban.com/simple
 ```
 
 验证django
@@ -25,7 +25,7 @@ pip install django
 ```
 
 ## 创建项目
-`django-admin.py startproject first_project`
+`django-admin startproject first_project`
 
 目录中出现了与项目同名的一个目录，即first_project。在这个目录中你会看到两个内容
 + 另一个与项目同名的目录
@@ -232,7 +232,7 @@ urlpatterns = [
 
 ## 回顾基本流程
 1. 创建 Django 项目
-+ 执行 python django-admin.py startproject <name> 命令，其中 <name> 是想创建的项目名
++ 执行 django-admin startproject <name> 命令，其中 <name> 是想创建的项目名
 称。
 2. 创建 Django 应用
 + 执行 python manage.py startapp <appname> 命令，其中 <appname> 是想创建的应用名称。
@@ -263,7 +263,7 @@ urlpatterns = [
 from django.http import HttpResponse
 
 def index(request):
-    return HttpResponse("龙腾测试！！！ <a href='/navigation/about/'>关于</a>")
+    return HttpResponse("龙腾测试！！！ <a href='/navigation/about'>关于</a>")
 
 def about(request):
     return HttpResponse("龙腾测试！！！ <a href='/navigation/'>首页</a>")
@@ -584,7 +584,7 @@ context_processors 列表中添加一个处理器， django.template.context_pro
 2. 在 about.html 模板中引入一个图片（存储在项目的 static 目录中）。
 3. 在关于页面中添加一行：我们在一起了。
 4. 在 Django 项目配置目录中新建一个目录，命名为 media。从网上下载一张猫的图片，保存到 media 目录中，命名为 cat.jpg。
-5. 在 about.html 模板中添加一个 <img> 标签，显示那个猫的图片。
+5. 在 about.html 模板中添加一个 `<img>` 标签，显示那个猫的图片。
 
 如下图
 ![imag](./Chapter-07-code/pics/django3.jpg)
