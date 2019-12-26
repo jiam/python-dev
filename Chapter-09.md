@@ -58,7 +58,7 @@ C:\Users\wang_>hrun -V
 
 ### 测试环境
 
-被测服务一个flask应用[api_server.py](./Chapter-10-code/demo/api_server.py)
+被测服务一个flask应用[api_server.py](./Chapter-09-code/demo/api_server.py)
 
 `pip install flask`
 
@@ -68,7 +68,7 @@ C:\Users\wang_>hrun -V
 * 支持 CRUD 操作的 RESTful APIs，所有接口的请求头域中都必须包含有效的 token
 
 
-编写一个测试api脚本[test_api.py](./Chapter-10-code/demo/test_api.py)
+编写一个测试api脚本[test_api.py](./Chapter-09-code/demo/test_api.py)
 
 ```
 # 启动flask应用
@@ -791,7 +791,7 @@ INFO     Generated Html report: D:\python\python-dev\Chapter-10-code\demo\report
 
 ### 数据类型
 + 字符串
-+ hash表
++ hash
 + 列表
 
 ### 数据操作
