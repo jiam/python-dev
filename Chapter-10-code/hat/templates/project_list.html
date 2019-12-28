@@ -2,6 +2,9 @@
 {% block title %}项目信息{% endblock %}
 {% load staticfiles %}
 {% block content %}
+
+   
+
     <div class="am-modal am-modal-prompt" tabindex="-1" id="my-edit">
         <div class="am-modal-dialog">
             <div style="font-size: medium;" class="am-modal-hd">HAT</div>
@@ -88,7 +91,7 @@
         </div>
     </div>
 
-    <div class="am-modal am-modal-confirm" tabindex="-1" id="my-invalid">
+     <div class="am-modal am-modal-confirm" tabindex="-1" id="my-invalid">
         <div class="am-modal-dialog">
             <div class="am-modal-hd">HAT</div>
             <div class="am-modal-bd">
@@ -99,7 +102,7 @@
                 <span class="am-modal-btn" data-am-modal-confirm>确定</span>
             </div>
         </div>
-    </div>   
+    </div>  
 
     <div class="admin-biaogelist">
         <div class="listbiaoti am-cf">
@@ -109,18 +112,14 @@
                 <button type="button" class="am-btn am-btn-danger am-round am-btn-xs am-icon-plus"
                         onclick="location='{% url 'project_add' %}'">新增项目
                 </button>
-                <button type="button" class="am-btn am-btn-primary am-round am-btn-xs am-icon-plus">批量导入
-                </button>
-                <button type="button" class="am-btn am-btn-danger am-round am-btn-xs am-icon-bug">批量运行
-                </button>
             </dl>
         </div>
 
-        <div class="am-btn-toolbars am-btn-toolbar am-kg am-cf">
-            <form id="pro_filter" method="post" action="{% url 'project_list' %}">
+         <div class="am-btn-toolbars am-btn-toolbar am-kg am-cf">
+            <form id="pro_filter">
                 <ul>
                     <li style="padding-top: 5px">
-                        <select name="project" class="am-input-zm am-input-xm">
+                        <select name="project" id="projectselect" class="am-input-zm am-input-xm">
                             <option value="{{ info.belong_project }}"
                                     selected>{{ info.belong_project }}</option>
 
@@ -145,10 +144,12 @@
                                 class="am-btn am-radius am-btn-xs am-btn-success">搜索
                         </button>
                     </li>
-                </ul>
+                </form
             </form>
         </div>
-        <form class="am-form am-g">
+
+        
+        <form class="am-form am-g" id="project_list" name="project_list">
             <table width="100%" class="am-table am-table-bordered am-table-radius am-table-striped">
                 <thead>
                 <tr class="am-success">
@@ -158,7 +159,7 @@
                     <th class="table-type">负责人</th>
                     <th class="table-title">发布应用</th>
                     <th class="table-title">测试人员</th>
-                    <th class="table-title">模块/Suite/用例/配置</th>
+                    <th class="table-title">模块/用例/配置</th>
                     <th class="table-date am-hide-sm-only">创建时间</th>
                     <th width="163px" class="table-set">操作</th>
                 </tr>
@@ -169,16 +170,14 @@
                         <td><input type="checkbox" name="project_{{ foo.id }}" value="{{ foo.id }}"/></td>
                         <td>{{ forloop.counter }}</td>
                         <td><a href="#"
-                               onclick="edit('{{ foo.id }}','{{ foo.project_name }}', '{{ foo.responsible_name }}'
-                                       , '{{ foo.test_user }}','{{ foo.dev_user }}', '{{ foo.publish_app }}'
-                                       , '{{ foo.simple_desc }}', '{{ foo.other_desc }}')">{{ foo.project_name }}</a>
+                               onclick="#">{{ foo.project_name }}</a>
                         </td>
                         <td>{{ foo.responsible_name }}</td>
                         <td>{{ foo.publish_app }}</td>
                         <td>{{ foo.test_user }}</td>
 
                         
-                        <td>0/0/0/0</td>
+                        <td>0</td>
                            
 
                         <td class="am-hide-sm-only">{{ foo.create_time }}</td>
@@ -188,6 +187,7 @@
                                     <button type="button"
                                             class="am-btn am-btn-default am-btn-xs am-text-secondary am-round"
                                             data-am-popover="{content: '运行', trigger: 'hover focus'}"
+                                            onclick="#"
                                             >
                                         <span class="am-icon-bug"></span></button>
                                     <button type="button"
@@ -224,7 +224,7 @@
                  <span class="step-links">
                                 {% if project.has_previous %}
                                    
-                                    <a href="?page={{ project.previous_page_number }}">上一页</a>
+                                    <a href="#" id='prepage' onclick="previous()">上一页</a>
                                 {% endif %}
                         
                                 <span class="current">
@@ -232,7 +232,8 @@
                                 </span>
                         
                                 {% if project.has_next %}
-                                    <a href="?page={{ project.next_page_number }}">下一页</a>
+                                
+                                   <a href="#" id='nextpage' onclick="next()"> 下一页</a>
                                     
                                 {% endif %}
                             </span>
@@ -259,6 +260,7 @@
                 }
             });
         }
+
         function invalid(id) {
             $('#my-invalid').modal({
                 relatedTarget: this,
@@ -269,6 +271,21 @@
                 }
             });
         }
+        
+        {% if project.has_next %}
+        function next(){
+           var params = $("#pro_filter").serialize() + "&page={{ project.next_page_number }}";
+           url = "{% url 'project_list' %}" + "?" + params
+           $("#nextpage").attr('href',url); 
+        }
+        {% endif %}
+        {% if project.has_previous%}
+        function previous(){
+            var params = $("#pro_filter").serialize() + "&page={{ project.previous_page_number }}";
+           url = "{% url 'project_list' %}" + "?" + params
+           $("#prepage").attr('href',url); 
+        }
+        {% endif %}
     </script>
 
 {% endblock %}

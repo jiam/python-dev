@@ -44,7 +44,6 @@ function myAlert(data) {
     });
 }
 
-
 function update_data_ajax(id, url) {
     var data = $(id).serializeJSON();
     $.ajax({
@@ -63,7 +62,8 @@ function update_data_ajax(id, url) {
             else {
                 window.location.reload();
             }
-        },
+        }
+        ,
         error: function () {
             myAlert('Sorry，服务器可能开小差啦, 请重试!');
         }
@@ -98,7 +98,6 @@ function del_data_ajax(id, url) {
 }
 
 
-
 function auto_load(id, url, target, type) {
     var data = $(id).serializeJSON();
     if (id === '#pro_filter') {
@@ -108,7 +107,35 @@ function auto_load(id, url, target, type) {
                 "type": type
             }
         }
-    } 
+    } else if (id === '#form_config') {
+        data = {
+            "config": {
+                "name": data,
+                "type": type
+            }
+        }
+    } else if (id === '#belong_message' || id === '#form_message') {
+        data = {
+            "case": {
+                "name": data,
+                "type": type
+            }
+        }
+    } else if (id === '#upload_project_info'){
+        data = {
+            "upload": {
+                "name": data,
+                "type": type
+            }
+        }
+    } else if (id ==='#project') {
+        data = {
+            "crontab": {
+                "name": data,
+                "type": type
+            }
+        }
+    }
     $.ajax({
         type: 'post',
         url: url,

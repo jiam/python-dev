@@ -33,6 +33,11 @@ INSTALLED_APPS = [
 
     `CREATE DATABASE `hat` /*!40100 DEFAULT CHARACTER SET utf8 */;`
 
+    安装python 的mysqlclient 模块；python通过改模块连接mysql数据库
+
+    `pip install --only-binary :all: mysqlclient`
+    --only-binary 安装编译好的二进制
+
 6. 配置mysql数据库
 
 修改settings.py
@@ -137,7 +142,7 @@ def index(request):
 
 ### 搭建网站页面架构
 
-创建base.html 模板
+在templates目录下创建base.html 模板
 ```
 <!doctype html>
 <html class="no-js" lang="zh-CN">
@@ -197,20 +202,33 @@ def index(request):
     <div class="nav-navicon admin-main admin-sidebar">
 
 
-        <div class="sideMenu am-icon-dashboard" style="color:#aeb2b7; margin: 10px 0 0 0;"> 欢迎您：xxx &nbsp;&nbsp;<a
+        <div class="sideMenu am-icon-dashboard" style="color:#aeb2b7; margin: 10px 0 0 0;"> 欢迎您：{{ request.session.now_account }} &nbsp;&nbsp;<a
                 href='#'>注 销</a></div>
         <div class="sideMenu">
+            {% if  "project" in request.path %}
+            <h3 class="am-icon-folder on"><em></em> <a href="#">项目管理</a></h3>
+            {% else %}
             <h3 class="am-icon-folder"><em></em> <a href="#">项目管理</a></h3>
+            {% endif %}
             <ul>
                 <li><a href="#">项 目 列 表</a></li>
                 <li><a href="#">新 增 项 目</a></li>
+                <li><a href="#">debugtalk.py</a></li>
             </ul>
+            {% if  "module" in request.path %}
+            <h3 class="am-icon-th-list on"><em></em> <a href="#"> 模块管理</a></h3>
+            {% else %} 
             <h3 class="am-icon-th-list"><em></em> <a href="#"> 模块管理</a></h3>
+            {% endif %}
             <ul>
                 <li><a href="#">模 块 列 表</a></li>
                 <li><a href="#">新 增 模 块</a></li>
             </ul>
+            {% if  "case" in request.path %}
+            <h3 class="am-icon-bug on"><em></em> <a href="#">用例管理</a></h3>
+            {% else %}
             <h3 class="am-icon-bug"><em></em> <a href="#">用例管理</a></h3>
+            {% endif %}
             <ul>
                 <li><a href="#">新 增 用 例</a></li>
                 <li><a href="#">用 例 列 表</a></li>
@@ -224,7 +242,6 @@ def index(request):
 
             <h3 class="am-icon-soundcloud"><em></em> <a href="#">测试计划</a></h3>
             <ul>
-                <li><a href="#">测 试 套 件</a></li>
                 <li><a href="#">定 时 任 务</a></li>
             </ul>
 
@@ -245,7 +262,7 @@ def index(request):
         <ul>
             <li>
                 <button type="button" class="am-btn am-btn-default am-radius am-btn-xs"
-                        onclick="location={% url 'index' %}">返回首页
+                        onclick="location='{% url 'index' %}'">返回首页
                     <a href="{% url 'index' %}" class="am-close am-close-spin">~</a></button>
             </li>
             <li>
@@ -256,38 +273,32 @@ def index(request):
             </li>
             <li>
                 <button type="button" class="am-btn am-btn-default am-radius am-btn-xs"
-                        onclick="#'">模块列表<a
+                        onclick="location='#' %}'">模块列表<a
                         href="#" class="am-close am-close-spin">~</a>
                 </button>
             </li>
             <li>
                 <button type="button" class="am-btn am-btn-default am-radius am-btn-xs"
-                        onclick="#">用例列表<a
+                        onclick="location='#'">用例列表<a
                         href="#" class="am-close am-close-spin">~</a>
                 </button>
             </li>
 
             <li>
                 <button type="button" class="am-btn am-btn-default am-radius am-btn-xs"
-                        onclick="location=#">新增配置<a
+                        onclick="location='#'">新增配置<a
                         href="#" class="am-close am-close-spin">~</a>
                 </button>
             </li>
             <li>
                 <button type="button" class="am-btn am-btn-default am-radius am-btn-xs"
-                        onclick="location=#">新增用例<a
+                        onclick="location='#'">新增用例<a
                         href="#" class="am-close am-close-spin">~</a>
                 </button>
             </li>
             <li>
                 <button type="button" class="am-btn am-btn-default am-radius am-btn-xs"
-                        onclick="location=#">新增Suite<a
-                        href="#" class="am-close am-close-spin">~</a>
-                </button>
-            </li>
-            <li>
-                <button type="button" class="am-btn am-btn-default am-radius am-btn-xs"
-                        onclick="location=#">新增任务<a
+                        onclick="location='#'">新增任务<a
                         href="#" class="am-close am-close-spin">~</a>
                 </button>
             </li>
@@ -313,6 +324,7 @@ def index(request):
 
 </body>
 </html>
+
 ```
 
 ### 创建index.html模板
@@ -329,7 +341,11 @@ def index(request):
 {% endblock %}
 ```
 
-更新index视图
+### 添加静态文件
+
+将qq群的assets.zip 解压 放到static目录下
+
+### 更新index视图
 ```
 from django.shortcuts import render
 from django.shortcuts import HttpResponse
@@ -341,10 +357,10 @@ def index(request):
 ```
 
 打开http://127.0.0.1:8000/ 如下：
-![img](./Chapter-09-code/pics/index.jpg)
+![img](./Chapter-10-code/pics/index.jpg)
 
 
-### 创建项目相关的modle
+### 在models.py创建项目相关的modle 类
 ```
 from django.db import models
 
@@ -372,8 +388,22 @@ class Project(BaseTable):
     simple_desc = models.CharField('简要描述', max_length=100, null=True)
     other_desc = models.CharField('其他信息', max_length=100, null=True)
 
+class DebugTalk(BaseTable):
+    class Meta:
+        verbose_name = '驱动py文件'
+        db_table = 'DebugTalk'
+
+    belong_project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    debugtalk = models.TextField(null=True, default='#debugtalk.py')
+
 ```
 BaseTable 类里面有两个字段create_time、update_time，这两个字段在其他多个类里也要用到，其它需要这两个字段的类继续BaseTable即可；
+
+执行python manage.py makemigrations
+```
+python manage.py makemigrations
+python manage.py migrate
+```
 ### 定义视图
 先定义空视图
 ```
@@ -441,18 +471,25 @@ def project_add(request):
             p.simple_desc = project.get('simple_desc')
             p.other_desc = project.get('other_desc')
             p.save()
+            d = DebugTalk()
+            d.belong_project = p
+            d.save()
             msg = 'ok'
         if msg == 'ok':
-            return HttpResponse(reverse('project_list'))
+            return HttpResponse("添加成功")
         else:
             return HttpResponse(msg)
 
     if request.method == 'GET':
         return render(request, 'project_add.html')
 ```
-导入from django.views.decorators.csrf import csrf_exempt
+导入
+```
+from django.views.decorators.csrf import csrf_exempt`
+import json
+from httpapitest.models import Project, DebugTalk
+```
 ### 新建project_add.html 模板
-
 ```
 {% extends "base.html" %}
 {% block title %}新增项目{% endblock %}
@@ -472,7 +509,7 @@ def project_add(request):
                         <label class="control-label col-md-2 text-primary" for="project_name">项目名称：</label>
                         <div class="col-md-5">
                             <input type="text" class="form-control" id="project_name"
-                                   aria-describedby="inputSuccess3Status" name="project_name" placeholder="请输入项目名称"
+                                   aria-describedby="inputSuccess3Status" name="project_name" placeholder="请输入项目名 称"
                                    value="">
                             <span class="glyphicon glyphicon-th-large form-control-feedback" aria-hidden="true"></span>
                         </div>
@@ -550,7 +587,7 @@ def project_add(request):
 {% endblock %}
 ```
 
-### 新建commons.js文件
+### commons.js文件
 ```
 /*表单信息异步传输*/
 function info_ajax(id, url) {
@@ -598,6 +635,7 @@ function myAlert(data) {
     });
 }
 
+
 ```
 使用浏览器打开http://127.0.0.1:8000/httpapitest/project/add 测试添加项目功能
 
@@ -606,13 +644,27 @@ function myAlert(data) {
 ### 修改project_list视图
 
 ```
+@csrf_exempt
 def project_list(request):
-    rs = Project.objects.all().order_by("-update_time")
-    paginator = Paginator(rs,5)
-    page = request.GET.get('page')
-    objects = paginator.get_page(page)
-    context_dict = {'project': objects}
-    return render(request,"project_list.html",context_dict)
+    if request.method == 'GET':
+        projects = Project.objects.all().order_by("-update_time")
+        project_name = request.GET.get('project','All')
+        env = Env.objects.all()
+        user = request.GET.get('user', '负责人')
+        info = {'belong_project': project_name, 'user':user}
+
+        
+        if project_name != "All":
+            rs = Project.objects.filter(project_name=project_name)
+        elif user != "负责人":
+            rs = Project.objects.filter(responsible_name=user)
+        else:
+            rs = projects
+        paginator = Paginator(rs,5)
+        page = request.GET.get('page')
+        objects = paginator.get_page(page)
+        context_dict = {'project': objects, 'all_projects': projects,'info': info, 'env':env}
+        return render(request,"project_list.html",context_dict)
 ```
 导入Pagintor
 `from django.core.paginator import Paginator`
@@ -632,34 +684,11 @@ def project_list(request):
                 <button type="button" class="am-btn am-btn-danger am-round am-btn-xs am-icon-plus"
                         onclick="location='{% url 'project_add' %}'">新增项目
                 </button>
-                <button type="button" class="am-btn am-btn-primary am-round am-btn-xs am-icon-plus">批量导入
-                </button>
-                <button type="button" class="am-btn am-btn-danger am-round am-btn-xs am-icon-bug">批量运行
-                </button>
             </dl>
         </div>
 
-        <div class="am-btn-toolbars am-btn-toolbar am-kg am-cf">
-            <form id="pro_filter" method="post" action="{% url 'project_list' %}">
-                <ul>
-                    <li style="padding-top: 5px">
-                        <select name="project" class="am-input-zm am-input-xm">
-                                <option value="All">All</option>
-                        </select>
-                    </li>
-                    <li style="padding-top: 5px"><input  type="text" name="user"
-                                                        class="am-input-sm am-input-xm"
-                                                        placeholder="负责人"/></li>
-
-                    <li>
-                        <button style="padding-top: 5px; margin-top: 9px"
-                                class="am-btn am-radius am-btn-xs am-btn-success">搜索
-                        </button>
-                    </li>
-                </ul>
-            </form>
-        </div>
-        <form class="am-form am-g">
+        
+        <form class="am-form am-g" id="project_list" name="project_list">
             <table width="100%" class="am-table am-table-bordered am-table-radius am-table-striped">
                 <thead>
                 <tr class="am-success">
@@ -669,7 +698,7 @@ def project_list(request):
                     <th class="table-type">负责人</th>
                     <th class="table-title">发布应用</th>
                     <th class="table-title">测试人员</th>
-                    <th class="table-title">模块/Suite/用例/配置</th>
+                    <th class="table-title">模块/用例/配置</th>
                     <th class="table-date am-hide-sm-only">创建时间</th>
                     <th width="163px" class="table-set">操作</th>
                 </tr>
@@ -680,16 +709,14 @@ def project_list(request):
                         <td><input type="checkbox" name="project_{{ foo.id }}" value="{{ foo.id }}"/></td>
                         <td>{{ forloop.counter }}</td>
                         <td><a href="#"
-                               onclick="edit('{{ foo.id }}','{{ foo.project_name }}', '{{ foo.responsible_name }}'
-                                       , '{{ foo.test_user }}','{{ foo.dev_user }}', '{{ foo.publish_app }}'
-                                       , '{{ foo.simple_desc }}', '{{ foo.other_desc }}')">{{ foo.project_name }}</a>
+                               onclick="#">{{ foo.project_name }}</a>
                         </td>
                         <td>{{ foo.responsible_name }}</td>
                         <td>{{ foo.publish_app }}</td>
                         <td>{{ foo.test_user }}</td>
 
                         
-                        <td>0/0/0/0</td>
+                        <td>0</td>
                            
 
                         <td class="am-hide-sm-only">{{ foo.create_time }}</td>
@@ -699,16 +726,19 @@ def project_list(request):
                                     <button type="button"
                                             class="am-btn am-btn-default am-btn-xs am-text-secondary am-round"
                                             data-am-popover="{content: '运行', trigger: 'hover focus'}"
+                                            onclick="#"
                                             >
                                         <span class="am-icon-bug"></span></button>
                                     <button type="button"
                                             class="am-btn am-btn-default am-btn-xs am-text-secondary am-round"
                                             data-am-popover="{content: '编辑', trigger: 'hover focus'}"
+                                            onclick="#"
                                             > <span
                                             class="am-icon-pencil-square-o"></span></button>
                                     <button type="button"
                                             class="am-btn am-btn-default am-btn-xs am-text-danger am-round"
                                             data-am-popover="{content: '删除', trigger: 'hover focus'}"
+                                            onclick="#"
                                            ><span
                                             class="am-icon-trash-o"></span></button>
                                 </div>
@@ -731,15 +761,16 @@ def project_list(request):
                  <span class="step-links">
                                 {% if project.has_previous %}
                                    
-                                    <a href="?page={{ project.previous_page_number }}">上一页</a>
+                                    <a href="#" id='prepage' onclick="previous()">上一页</a>
                                 {% endif %}
                         
                                 <span class="current">
                                      {{ project.number }}/{{ project.paginator.num_pages }} 页.
                                 </span>
                         
-                                {% if module.has_next %}
-                                    <a href="?page={{ project.next_page_number }}">下一页</a>
+                                {% if project.has_next %}
+                                
+                                   <a href="#" id='nextpage' onclick="next()"> 下一页</a>
                                     
                                 {% endif %}
                             </span>
@@ -748,6 +779,21 @@ def project_list(request):
         </form>
     </div>
     <script type="text/javascript">
+        
+        {% if project.has_next %}
+        function next(){
+           var params = $("#pro_filter").serialize() + "&page={{ project.next_page_number }}";
+           url = "{% url 'project_list' %}" + "?" + params
+           $("#nextpage").attr('href',url); 
+        }
+        {% endif %}
+        {% if project.has_previous%}
+        function previous(){
+            var params = $("#pro_filter").serialize() + "&page={{ project.previous_page_number }}";
+           url = "{% url 'project_list' %}" + "?" + params
+           $("#prepage").attr('href',url); 
+        }
+        {% endif %}
     </script>
 
 {% endblock %}
@@ -758,7 +804,20 @@ def project_list(request):
 ### 修改base.html
 修改base.html 使菜单 项目列表，和添加项目可用
 
+```
+            <ul>
+                <li><a href="{% url 'project_list' %}">项 目 列 表</a></li>
+                <li><a href="{% url 'project_add' %}">新 增 项 目</a></li>
+                <li><a href="#">debugtalk.py</a></li>
+            </ul>
+```
 
+### 修改project_add试图
+添加成功后跳转到项目列表页
+```
+if msg == 'ok':
+    return HttpResponse(reverse('project_list'))
+```
 
 ###  project_list 模板添加编辑功能
 找到编辑button 编辑以下代码
@@ -1040,90 +1099,14 @@ def project_delete(request):
 
 ### 添加项目搜索功能
 
-添加搜索视图
-```
-def project_search(request):
-    pass
-```
-
-添加url
-```
-path('project/search', views.project_search, name='project_search'),
-```
-
 修改project_list视图中的搜索表单
 
 ```
-<div class="am-btn-toolbars am-btn-toolbar am-kg am-cf">
-            <form id="pro_filter" method="post" action="{% url 'project_search' %}">
+ <div class="am-btn-toolbars am-btn-toolbar am-kg am-cf">
+            <form id="pro_filter">
                 <ul>
                     <li style="padding-top: 5px">
-                        <select name="project" class="am-input-zm am-input-xm">
-                                <option value="All">All</option>
-                                {% for foo in project %}
-                                <option value="{{ foo.project_name}}">{{ foo.project_name }}</option>
-                                {% endfor %}
-                        </select>
-                    </li>
-                    <li style="padding-top: 5px"><input  type="text" name="user"
-                                                        class="am-input-sm am-input-xm"
-                                                        placeholder="负责人"/></li>
-
-                    <li>
-                        <button style="padding-top: 5px; margin-top: 9px"
-                                class="am-btn am-radius am-btn-xs am-btn-success">搜索
-                        </button>
-                    </li>
-                </ul>
-            </form>
-        </div>
-```
-验证查看项目列表，搜索表单中的下拉选项
-
-### 添加搜索功能
-
-修改project_list 视图
-
-```
-@csrf_exempt
-def project_list(request):
-    if request.method == "GET":
-        info = {'belong_project': "All"}
-        projects = Project.objects.all().order_by("-update_time")
-        rs = Project.objects.all().order_by("-update_time")
-        paginator = Paginator(rs,5)
-        page = request.GET.get('page')
-        objects = paginator.get_page(page)
-        context_dict = {'project': objects,'all_projects': projects, 'info': info}
-        return render(request,"project_list.html",context_dict)
-    if request.method == 'POST':
-        projects = Project.objects.all().order_by("-update_time")
-        project_name = request.POST.get('project')
-        user = request.POST.get('user')
-        info = {'belong_project': project_name, 'user':user}
-
-        if project_name != "All":
-            rs = Project.objects.filter(project_name=project_name)
-        elif user:
-            rs = Project.objects.filter(responsible_name=user)
-        else:
-            rs = projects
-        paginator = Paginator(rs,5)
-        page = request.GET.get('page')
-        objects = paginator.get_page(page)
-        context_dict = {'project': objects, 'all_projects': projects,'info': info}
-        return render(request,"project_list.html",context_dict)
-```
-
-
-
-修改project_list.html模板的pro_filter form
-```
-        <div class="am-btn-toolbars am-btn-toolbar am-kg am-cf">
-            <form id="pro_filter" method="post" action="{% url 'project_list' %}">
-                <ul>
-                    <li style="padding-top: 5px">
-                        <select name="project" class="am-input-zm am-input-xm">
+                        <select name="project" id="projectselect" class="am-input-zm am-input-xm">
                             <option value="{{ info.belong_project }}"
                                     selected>{{ info.belong_project }}</option>
 
@@ -1148,10 +1131,11 @@ def project_list(request):
                                 class="am-btn am-radius am-btn-xs am-btn-success">搜索
                         </button>
                     </li>
-                </ul>
+                </form
             </form>
         </div>
 ```
+验证查看项目列表，搜索表单中的下拉选项
 
 测试搜索功能
 
@@ -1187,60 +1171,36 @@ def module_add(request):
 def module_list(request):
     pass
 
+def module_search_ajax(request):
+    pass
+
 def module_edit(request):
     pass
 
 def module_delete(request):
     pass
 
+
+
 ```
 
 ### 定义url
 ```
     path('module/list', views.module_list, name='module_list'),
+    path('module/search/ajax', views.module_search_ajax, name='module_search_ajax'),
     path('module/add', views.module_add, name='module_add'),
     path('module/edit', views.module_edit, name='module_edit'),
     path('module/delete', views.module_delete, name='module_delete'),
+    
 ```
 ### 修改module_add视图
 
 ```
-@csrf_exempt
-def module_add(request):
-    if request.method == 'GET':
-        projects = Project.objects.all().order_by("-update_time")
-        context_dict = {'data': projects}
-        return render(request, 'module_add.html',context_dict)
-    if request.is_ajax():
-        module = json.loads(request.body.decode('utf-8'))
-        if module.get('module_name') == '':
-            msg = '模块名称不能为空'
-            return HttpResponse(msg)
-        if module.get('belong_project') == '请选择':
-            msg = '请选择项目，没有请先添加哦'
-            return HttpResponse(msg)
-        if module.get('test_user') == '':
-            msg = '测试人员不能为空'
-            return HttpResponse(msg)
-        p = Project.objects.get(project_name=module.get('belong_project'))
-        if Module.objects.filter(module_name=module.get('module_name'), belong_project=p):
-            msg = "项目已经存在"
-            return HttpResponse(msg)
-        else:
-            m = Module()
-            m.module_name = module.get('module_name')
-            p = Project.objects.get(project_name=module.get('belong_project'))
-            m.belong_project = p
-            m.test_user = module.get('test_user')
-            m.simple_desc = module.get('simple_desc')
-            m.other_desc = module.get('other_desc')
-            m.save()
-            msg = 'ok'
-        if msg == 'ok':
-            return HttpResponse(reverse('module_list'))
-        else:
-            return HttpResponse(msg)
+
 ```
+导入 Module 模型类
+修改`from httpapitest.models import Project, DebugTalk`为
+`from httpapitest.models import Project, DebugTalk, Module`
 
 ### 添加module_add.html模板
 ```
@@ -1324,6 +1284,7 @@ def module_add(request):
 ```
 
 验证添加模块功能
+访问`http://127.0.0.1:8000/httpapitest/module/add`
 
 ### 修改module_list视图
 
@@ -1337,186 +1298,39 @@ def module_list(request):
     return render(request,"module_list.html",context_dict)
 ```
 
+添加module_search_ajax 函数
+```
+@csrf_exempt
+@login_check
+def module_search_ajax(request):
+    if request.is_ajax():
+        data = json.loads(request.body.decode('utf-8'))
+        if 'test' in data.keys():
+            project = data["test"]["name"]["project"]
+        if 'config' in data.keys():
+            project = data["config"]["name"]["project"]
+        if 'case' in data.keys():
+            project = data["case"]["name"]["project"]
+        if 'upload' in data.keys():
+            project = data["upload"]["name"]["project"]
+        if 'crontab' in data.keys():
+            project = data["crontab"]["name"]["project"]
+        if  project != "All" and project != "请选择":
+            p = Project.objects.get(project_name=project)
+            modules = Module.objects.filter(belong_project=p)
+            modules_list = ['%d^=%s' % (m.id, m.module_name) for m in modules ]
+            modules_string = 'replaceFlag'.join(modules_list)
+            return HttpResponse(modules_string)
+        else:
+            return HttpResponse('')
+```
+
 ### 添加module_list.html 模板
 ```
 {% extends "base.html" %}
 {% block title %}模块信息{% endblock %}
 {% load staticfiles %}
 {% block content %}
-    <div class="admin-biaogelist">
-        <div class="listbiaoti am-cf">
-            <ul class="am-icon-flag on"> 模块列表</ul>
-            <dl class="am-icon-home" style="float: right;"> 当前位置： 模块管理 > <a href="#">模块展示</a></dl>
-            <dl>
-                <button type="button" class="am-btn am-btn-danger am-round am-btn-xs am-icon-plus"
-                        onclick="location='{% url 'module_add' %}'">新增模块
-                </button>
-                <button type="button" class="am-btn am-btn-danger am-round am-btn-xs am-icon-bug">运行
-                </button>
-
-            </dl>
-        </div>
-
-        <div class="am-btn-toolbars am-btn-toolbar am-kg am-cf">
-            <form id="pro_filter" method="post" action="{% url 'module_list' %}">
-                <ul>
-                    <li style="padding-top: 5px">
-                        <select name="project" class="am-input-zm am-input-xm">
-                                <option value="All">All</option>
-                        </select>
-                    </li>
-                    <li style="padding-top: 5px"><input  type="text" name="user"
-                                                        class="am-input-sm am-input-xm"
-                                                        placeholder="负责人"/></li>
-
-                    <li>
-                        <button style="padding-top: 5px; margin-top: 9px"
-                                class="am-btn am-radius am-btn-xs am-btn-success">搜索
-                        </button>
-                    </li>
-                </ul>
-            </form>
-        </div>
-
-
-        <form class="am-form am-g" id='module_list' name="module_list" method="post" action="/api/run_batch_test/">
-            <table width="100%" class="am-table am-table-bordered am-table-radius am-table-striped">
-                <thead>
-                <tr class="am-success">
-                    <th class="table-check"><input type="checkbox" id="select_all"/></th>
-                    <th class="table-title">序号</th>
-                    <th class="table-type">模块名称</th>
-                    <th class="table-type">测试人员</th>
-                    <th class="table-type">所属项目</th>
-                    <th class="table-type">用例/配置</th>
-                    <th class="table-date am-hide-sm-only">创建日期</th>
-                    <th width="163px" class="table-set">操作</th>
-                </tr>
-                </thead>
-                <tbody>
-
-                {% for foo in module %}
-                    <tr>
-                        <td><input type="checkbox" name="module_{{ foo.id }}" value="{{ foo.id }}"/></td>
-                        <td>{{ forloop.counter }}</td>
-                        <td><a href="#"
-                               onclick="edit('{{ foo.id }}','{{ foo.module_name }}', '{{ foo.belong_project.project_name }}'
-                                       , '{{ foo.test_user }}', '{{ foo.simple_desc }}', '{{ foo.other_desc }}')">{{ foo.module_name }}</a>
-                        </td>
-                        <td>{{ foo.test_user }}</td>
-                        <td>{{ foo.belong_project.project_name }}</td>
-                        <td>0/0</td> 
-                        <td class="am-hide-sm-only">{{ foo.create_time }}</td>
-                        <td>
-                            <div class="am-btn-toolbar">
-                                <div class="am-btn-group am-btn-group-xs">
-                                    <button type="button"
-                                            class="am-btn am-btn-default am-btn-xs am-text-secondary am-round"
-                                            data-am-popover="{content: '运行', trigger: 'hover focus'}"
-                                            >
-                                        <span class="am-icon-bug"></span>
-                                    </button>
-                                    <button type="button"
-                                            class="am-btn am-btn-default am-btn-xs am-text-secondary am-round"
-                                            data-am-popover="{content: '编辑', trigger: 'hover focus'}"
-                                            > 
-                                            <span class="am-icon-pencil-square-o"></span>
-                                    </button>
-                                    <button type="button"
-                                            class="am-btn am-btn-default am-btn-xs am-text-danger am-round"
-                                            data-am-popover="{content: '删除', trigger: 'hover focus'}"
-                                            >
-                                            <span class="am-icon-trash-o"></span></button>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                {% endfor %}
-
-
-                </tbody>
-            </table>
-
-            <div class="am-btn-group am-btn-group-xs">
-                <button type="button" class="am-btn am-btn-default" onclick="location='{% url 'module_add' %}'"><span
-                        class="am-icon-plus"></span> 新增
-                </button>
-            </div>
-
-            <ul class="am-pagination am-fr">
-                            <span class="step-links">
-                                {% if module.has_previous %}
-                                   
-                                    <a href="?page={{ module.previous_page_number }}">上一页</a>
-                                {% endif %}
-                        
-                                <span class="current">
-                                     {{ module.number }}/{{ module.paginator.num_pages }} 页.
-                                </span>
-                        
-                                {% if project.has_next %}
-                                    <a href="?page={{ module.next_page_number }}">下一页</a>
-                                    
-                                {% endif %}
-                            </span>
-            </ul>
-
-
-            <hr/>
-
-        </form>
-    </div>
-    <script type="text/javascript">
-       
-    </script>
-
-{% endblock %}
-```
-
-### 修改base.html
-修改base.html 使菜单 模块列表，和添加模块可用
-```
-            <ul>
-                <li><a href="{% url 'module_list' %}">模 块 列 表</a></li>
-                <li><a href="{% url 'module_add' %}">新 增 模 块</a></li>
-            </ul>
-```
-
-###  module_list 模板添加编辑功能
-找到编辑button 修改为以下代码
-```
-                                    <button type="button"
-                                            class="am-btn am-btn-default am-btn-xs am-text-secondary am-round"
-                                            data-am-popover="{content: '编辑', trigger: 'hover focus'}"
-                                            onclick="edit('{{ foo.id }}','{{ foo.module_name }}', '{{ foo.belong_project.project_name }}'
-                                                    , '{{ foo.test_user }}', '{{ foo.simple_desc }}', '{{ foo.other_desc }}')">
-                                            <span class="am-icon-pencil-square-o"></span>
-                                    </button>
-```
-
-在module_list.html的javascript部分添加以下代码
-```
-        function edit(id, module_name, belong_project, test_user, simple_desc, other_desc) {
-            $('#index').val(id);
-            $('#module_name').val(module_name);
-            $('#belong_project').val(belong_project);
-            $('#test_user').val(test_user);
-            $('#simple_desc').val(simple_desc);
-            $('#other_desc').val(other_desc);
-            $('#my-edit').modal({
-                relatedTarget: this,
-                onConfirm: function () {
-                    update_data_ajax('#edit_form', '{% url 'module_edit' %}')
-                },
-                onCancel: function () {
-                }
-            });
-        }
-```
-
-在`{% block content %}`下面添加以下代码
-该代码为编辑表单的弹出窗口
-```
     <div class="am-modal am-modal-prompt" tabindex="-1" id="my-edit">
         <div class="am-modal-dialog">
             <div style="font-size: medium;" class="am-modal-hd">HAT</div>
@@ -1582,78 +1396,8 @@ def module_list(request):
                 <span class="am-modal-btn" data-am-modal-confirm>提交</span>
             </div>
         </div>
-    </div
-
-```
-
-### 修改moddule_edit视图
-```
-@csrf_exempt
-def module_edit(request):
-    if request.is_ajax():
-        module = json.loads(request.body.decode('utf-8'))
-        
-        if module.get('module_name') == '':
-            msg = '模块名称不能为空'
-            return HttpResponse(msg)
-        if module.get('belong_project') == '请选择':
-            msg = '请选择项目，没有请先添加哦'
-            return HttpResponse(msg)
-        if module.get('test_user') == '':
-            msg = '测试人员不能为空'
-            return HttpResponse(msg)
-        p = Project.objects.get(project_name=module.get('belong_project'))
-        if Module.objects.filter(module_name=module.get('module_name'), belong_project=p):
-            msg = "模块已经存在"
-            return HttpResponse(msg)
-        else:
-            m = Module.objects.get(id=module.get('index'))
-            m.module_name = module.get('module_name')
-            m.belong_project = p
-            m.test_user = module.get('test_user')
-            m.simple_desc = module.get('simple_desc')
-            m.other_desc = module.get('other_desc')
-            m.save()
-            msg = 'ok'
-        if msg == 'ok':
-            return HttpResponse(reverse('module_list'))
-        else:
-            return HttpResponse(msg)
-```
-
-点击编辑测试
-
-### 修改module_list 添加删除功能
-找到删除button 修改为
-
-```
-                                    <button type="button"
-                                            class="am-btn am-btn-default am-btn-xs am-text-danger am-round"
-                                            data-am-popover="{content: '删除', trigger: 'hover focus'}"
-                                            onclick="invalid('{{ foo.id }}')">
-                                            <span class="am-icon-trash-o"></span>
-                                    </button>
-```
-
-在javascript部分添加以下代码
-
-```
-        function invalid(name) {
-            $('#my-invalid').modal({
-                relatedTarget: this,
-                onConfirm: function () {
-                    del_data_ajax(name, '{% url module_delete %}')
-                },
-                onCancel: function () {
-                }
-            });
-        }
-```
-
-添加以下代码到 my-edit div 下面
-
-```
-    <div class="am-modal am-modal-confirm" tabindex="-1" id="my-invalid">
+    </div>
+        <div class="am-modal am-modal-confirm" tabindex="-1" id="my-invalid">
         <div class="am-modal-dialog">
             <div class="am-modal-hd">HAT</div>
             <div class="am-modal-bd">
@@ -1665,40 +1409,71 @@ def module_edit(request):
             </div>
         </div>
     </div>
-```
 
-修改module_delete视图
+    <div class="am-modal am-modal-confirm" tabindex="-1" id="select_env">
+        <div class="am-modal-dialog">
+            <div class="am-modal-hd">HAT</div>
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label class="control-label col-sm-3"
+                           style="font-weight: inherit; font-size: small ">运行环境:</label>
+                    <div class="col-sm-8">
+                        <select class="form-control" id="env_name" name="env_name">
+                            <option value="">自带环境</option>
+                            {% for foo in env %}
+                                <option value="{{ foo.base_url }}">{{ foo.env_name }}</option>
+                            {% endfor %}
 
-```
-@csrf_exempt
-def module_delete(request):
-    if request.is_ajax():
-        data = json.loads(request.body.decode('utf-8'))
-        project_id = data.get('id')
-        module = Module.objects.get(id=project_id)
-        module.delete()
-        return HttpResponse(reverse('module_list'))
-```
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-3" for="report_name"
+                           style="font-weight: inherit; font-size: small ">报告名称：</label>
+                    <div class="col-sm-8">
+                        <input name="report_name" type="text" id="report_name" class="form-control"
+                               placeholder="默认时间戳命名" value="" readonly>
+                    </div>
+                </div>
 
-### 添加搜索功能
+                <div class="form-group">
+                    <label class="control-label col-sm-3"
+                           style="font-weight: inherit; font-size: small ">执行方式:</label>
+                    <div class="col-sm-8">
+                        <select class="form-control" id="mode" name="mode">
+                            <option value="true">同步(执行完立即返回报告)</option>
+                            <option value="false">异步(后台执行，完毕后可查看报告)</option>
+                        </select>
+                    </div>
+                </div>
+            </form>
+            </form>
 
-添加 视图函数 module_search
-```
-@csrf_exempt
-def module_search_ajax(request):
-    pass
-```
+            <div class="am-modal-footer">
+                <span class="am-modal-btn" data-am-modal-cancel>取消</span>
+                <span class="am-modal-btn" data-am-modal-confirm>确定</span>
+            </div>
+        </div>
+    </div>
 
-添加 url
-```
-    path('module/search/ajax', views.module_search_ajax, name='module_search_ajax'),
-```
 
-修改project_list.html模板
+    <div class="admin-biaogelist">
+        <div class="listbiaoti am-cf">
+            <ul class="am-icon-flag on"> 模块列表</ul>
+            <dl class="am-icon-home" style="float: right;"> 当前位置： 模块管理 > <a href="#">模块展示</a></dl>
+            <dl>
+                <button type="button" class="am-btn am-btn-danger am-round am-btn-xs am-icon-plus"
+                        onclick="location='{% url 'module_add' %}'">新增模块
+                </button>
+                <button type="button" class="am-btn am-btn-danger am-round am-btn-xs am-icon-bug"
+                         onclick="#">运行
+                </button>
 
-```
-<div class="am-btn-toolbars am-btn-toolbar am-kg am-cf">
-            <form id="pro_filter" method="post" action="{% url 'module_list' %}">
+            </dl>
+        </div>
+
+        <div class="am-btn-toolbars am-btn-toolbar am-kg am-cf">
+            <form id="pro_filter">
                 <ul>
                     <li style="padding-top: 5px">
                         <select name="project" class="am-input-zm am-input-xm"
@@ -1738,11 +1513,146 @@ def module_search_ajax(request):
                 </ul>
             </form>
         </div>
+
+
+        <form class="am-form am-g" id='module_list' name="module_list" >
+            <table width="100%" class="am-table am-table-bordered am-table-radius am-table-striped">
+                <thead>
+                <tr class="am-success">
+                    <th class="table-check"><input type="checkbox" id="select_all"/></th>
+                    <th class="table-title">序号</th>
+                    <th class="table-type">模块名称</th>
+                    <th class="table-type">测试人员</th>
+                    <th class="table-type">所属项目</th>
+                    <th class="table-type">用例/配置</th>
+                    <th class="table-date am-hide-sm-only">创建日期</th>
+                    <th width="163px" class="table-set">操作</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                {% for foo in module %}
+                    <tr>
+                        <td><input type="checkbox" name="module_{{ foo.id }}" value="{{ foo.id }}"/></td>
+                        <td>{{ forloop.counter }}</td>
+                        <td><a href="#"
+                               onclick="edit('{{ foo.id }}','{{ foo.module_name }}', '{{ foo.belong_project.project_name }}'
+                                       , '{{ foo.test_user }}', '{{ foo.simple_desc }}', '{{ foo.other_desc }}')">{{ foo.module_name }}</a>
+                        </td>
+                        <td>{{ foo.test_user }}</td>
+                        <td>{{ foo.belong_project.project_name }}</td>
+                        <td>0</td> 
+                        <td class="am-hide-sm-only">{{ foo.create_time }}</td>
+                        <td>
+                            <div class="am-btn-toolbar">
+                                <div class="am-btn-group am-btn-group-xs">
+                                    <button type="button"
+                                            class="am-btn am-btn-default am-btn-xs am-text-secondary am-round"
+                                            data-am-popover="{content: '运行', trigger: 'hover focus'}"
+                                            onclick="#"
+                                            >
+                                        <span class="am-icon-bug"></span>
+                                    </button>
+                                    <button type="button"
+                                            class="am-btn am-btn-default am-btn-xs am-text-secondary am-round"
+                                            data-am-popover="{content: '编辑', trigger: 'hover focus'}"
+                                            onclick="edit('{{ foo.id }}','{{ foo.module_name }}', '{{ foo.belong_project.project_name }}'
+                                                    , '{{ foo.test_user }}', '{{ foo.simple_desc }}', '{{ foo.other_desc }}')">
+                                            <span class="am-icon-pencil-square-o"></span>
+                                    </button>
+                                    <button type="button"
+                                            class="am-btn am-btn-default am-btn-xs am-text-danger am-round"
+                                            data-am-popover="{content: '删除', trigger: 'hover focus'}"
+                                            onclick="invalid('{{ foo.id }}')">
+                                            <span class="am-icon-trash-o"></span>
+                                    </button>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+
+
+                </tbody>
+            </table>
+
+            <div class="am-btn-group am-btn-group-xs">
+                <button type="button" class="am-btn am-btn-default" onclick="location='{% url 'module_add' %}'"><span
+                        class="am-icon-plus"></span> 新增
+                </button>
+            </div>
+
+            <ul class="am-pagination am-fr">
+                            <span class="step-links">
+                                {% if module.has_previous %}
+                                   
+                                    <a href="?page={{ module.previous_page_number }}">上一页</a>
+                                {% endif %}
+                        
+                                <span class="current">
+                                     {{ module.number }}/{{ module.paginator.num_pages }} 页.
+                                </span>
+                        
+                                {% if module.has_next %}
+                                    <a href="?page={{ module.next_page_number }}">下一页</a>
+                                    
+                                {% endif %}
+                            </span>
+            </ul>
+
+
+            <hr/>
+
+        </form>
+    </div>
+    <script type="text/javascript">
+       function edit(id, module_name, belong_project, test_user, simple_desc, other_desc) {
+            $('#index').val(id);
+            $('#module_name').val(module_name);
+            $('#belong_project').val(belong_project);
+            $('#test_user').val(test_user);
+            $('#simple_desc').val(simple_desc);
+            $('#other_desc').val(other_desc);
+            $('#my-edit').modal({
+                relatedTarget: this,
+                onConfirm: function () {
+                    update_data_ajax('#edit_form', '{% url 'module_edit' %}')
+                },
+                onCancel: function () {
+                }
+            });
+        }
+
+        function invalid(name) {
+            $('#my-invalid').modal({
+                relatedTarget: this,
+                onConfirm: function () {
+                    del_data_ajax(name, '{% url 'module_delete' %}')
+                },
+                onCancel: function () {
+                }
+            });
+        }
+        $('#mode').change(function () {
+            if ($('#mode').val() == 'false') {
+                $('#report_name').removeAttr("readonly");
+            } else {
+                $('#report_name').attr('readonly', 'readonly');
+            }
+        });
+
+        
+
+        $('#select_all').click(function () {
+            var isChecked = $(this).prop("checked");
+            $("input[name^='module']").prop("checked", isChecked);
+        })
+    </script>
+
+{% endblock %}
 ```
 
-上面的 pro_filter 的form为搜索需要提交的表单
-name 为project的select 添加onchange监听事件，当选择不通的project时，module 的select内容相应变化，auto_load函数实现此功能，所以需要在commons.js中添加以下代码
-
+### commans.js 添加以下函数
 ```
 function auto_load(id, url, target, type) {
     var data = $(id).serializeJSON();
@@ -1753,7 +1663,35 @@ function auto_load(id, url, target, type) {
                 "type": type
             }
         }
-    } 
+    } else if (id === '#form_config') {
+        data = {
+            "config": {
+                "name": data,
+                "type": type
+            }
+        }
+    } else if (id === '#belong_message' || id === '#form_message') {
+        data = {
+            "case": {
+                "name": data,
+                "type": type
+            }
+        }
+    } else if (id === '#upload_project_info'){
+        data = {
+            "upload": {
+                "name": data,
+                "type": type
+            }
+        }
+    } else if (id ==='#project') {
+        data = {
+            "crontab": {
+                "name": data,
+                "type": type
+            }
+        }
+    }
     $.ajax({
         type: 'post',
         url: url,
@@ -1785,182 +1723,69 @@ function show_module(module_info, id) {
 
 }
 ```
-修改视图函数module_list,用来返回模板中的projects
-```
-def module_list(request):
-    projects = Project.objects.all().order_by("-update_time")
-    rs = Module.objects.all().order_by("-update_time")
-    paginator = Paginator(rs,5)
-    page = request.GET.get('page')
-    objects = paginator.get_page(page)
-    context_dict = {'module': objects, 'projects': projects}
-    return render(request,"module_list.html",context_dict)
-```
-测试，在列出模块页面，点击项目的下拉列表，列出所有项目
 
-添加视图函数module_search_ajax,该函数用来返回指定项目的全部模块
+### 修改base.html
+修改base.html 使菜单 模块列表，和添加模块可用
+```
+            <ul>
+                <li><a href="{% url 'module_list' %}">模 块 列 表</a></li>
+                <li><a href="{% url 'module_add' %}">新 增 模 块</a></li>
+            </ul>
+```
+
+
+
+
+### 修改moddule_edit视图
 ```
 @csrf_exempt
-def module_search_ajax(request):
+def module_edit(request):
+    if request.is_ajax():
+        module = json.loads(request.body.decode('utf-8'))
+        
+        if module.get('module_name') == '':
+            msg = '模块名称不能为空'
+            return HttpResponse(msg)
+        if module.get('belong_project') == '请选择':
+            msg = '请选择项目，没有请先添加哦'
+            return HttpResponse(msg)
+        if module.get('test_user') == '':
+            msg = '测试人员不能为空'
+            return HttpResponse(msg)
+        p = Project.objects.get(project_name=module.get('belong_project'))
+        if module.get('module_name') != Module.objects.get(id=module.get('index')).module_name and \
+            Module.objects.filter(module_name=module.get('module_name'), belong_project=p).count()>0:
+            msg = "模块已经存在"
+            return HttpResponse(msg)
+        else:
+            m = Module.objects.get(id=module.get('index'))
+            m.module_name = module.get('module_name')
+            m.belong_project = p
+            m.test_user = module.get('test_user')
+            m.simple_desc = module.get('simple_desc')
+            m.other_desc = module.get('other_desc')
+            m.save()
+            msg = 'ok'
+        if msg == 'ok':
+            return HttpResponse(reverse('module_list'))
+        else:
+            return HttpResponse(msg)
+```
+
+点击编辑测试
+
+
+
+修改module_delete视图
+
+```
+@csrf_exempt
+def module_delete(request):
     if request.is_ajax():
         data = json.loads(request.body.decode('utf-8'))
-        project = data["test"]["name"]["project"]
-        if  project != "All":
-            p = Project.objects.get(project_name=project)
-            modules = Module.objects.filter(belong_project=p)
-            modules_list = ['%d^=%s' % (m.id, m.module_name) for m in modules ]
-            modules_string = 'replaceFlag'.join(modules_list)
-            return HttpResponse(modules_string)
-        else:
-            return HttpResponse('')
+        project_id = data.get('id')
+        module = Module.objects.get(id=project_id)
+        module.delete()
+        return HttpResponse(reverse('module_list'))
 ```
-测试，选中特定的项目，然后点击模块的下拉列表，查看该项目的所有模块
-
-修改module_list视图，来处理搜索请求
-```
-@csrf_exempt
-def module_list(request):
-    if request.method == 'GET':
-        info = {'belong_project': 'All', 'belong_module': "请选择"}
-        projects = Project.objects.all().order_by("-update_time")
-        rs = Module.objects.all().order_by("-update_time")
-        paginator = Paginator(rs,5)
-        page = request.GET.get('page')
-        objects = paginator.get_page(page)
-        context_dict = {'module': objects, 'projects': projects, 'info':info}
-        return render(request,"module_list.html",context_dict)
-    if request.method == 'POST':
-        projects = Project.objects.all().order_by("-update_time")
-        project = request.POST.get("project")
-        module = request.POST.get("module")
-        user = request.POST.get("user")
-        request.session['project'] = project
-        if project == "All":
-            if user:
-                rs = Module.objects.filter(test_user=user).order_by("-update_time")
-               
-            else:
-                rs = Module.objects.all().order_by("-update_time")
-        else:
-            p = Project.objects.get(project_name=project)
-            if module != "请选择":
-                if user:
-                    rs = Module.objects.filter(id=module, belong_project=p, test_user=user).order_by("-update_time")
-                else:
-                    rs = Module.objects.filter(id=module, belong_project=p).order_by("-update_time")
-                module = Module.objects.get(id=module)
-            else:
-                if user:
-                    rs = Module.objects.filter(belong_project=p, test_user=user).order_by("-update_time")
-                else:
-                    rs = Module.objects.filter(belong_project=p).order_by("-update_time")
-    paginator = Paginator(rs,5)
-    page = request.GET.get('page')
-    objects = paginator.get_page(page)
-    context_dict = {'module': objects, 'projects': projects, 'info': {'belong_project': project,'belong_module': module, 'user':user}}
-    return render(request,"module_list.html",context_dict)
-```
-处理搜索的具体逻辑
-
-到此已经可以处理搜索了，但是有个bug，
-* 项目和模块下拉框，点击搜索后，被清空
-
-### 解决第一个问题
-
-更新module_search视图
-
-```
-@csrf_exempt
-def module_list(request):
-    if request.method == 'GET':
-        info = {'belong_project': 'All', 'belong_module': "请选择"}
-        projects = Project.objects.all().order_by("-update_time")
-        rs = Module.objects.all().order_by("-update_time")
-        paginator = Paginator(rs,5)
-        page = request.GET.get('page')
-        objects = paginator.get_page(page)
-        context_dict = {'module': objects, 'projects': projects, 'info': info}
-        return render(request,"module_list.html",context_dict)
-    if request.method == 'POST':
-        
-        projects = Project.objects.all().order_by("-update_time")
-        project = request.POST.get("project")
-        module = request.POST.get("module")
-        user = request.POST.get("user")
-        
-        if project == "All":
-            if user:
-                rs = Module.objects.filter(test_user=user).order_by("-update_time")
-               
-            else:
-                rs = Module.objects.all().order_by("-update_time")
-        else:
-            p = Project.objects.get(project_name=project)
-            if module != "请选择":
-                if user:
-                    rs = Module.objects.filter(id=module, belong_project=p, test_user=user).order_by("-update_time")
-                else:
-                    rs = Module.objects.filter(id=module, belong_project=p).order_by("-update_time")
-                module = Module.objects.get(id=module)
-            else:
-                if user:
-                    rs = Module.objects.filter(belong_project=p, test_user=user).order_by("-update_time")
-                else:
-                    rs = Module.objects.filter(belong_project=p).order_by("-update_time")
-    paginator = Paginator(rs,5)
-    page = request.GET.get('page')
-    objects = paginator.get_page(page)
-    context_dict = {'module': objects, 'projects': projects, 'info': {'belong_project': project,'belong_module': module, 'user':user}}
-    return render(request,"module_list.html",context_dict)
-```
-在context_dict总添加一个 info 字典来记录搜索信息
-
-更新module_list 模板的pro_filter form
-```
-        <div class="am-btn-toolbars am-btn-toolbar am-kg am-cf">
-            <form id="pro_filter" method="post" action="{% url 'module_list' %}">
-                <ul>
-                    <li style="padding-top: 5px">
-                        <select name="project" class="am-input-zm am-input-xm"
-                                onchange="auto_load('#pro_filter', '{% url 'module_search_ajax' %}', '#module', 'module')">
-                            <option value="{{ info.belong_project }}"
-                                    selected>{{ info.belong_project }}</option>
-
-                            {% for foo in projects %}
-                                {% ifnotequal info.belong_project foo.project_name %}
-                                    <option value="{{ foo.project_name }}">{{ foo.project_name }}</option>
-                                {% endifnotequal %}
-
-                            {% endfor %}
-                            {% if info.belong_project != 'All' %}
-                                <option value="All">All</option>
-                            {% endif %}
-                        </select>
-                    </li>
-
-                    <li style="padding-top: 5px">
-                        <select name="module" class=" am-input-zm am-input-xm" id="module">
-                            {% if info.belong_module == "请选择" %}
-                            <option selected value="{{ info.belong_module }}">{{ info.belong_module }}</option>
-                            {% else %}
-                            <option selected value="{{ info.belong_module.id }}">{{ info.belong_module.module_name }}</option>
-                            {% endif %}
-                        </select>
-                    </li>
-                    <li style="padding-top: 5px"><input value="{{ info.user }}" type="text" name="user"
-                                                        class="am-input-sm am-input-xm"
-                                                        placeholder="测试人员"/></li>
-                    <li>
-                        <button style="padding-top: 5px; margin-top: 9px"
-                                class="am-btn am-radius am-btn-xs am-btn-success">搜索
-                        </button>
-                    </li>
-                </ul>
-            </form>
-        </div>
-```
-
-
-
-
 

@@ -1,5 +1,6 @@
 .idea/
 venv/
+.env/
 *.pyc
 Chapter-*-code/autotest/apiautotest/static/
 Chapter-*-code/locallibrary/catalog/static/

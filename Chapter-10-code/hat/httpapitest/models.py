@@ -1,5 +1,6 @@
 from django.db import models
 
+
 # Create your models here.
 
 class BaseTable(models.Model):
@@ -23,6 +24,8 @@ class Project(BaseTable):
     publish_app = models.CharField('发布应用', max_length=100, null=False)
     simple_desc = models.CharField('简要描述', max_length=100, null=True)
     other_desc = models.CharField('其他信息', max_length=100, null=True)
+
+
 
 class Module(BaseTable):
     class Meta:
