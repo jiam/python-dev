@@ -105,7 +105,7 @@ from httpapitest import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('',views.index),
-    path('httpapitest', include('httpapitest.urls')),
+    path('httpapitest/', include('httpapitest.urls')),
     
 ]
 ```
@@ -388,13 +388,6 @@ class Project(BaseTable):
     simple_desc = models.CharField('简要描述', max_length=100, null=True)
     other_desc = models.CharField('其他信息', max_length=100, null=True)
 
-class DebugTalk(BaseTable):
-    class Meta:
-        verbose_name = '驱动py文件'
-        db_table = 'DebugTalk'
-
-    belong_project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    debugtalk = models.TextField(null=True, default='#debugtalk.py')
 
 ```
 BaseTable 类里面有两个字段create_time、update_time，这两个字段在其他多个类里也要用到，其它需要这两个字段的类继续BaseTable即可；
@@ -487,7 +480,7 @@ def project_add(request):
 ```
 from django.views.decorators.csrf import csrf_exempt`
 import json
-from httpapitest.models import Project, DebugTalk
+from httpapitest.models import Project
 ```
 ### 新建project_add.html 模板
 ```
@@ -649,7 +642,7 @@ def project_list(request):
     if request.method == 'GET':
         projects = Project.objects.all().order_by("-update_time")
         project_name = request.GET.get('project','All')
-        env = Env.objects.all()
+        #env = Env.objects.all()
         user = request.GET.get('user', '负责人')
         info = {'belong_project': project_name, 'user':user}
 
@@ -663,7 +656,7 @@ def project_list(request):
         paginator = Paginator(rs,5)
         page = request.GET.get('page')
         objects = paginator.get_page(page)
-        context_dict = {'project': objects, 'all_projects': projects,'info': info, 'env':env}
+        context_dict = {'project': objects, 'all_projects': projects,'info': info}
         return render(request,"project_list.html",context_dict)
 ```
 导入Pagintor
@@ -818,6 +811,8 @@ def project_list(request):
 if msg == 'ok':
     return HttpResponse(reverse('project_list'))
 ```
+导入reverse 将`from django.shortcuts import render`改为
+`from django.shortcuts import render, reverse`
 
 ###  project_list 模板添加编辑功能
 找到编辑button 编辑以下代码
