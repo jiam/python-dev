@@ -80,6 +80,9 @@
             </div>
         </div>
     </div>
+
+    
+
     <div class="admin-biaogelist">
         <div class="listbiaoti am-cf">
             <ul class="am-icon-flag on"> 模块列表</ul>
@@ -88,14 +91,15 @@
                 <button type="button" class="am-btn am-btn-danger am-round am-btn-xs am-icon-plus"
                         onclick="location='{% url 'module_add' %}'">新增模块
                 </button>
-                <button type="button" class="am-btn am-btn-danger am-round am-btn-xs am-icon-bug">运行
+                <button type="button" class="am-btn am-btn-danger am-round am-btn-xs am-icon-bug"
+                         onclick="#">运行
                 </button>
 
             </dl>
         </div>
 
         <div class="am-btn-toolbars am-btn-toolbar am-kg am-cf">
-            <form id="pro_filter" method="post" action="{% url 'module_list' %}">
+            <form id="pro_filter">
                 <ul>
                     <li style="padding-top: 5px">
                         <select name="project" class="am-input-zm am-input-xm"
@@ -137,7 +141,7 @@
         </div>
 
 
-        <form class="am-form am-g" id='module_list' name="module_list" method="post" action="/api/run_batch_test/">
+        <form class="am-form am-g" id='module_list' name="module_list" >
             <table width="100%" class="am-table am-table-bordered am-table-radius am-table-striped">
                 <thead>
                 <tr class="am-success">
@@ -163,7 +167,7 @@
                         </td>
                         <td>{{ foo.test_user }}</td>
                         <td>{{ foo.belong_project.project_name }}</td>
-                        <td>0/0</td> 
+                        <td>0</td> 
                         <td class="am-hide-sm-only">{{ foo.create_time }}</td>
                         <td>
                             <div class="am-btn-toolbar">
@@ -171,6 +175,7 @@
                                     <button type="button"
                                             class="am-btn am-btn-default am-btn-xs am-text-secondary am-round"
                                             data-am-popover="{content: '运行', trigger: 'hover focus'}"
+                                            onclick="#"
                                             >
                                         <span class="am-icon-bug"></span>
                                     </button>
@@ -254,6 +259,20 @@
                 }
             });
         }
+        $('#mode').change(function () {
+            if ($('#mode').val() == 'false') {
+                $('#report_name').removeAttr("readonly");
+            } else {
+                $('#report_name').attr('readonly', 'readonly');
+            }
+        });
+
+        
+
+        $('#select_all').click(function () {
+            var isChecked = $(this).prop("checked");
+            $("input[name^='module']").prop("checked", isChecked);
+        })
     </script>
 
 {% endblock %}

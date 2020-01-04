@@ -1191,7 +1191,41 @@ def module_delete(request):
 ### 修改module_add视图
 
 ```
-
+@csrf_exempt
+def module_add(request):
+    if request.method == 'GET':
+        projects = Project.objects.all().order_by("-update_time")
+        context_dict = {'data': projects}
+        return render(request, 'module_add.html',context_dict)
+    if request.is_ajax():
+        module = json.loads(request.body.decode('utf-8'))
+        if module.get('module_name') == '':
+            msg = '模块名称不能为空'
+            return HttpResponse(msg)
+        if module.get('belong_project') == '请选择':
+            msg = '请选择项目，没有请先添加哦'
+            return HttpResponse(msg)
+        if module.get('test_user') == '':
+            msg = '测试人员不能为空'
+            return HttpResponse(msg)
+        p = Project.objects.get(project_name=module.get('belong_project'))
+        if Module.objects.filter(module_name=module.get('module_name'), belong_project=p):
+            msg = "项目已经存在"
+            return HttpResponse(msg)
+        else:
+            m = Module()
+            m.module_name = module.get('module_name')
+            p = Project.objects.get(project_name=module.get('belong_project'))
+            m.belong_project = p
+            m.test_user = module.get('test_user')
+            m.simple_desc = module.get('simple_desc')
+            m.other_desc = module.get('other_desc')
+            m.save()
+            msg = 'ok'
+        if msg == 'ok':
+            return HttpResponse("添加成功")
+        else:
+            return HttpResponse(msg)
 ```
 导入 Module 模型类
 修改`from httpapitest.models import Project, DebugTalk`为
@@ -1718,6 +1752,8 @@ function show_module(module_info, id) {
 
 }
 ```
+
+### 修改module_add 视图添加成功后调整到list
 
 ### 修改base.html
 修改base.html 使菜单 模块列表，和添加模块可用

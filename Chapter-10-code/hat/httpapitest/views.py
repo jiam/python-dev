@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.shortcuts import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
-from httpapitest.models import Project, DebugTalk, Module
+from httpapitest.models import Project, Module
 from django.shortcuts import reverse
 from django.core.paginator import Paginator
 
@@ -152,7 +152,7 @@ def module_add(request):
             m.save()
             msg = 'ok'
         if msg == 'ok':
-            return HttpResponse("添加成功")
+            return HttpResponse(reverse('module_list'))
         else:
             return HttpResponse(msg)
 

@@ -16,8 +16,16 @@ def data_type(value):
     return str(type(value).__name__)
 
 
+
+
 @register.filter(name='json_dumps')
 def json_dumps(value):
     return json.dumps(value, indent=4, separators=(',', ': '), ensure_ascii=False)
 
 
+@register.filter(name='is_del')
+def id_del(value):
+    if value.endswith('已删除'):
+        return True
+    else:
+        return False

@@ -26,16 +26,20 @@ class DebugTalk(BaseTable):
             d.save()
 ```
 
-### 添加debugtalk_list 视图
+### 添加debugtalk视图
 
 ```
 def debugtalk_list(request):
     pass
+
+def debugtalk_edit(request, id)：
+    pass
 ```
 
-### 添加debugtalk/list url
+### 添加debugtalk url
 ```
 path('debugtalk/list', views.debugtalk_list, name='debugtalk_list'),
+path('debugtalk/edit/<int:id>', views.debugtalk_edit, name='debugtalk_edit'),
 ```
 ### 修改debugtalk_list 视图
 ```
@@ -48,6 +52,9 @@ def debugtalk_list(request):
         context_dict = {'debugtalk': objects }
         return render(request,"debugtalk_list.html",context_dict)
 ```
+导入 DebugTalk module
+修改`from httpapitest.models import Project, Module`为
+`from httpapitest.models import Project, DebugTalk, Module`
 
 ### 添加debugtalk_list.html模板
 
@@ -55,6 +62,14 @@ def debugtalk_list(request):
 
 测试,访问http://127.0.0.1:8000/httpapitest/debugtalk/list
 在base.html模板中，添加debugtalk.py 的菜单
+
+···
+            <ul>
+                <li><a href="{% url 'project_list' %}">项 目 列 表</a></li>
+                <li><a href="{% url 'project_add' %}">新 增 项 目</a></li>
+                <li><a href="{% url 'debugtalk_list' %}">debugtalk.py</a></li>
+            </ul>
+···
 
 
 ### 添加debugtalk视图
@@ -68,10 +83,6 @@ def debugtalk_edit(request, id):
         return render(request, "debugtalk_edit.html",context_dict)
 ```
 
-### 添加debugtalk/edit url
-```
-path('debugtalk/edit/<int:id>', views.debugtalk_edit, name='debugtalk_edit'),
-```
 
 ### 添加debugtalk_edit 模板
 [debugtalk_edit.html](./Chapter-11-code/hat/templates/debugtalk_edit.html)
@@ -120,6 +131,9 @@ def debugtalk_edit(request, id):
         d.save()
         return redirect(reverse('debugtalk_list'))
 ```
+导入redirect函数
+修改`from django.shortcuts import reverse`为
+`from django.shortcuts import reverse, redirect`
 
 测试，打开编辑页面修改代码然后提交
 
@@ -140,7 +154,7 @@ class TestConfig(BaseTable):
     request = models.TextField('请求信息', null=False)
 ```
 
-添加view config_add
+添加view 
 
 ```
 def config_add(request):
@@ -293,64 +307,9 @@ function add_params(id) {
 }
 ```
 
-修改commons.js的auto_load函数
-```
-function auto_load(id, url, target, type) {
-    var data = $(id).serializeJSON();
-    if (id === '#pro_filter') {
-        data = {
-            "test": {
-                "name": data,
-                "type": type
-            }
-        }
-    } else if (id === '#form_config') {
-        data = {
-            "config": {
-                "name": data,
-                "type": type
-            }
-        }
-    }
-    $.ajax({
-        type: 'post',
-        url: url,
-        data: JSON.stringify(data),
-        contentType: "application/json",
-        success: function (data) {
-        
-                show_module(data, target)
-        }
-        ,
-        error: function () {
-            myAlert('Sorry，服务器可能开小差啦, 请重试!');
-        }
-    });
 
-}
 
-```
 
-修改视图函数 module_search_ajax
-
-```
-@csrf_exempt
-def module_search_ajax(request):
-    if request.is_ajax():
-        data = json.loads(request.body.decode('utf-8'))
-        if 'test' in data.keys():
-            project = data["test"]["name"]["project"]
-        if 'config' in data.keys():
-            project = data["config"]["name"]["project"]
-        if  project != "All":
-            p = Project.objects.get(project_name=project)
-            modules = Module.objects.filter(belong_project=p)
-            modules_list = ['%d^=%s' % (m.id, m.module_name) for m in modules ]
-            modules_string = 'replaceFlag'.join(modules_list)
-            return HttpResponse(modules_string)
-        else:
-            return HttpResponse('')
-```
 测试config_add.html 模板功能
 
 修改视图函数config_add
@@ -393,11 +352,15 @@ LOGGING = {
             'maxBytes': 1024 * 1024 * 100,
             'backupCount': 5,
             'formatter': 'standard',
-        }
+        },
+        'console': {
+            'class': 'logging.StreamHandler',
+
+        },
     },
     'loggers': {
         'django': {
-            'handlers': ['default',],
+            'handlers': ['default', 'console'],
             'level': 'INFO',
             'propagate': True
         }
@@ -406,7 +369,7 @@ LOGGING = {
 ```
 
 重启开发服务器，会在log目录下看到一个all.log的日志文件
-[django日志配置](https://docs.djangoproject.com/zh-hans/2.1/topics/logging/)
+[django日志配置](https://docs.djangoproject.com/en/2.2/topics/logging/)
 
 在httpapitest目录下添加新文件utils.py
 
@@ -667,6 +630,8 @@ class TestConfig(BaseTable):
     request = models.TextField('请求信息', null=False)
     objects = TestConfigManager()
 ```
+modules.py 导入 TestConfigManager
+`from .managers import TestConfigManager`
 注意添加了一行'objects = TestConfigManager()',objects  是一个管理类的实例，用来定义操作数据库的方法。
 
 在 views.py中导入utils模块
@@ -730,6 +695,9 @@ def config_list(request):
     return render(request,"config_list.html",context_dict)
 ```
 需要导入models.py 中TestConfig 类
+
+修改`from httpapitest.models import Project, DebugTalk, Module`为
+`from httpapitest.models import Project, DebugTalk, Module, TestConfig`
 
 2. 配置 url
 
@@ -874,6 +842,9 @@ def id_del(value):
     else:
         return False
 ```
+
+
+
 
 ## locust性能测试
 Locust 是一个易于使用的分布式用户负载测试工具。它用于对Web站点（或其他系统）进行负载测试，并计算出一个系统可以处理多少并发用户。Locust 完全基于事件，因此可以在一台机器上支持数千个并发用户。与许多其他基于事件的应用程序相比，它不使用回调，而是使用基于 gevent 的轻量级进程。每个 Locust 都在自己的进程中运行（正确的说法是greenlet）。这允许你用Python编写非常有表现力的场景，而不用使用回调使代码复杂化。

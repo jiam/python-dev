@@ -75,8 +75,8 @@
             <h3 class="am-icon-th-list"><em></em> <a href="#"> 模块管理</a></h3>
             {% endif %}
             <ul>
-                <li><a href="#">模 块 列 表</a></li>
-                <li><a href="#">新 增 模 块</a></li>
+                <li><a href="{% url 'module_list' %}">模 块 列 表</a></li>
+                <li><a href="{% url 'module_add' %}">新 增 模 块</a></li>
             </ul>
             {% if  "case" in request.path %}
             <h3 class="am-icon-bug on"><em></em> <a href="#">用例管理</a></h3>

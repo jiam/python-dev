@@ -1,16 +1,16 @@
-import json
-from django.shortcuts import render,reverse,redirect
+from django.shortcuts import render
 from django.shortcuts import HttpResponse
-from httpapitest.models import Project,Module,DebugTalk,TestConfig
 from django.views.decorators.csrf import csrf_exempt
+import json
+from httpapitest.models import Project, DebugTalk, Module, TestConfig
+from django.shortcuts import reverse, redirect
 from django.core.paginator import Paginator
 from .utils import config_logic
-import logging
 
-logger = logging.getLogger('django')
 # Create your views here.
 def index(request):
     return render(request, 'index.html')
+
 
 @csrf_exempt
 def project_add(request):
@@ -58,27 +58,24 @@ def project_add(request):
 
 @csrf_exempt
 def project_list(request):
-    if request.method == "GET":
+    if request.method == 'GET':
         projects = Project.objects.all().order_by("-update_time")
-        rs = Project.objects.all().order_by("-update_time")
-        paginator = Paginator(rs,5)
-        page = request.GET.get('page')
-        objects = paginator.get_page(page)
-        context_dict = {'project': objects,'all_projects': projects}
-        return render(request,"project_list.html",context_dict)
+        project_name = request.GET.get('project','All')
 
-    if request.method == 'POST':
-        projects = Project.objects.all().order_by("-update_time")
-        project_name = request.POST.get('project')
+        user = request.GET.get('user', '负责人')
+        info = {'belong_project': project_name, 'user':user}
+
+        
         if project_name != "All":
             rs = Project.objects.filter(project_name=project_name)
-        user = request.POST.get('user')
-        if user:
+        elif user != "负责人":
             rs = Project.objects.filter(responsible_name=user)
+        else:
+            rs = projects
         paginator = Paginator(rs,5)
         page = request.GET.get('page')
         objects = paginator.get_page(page)
-        context_dict = {'project': objects, 'all_projects': projects}
+        context_dict = {'project': objects, 'all_projects': projects,'info': info}
         return render(request,"project_list.html",context_dict)
 
 @csrf_exempt
@@ -124,8 +121,6 @@ def project_delete(request):
         project.delete()
         return HttpResponse(reverse('project_list'))
 
-
-
 @csrf_exempt
 def module_add(request):
     if request.method == 'GET':
@@ -165,21 +160,13 @@ def module_add(request):
 @csrf_exempt
 def module_list(request):
     if request.method == 'GET':
-        info = {'belong_project': 'All', 'belong_module': "请选择"}
-        projects = Project.objects.all().order_by("-update_time")
-        rs = Module.objects.all().order_by("-update_time")
-        paginator = Paginator(rs,5)
-        page = request.GET.get('page')
-        objects = paginator.get_page(page)
-        context_dict = {'module': objects, 'projects': projects, 'info': info}
-        return render(request,"module_list.html",context_dict)
-    if request.method == 'POST':
         
         projects = Project.objects.all().order_by("-update_time")
-        project = request.POST.get("project")
-        module = request.POST.get("module")
-        user = request.POST.get("user")
+        project = request.GET.get("project", "All")
+        module = request.GET.get("module", "请选择")
+        user = request.GET.get("user", '')
         
+
         if project == "All":
             if user:
                 rs = Module.objects.filter(test_user=user).order_by("-update_time")
@@ -199,11 +186,35 @@ def module_list(request):
                     rs = Module.objects.filter(belong_project=p, test_user=user).order_by("-update_time")
                 else:
                     rs = Module.objects.filter(belong_project=p).order_by("-update_time")
-    paginator = Paginator(rs,5)
-    page = request.GET.get('page')
-    objects = paginator.get_page(page)
-    context_dict = {'module': objects, 'projects': projects, 'info': {'belong_project': project,'belong_module': module, 'user':user}}
-    return render(request,"module_list.html",context_dict)
+        info = {'belong_project': project,'belong_module': module, 'user':user}
+        paginator = Paginator(rs,5)
+        page = request.GET.get('page')
+        objects = paginator.get_page(page)
+        context_dict = {'module': objects, 'projects': projects, 'info': info }
+        return render(request,"module_list.html",context_dict)
+
+@csrf_exempt
+def module_search_ajax(request):
+    if request.is_ajax():
+        data = json.loads(request.body.decode('utf-8'))
+        if 'test' in data.keys():
+            project = data["test"]["name"]["project"]
+        if 'config' in data.keys():
+            project = data["config"]["name"]["project"]
+        if 'case' in data.keys():
+            project = data["case"]["name"]["project"]
+        if 'upload' in data.keys():
+            project = data["upload"]["name"]["project"]
+        if 'crontab' in data.keys():
+            project = data["crontab"]["name"]["project"]
+        if  project != "All" and project != "请选择":
+            p = Project.objects.get(project_name=project)
+            modules = Module.objects.filter(belong_project=p)
+            modules_list = ['%d^=%s' % (m.id, m.module_name) for m in modules ]
+            modules_string = 'replaceFlag'.join(modules_list)
+            return HttpResponse(modules_string)
+        else:
+            return HttpResponse('')
 
 @csrf_exempt
 def module_edit(request):
@@ -220,7 +231,8 @@ def module_edit(request):
             msg = '测试人员不能为空'
             return HttpResponse(msg)
         p = Project.objects.get(project_name=module.get('belong_project'))
-        if Module.objects.filter(module_name=module.get('module_name'), belong_project=p):
+        if module.get('module_name') != Module.objects.get(id=module.get('index')).module_name and \
+            Module.objects.filter(module_name=module.get('module_name'), belong_project=p).count()>0:
             msg = "模块已经存在"
             return HttpResponse(msg)
         else:
@@ -247,23 +259,6 @@ def module_delete(request):
         return HttpResponse(reverse('module_list'))
 
 
-@csrf_exempt
-def module_search_ajax(request):
-    if request.is_ajax():
-        data = json.loads(request.body.decode('utf-8'))
-        if 'test' in data.keys():
-            project = data["test"]["name"]["project"]
-        if 'config' in data.keys():
-            project = data["config"]["name"]["project"]
-        if  project != "All" and project != "请选择":
-            p = Project.objects.get(project_name=project)
-            modules = Module.objects.filter(belong_project=p)
-            modules_list = ['%d^=%s' % (m.id, m.module_name) for m in modules ]
-            modules_string = 'replaceFlag'.join(modules_list)
-            return HttpResponse(modules_string)
-        else:
-            return HttpResponse('')
-
 def debugtalk_list(request):
     if request.method == "GET":
         rs = DebugTalk.objects.all().order_by("-update_time")
@@ -272,6 +267,7 @@ def debugtalk_list(request):
         objects = paginator.get_page(page)
         context_dict = {'debugtalk': objects }
         return render(request,"debugtalk_list.html",context_dict)
+
 
 @csrf_exempt
 def debugtalk_edit(request, id):
@@ -287,7 +283,8 @@ def debugtalk_edit(request, id):
         d.debugtalk = code
         d.save()
         return redirect(reverse('debugtalk_list'))
-    
+
+
 @csrf_exempt
 def config_add(request):
     if request.method == 'GET':
@@ -302,6 +299,7 @@ def config_add(request):
             return HttpResponse(reverse('config_list'))
         else:
             return HttpResponse(msg)
+
 
 @csrf_exempt
 def config_list(request):
@@ -353,7 +351,6 @@ def config_list(request):
     return render(request,"config_list.html",context_dict)
 
 
-
 @csrf_exempt
 def config_delete(request):
     if request.is_ajax():
@@ -362,6 +359,7 @@ def config_delete(request):
         config = TestConfig.objects.get(id=config_id)
         config.delete()
         return HttpResponse(reverse('config_list'))
+
 
 @csrf_exempt
 def config_copy(request):
@@ -398,7 +396,3 @@ def config_edit(request,id):
             return HttpResponse(reverse('config_list'))
         else:
             return HttpResponse(msg)
-
-
-
-

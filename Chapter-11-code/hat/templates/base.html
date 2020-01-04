@@ -56,21 +56,33 @@
     <div class="nav-navicon admin-main admin-sidebar">
 
 
-        <div class="sideMenu am-icon-dashboard" style="color:#aeb2b7; margin: 10px 0 0 0;"> 欢迎您：xxx &nbsp;&nbsp;<a
+        <div class="sideMenu am-icon-dashboard" style="color:#aeb2b7; margin: 10px 0 0 0;"> 欢迎您：{{ request.session.now_account }} &nbsp;&nbsp;<a
                 href='#'>注 销</a></div>
         <div class="sideMenu">
+            {% if  "project" in request.path %}
+            <h3 class="am-icon-folder on"><em></em> <a href="#">项目管理</a></h3>
+            {% else %}
             <h3 class="am-icon-folder"><em></em> <a href="#">项目管理</a></h3>
+            {% endif %}
             <ul>
                 <li><a href="{% url 'project_list' %}">项 目 列 表</a></li>
                 <li><a href="{% url 'project_add' %}">新 增 项 目</a></li>
                 <li><a href="{% url 'debugtalk_list' %}">debugtalk.py</a></li>
             </ul>
+            {% if  "module" in request.path %}
+            <h3 class="am-icon-th-list on"><em></em> <a href="#"> 模块管理</a></h3>
+            {% else %} 
             <h3 class="am-icon-th-list"><em></em> <a href="#"> 模块管理</a></h3>
+            {% endif %}
             <ul>
                 <li><a href="{% url 'module_list' %}">模 块 列 表</a></li>
                 <li><a href="{% url 'module_add' %}">新 增 模 块</a></li>
             </ul>
+            {% if  "case" in request.path %}
+            <h3 class="am-icon-bug on"><em></em> <a href="#">用例管理</a></h3>
+            {% else %}
             <h3 class="am-icon-bug"><em></em> <a href="#">用例管理</a></h3>
+            {% endif %}
             <ul>
                 <li><a href="#">新 增 用 例</a></li>
                 <li><a href="#">用 例 列 表</a></li>
@@ -78,13 +90,12 @@
 
             <h3 class="am-icon-tags"><em></em> <a href="#">配置管理</a></h3>
             <ul>
-                <li><a href="{% url 'config_add' %}">新 增 配 置</a></li>
-                <li><a href="{% url 'config_list' %}">配 置 列 表</a></li>
+                <li><a href="#">新 增 配 置</a></li>
+                <li><a href="#">配 置 列 表</a></li>
             </ul>
 
             <h3 class="am-icon-soundcloud"><em></em> <a href="#">测试计划</a></h3>
             <ul>
-                <li><a href="#">测 试 套 件</a></li>
                 <li><a href="#">定 时 任 务</a></li>
             </ul>
 
@@ -105,7 +116,7 @@
         <ul>
             <li>
                 <button type="button" class="am-btn am-btn-default am-radius am-btn-xs"
-                        onclick="location={% url 'index' %}">返回首页
+                        onclick="location='{% url 'index' %}'">返回首页
                     <a href="{% url 'index' %}" class="am-close am-close-spin">~</a></button>
             </li>
             <li>
@@ -116,38 +127,32 @@
             </li>
             <li>
                 <button type="button" class="am-btn am-btn-default am-radius am-btn-xs"
-                        onclick="#'">模块列表<a
+                        onclick="location='#' %}'">模块列表<a
                         href="#" class="am-close am-close-spin">~</a>
                 </button>
             </li>
             <li>
                 <button type="button" class="am-btn am-btn-default am-radius am-btn-xs"
-                        onclick="#">用例列表<a
+                        onclick="location='#'">用例列表<a
                         href="#" class="am-close am-close-spin">~</a>
                 </button>
             </li>
 
             <li>
                 <button type="button" class="am-btn am-btn-default am-radius am-btn-xs"
-                        onclick="location=#">新增配置<a
+                        onclick="location='#'">新增配置<a
                         href="#" class="am-close am-close-spin">~</a>
                 </button>
             </li>
             <li>
                 <button type="button" class="am-btn am-btn-default am-radius am-btn-xs"
-                        onclick="location=#">新增用例<a
+                        onclick="location='#'">新增用例<a
                         href="#" class="am-close am-close-spin">~</a>
                 </button>
             </li>
             <li>
                 <button type="button" class="am-btn am-btn-default am-radius am-btn-xs"
-                        onclick="location=#">新增Suite<a
-                        href="#" class="am-close am-close-spin">~</a>
-                </button>
-            </li>
-            <li>
-                <button type="button" class="am-btn am-btn-default am-radius am-btn-xs"
-                        onclick="location=#">新增任务<a
+                        onclick="location='#'">新增任务<a
                         href="#" class="am-close am-close-spin">~</a>
                 </button>
             </li>

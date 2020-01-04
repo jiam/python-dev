@@ -25,6 +25,8 @@ class Project(BaseTable):
     simple_desc = models.CharField('简要描述', max_length=100, null=True)
     other_desc = models.CharField('其他信息', max_length=100, null=True)
 
+
+
 class Module(BaseTable):
     class Meta:
         verbose_name = '模块信息'

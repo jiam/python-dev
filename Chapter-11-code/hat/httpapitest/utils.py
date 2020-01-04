@@ -1,7 +1,6 @@
 import logging
 from .models import TestConfig, Module
 from django.db import DataError
-from django.core.exceptions import ObjectDoesNotExist
 
 logger = logging.getLogger('django')
 
@@ -212,7 +211,3 @@ def add_config_data(type, **kwargs):
         logger.error('{name}配置信息过长：{kwargs}'.format(name=name, kwargs=kwargs))
         return '字段长度超长，请重新编辑'
     return 'ok'
-
-
-
-
