@@ -304,20 +304,11 @@ def config_add(request):
 @csrf_exempt
 def config_list(request):
     if request.method == 'GET':
-        info = {'belong_project': 'All', 'belong_module': "请选择"}
         projects = Project.objects.all().order_by("-update_time")
-        rs = TestConfig.objects.all().order_by("-update_time")
-        paginator = Paginator(rs,5)
-        page = request.GET.get('page')
-        objects = paginator.get_page(page)
-        context_dict = {'config': objects, 'projects': projects, 'info': info}
-        return render(request,"config_list.html",context_dict)
-    if request.method == 'POST':
-        projects = Project.objects.all().order_by("-update_time")
-        project = request.POST.get("project")
-        module = request.POST.get("module")
-        name = request.POST.get("name")
-        user = request.POST.get("user")
+        project = request.GET.get("project", "All")
+        module = request.GET.get("module", "请选择")
+        name = request.GET.get("name",'')
+        user = request.GET.get("user",'')
         
         if project == "All":
             if name:
@@ -335,6 +326,8 @@ def config_list(request):
                     rs = TestConfig.objects.filter(belong_project=project,author=user).order_by("-update_time")
                 else:
                     rs = TestConfig.objects.filter(belong_module=m, belong_project=project).order_by("-update_time")
+                module = m
+                logger.info(module)
                 
             else:
                 if name:
@@ -343,12 +336,12 @@ def config_list(request):
                     rs = TestConfig.objects.filter(belong_project=project, author=user).order_by("-update_time")
                 else:
                     rs = TestConfig.objects.filter(belong_project=project).order_by("-update_time")
-                
-    paginator = Paginator(rs,5)
-    page = request.GET.get('page')
-    objects = paginator.get_page(page)
-    context_dict = {'config': objects, 'projects': projects, 'info': {'belong_project': project,'belong_module': module, 'user':user}}
-    return render(request,"config_list.html",context_dict)
+        info = {'belong_project': project, 'belong_module': module, 'name': name, 'user':user}               
+        paginator = Paginator(rs,5)
+        page = request.GET.get('page')
+        objects = paginator.get_page(page)
+        context_dict = {'config': objects, 'projects': projects, 'info': info}
+        return render(request,"config_list.html",context_dict)
 
 
 @csrf_exempt
