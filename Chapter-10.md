@@ -1318,13 +1318,41 @@ def module_add(request):
 ### 修改module_list视图
 
 ```
+@csrf_exempt
 def module_list(request):
-    rs = Module.objects.all().order_by("-update_time")
-    paginator = Paginator(rs,5)
-    page = request.GET.get('page')
-    objects = paginator.get_page(page)
-    context_dict = {'module': objects}
-    return render(request,"module_list.html",context_dict)
+    if request.method == 'GET':
+        
+        projects = Project.objects.all().order_by("-update_time")
+        project = request.GET.get("project", "All")
+        module = request.GET.get("module", "请选择")
+        user = request.GET.get("user", '')
+        
+
+        if project == "All":
+            if user:
+                rs = Module.objects.filter(test_user=user).order_by("-update_time")
+               
+            else:
+                rs = Module.objects.all().order_by("-update_time")
+        else:
+            p = Project.objects.get(project_name=project)
+            if module != "请选择":
+                if user:
+                    rs = Module.objects.filter(id=module, belong_project=p, test_user=user).order_by("-update_time")
+                else:
+                    rs = Module.objects.filter(id=module, belong_project=p).order_by("-update_time")
+                module = Module.objects.get(id=module)
+            else:
+                if user:
+                    rs = Module.objects.filter(belong_project=p, test_user=user).order_by("-update_time")
+                else:
+                    rs = Module.objects.filter(belong_project=p).order_by("-update_time")
+        info = {'belong_project': project,'belong_module': module, 'user':user}
+        paginator = Paginator(rs,5)
+        page = request.GET.get('page')
+        objects = paginator.get_page(page)
+        context_dict = {'module': objects, 'projects': projects, 'info': info }
+        return render(request,"module_list.html",context_dict)
 ```
 
 添加module_search_ajax 函数
