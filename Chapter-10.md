@@ -1228,8 +1228,8 @@ def module_add(request):
             return HttpResponse(msg)
 ```
 导入 Module 模型类
-修改`from httpapitest.models import Project, DebugTalk`为
-`from httpapitest.models import Project, DebugTalk, Module`
+修改`from httpapitest.models import Project`为
+`from httpapitest.models import Project, Module`
 
 ### 添加module_add.html模板
 ```
@@ -1330,7 +1330,6 @@ def module_list(request):
 添加module_search_ajax 函数
 ```
 @csrf_exempt
-@login_check
 def module_search_ajax(request):
     if request.is_ajax():
         data = json.loads(request.body.decode('utf-8'))
