@@ -1,21 +1,21 @@
-import json
-from django.shortcuts import render,reverse,redirect
+from django.shortcuts import render
 from django.shortcuts import HttpResponse
-from httpapitest.models import Project,Module,DebugTalk,TestConfig, TestCase, TestReports, Env, TestSuite
 from django.views.decorators.csrf import csrf_exempt
+import json
+from httpapitest.models import Project, DebugTalk, Module, TestConfig, Env, TestCase
+from django.shortcuts import reverse, redirect
 from django.core.paginator import Paginator
-from .utils import config_logic, case_logic, get_time_stamp,timestamp_to_datetime, env_data_logic, add_suite_data,edit_suite_data
+from .utils import config_logic, env_data_logic, case_logic
+from .utils import  get_time_stamp,timestamp_to_datetime
 from httprunner.api import HttpRunner
 from .runner import run_test_by_type,run_by_single,run_by_batch
-from .tasks import main_hrun
 import logging
 import os,shutil
 
-
-logger = logging.getLogger('django')
 # Create your views here.
 def index(request):
     return render(request, 'index.html')
+
 
 @csrf_exempt
 def project_add(request):
@@ -66,7 +66,7 @@ def project_list(request):
     if request.method == 'GET':
         projects = Project.objects.all().order_by("-update_time")
         project_name = request.GET.get('project','All')
-        env = Env.objects.all()
+
         user = request.GET.get('user', '负责人')
         info = {'belong_project': project_name, 'user':user}
 
@@ -80,7 +80,7 @@ def project_list(request):
         paginator = Paginator(rs,5)
         page = request.GET.get('page')
         objects = paginator.get_page(page)
-        context_dict = {'project': objects, 'all_projects': projects,'info': info, 'env':env}
+        context_dict = {'project': objects, 'all_projects': projects,'info': info}
         return render(request,"project_list.html",context_dict)
 
 @csrf_exempt
@@ -125,8 +125,6 @@ def project_delete(request):
         project = Project.objects.get(id=project_id)
         project.delete()
         return HttpResponse(reverse('project_list'))
-
-
 
 @csrf_exempt
 def module_add(request):
@@ -201,6 +199,29 @@ def module_list(request):
         return render(request,"module_list.html",context_dict)
 
 @csrf_exempt
+def module_search_ajax(request):
+    if request.is_ajax():
+        data = json.loads(request.body.decode('utf-8'))
+        if 'test' in data.keys():
+            project = data["test"]["name"]["project"]
+        if 'config' in data.keys():
+            project = data["config"]["name"]["project"]
+        if 'case' in data.keys():
+            project = data["case"]["name"]["project"]
+        if 'upload' in data.keys():
+            project = data["upload"]["name"]["project"]
+        if 'crontab' in data.keys():
+            project = data["crontab"]["name"]["project"]
+        if  project != "All" and project != "请选择":
+            p = Project.objects.get(project_name=project)
+            modules = Module.objects.filter(belong_project=p)
+            modules_list = ['%d^=%s' % (m.id, m.module_name) for m in modules ]
+            modules_string = 'replaceFlag'.join(modules_list)
+            return HttpResponse(modules_string)
+        else:
+            return HttpResponse('')
+
+@csrf_exempt
 def module_edit(request):
     if request.is_ajax():
         module = json.loads(request.body.decode('utf-8'))
@@ -243,25 +264,6 @@ def module_delete(request):
         return HttpResponse(reverse('module_list'))
 
 
-@csrf_exempt
-def module_search_ajax(request):
-    if request.is_ajax():
-        data = json.loads(request.body.decode('utf-8'))
-        if 'test' in data.keys():
-            project = data["test"]["name"]["project"]
-        if 'config' in data.keys():
-            project = data["config"]["name"]["project"]
-        if 'case' in data.keys():
-            project = data["case"]["name"]["project"]
-        if  project != "All" and project != "请选择":
-            p = Project.objects.get(project_name=project)
-            modules = Module.objects.filter(belong_project=p)
-            modules_list = ['%d^=%s' % (m.id, m.module_name) for m in modules ]
-            modules_string = 'replaceFlag'.join(modules_list)
-            return HttpResponse(modules_string)
-        else:
-            return HttpResponse('')
-
 def debugtalk_list(request):
     if request.method == "GET":
         rs = DebugTalk.objects.all().order_by("-update_time")
@@ -270,6 +272,7 @@ def debugtalk_list(request):
         objects = paginator.get_page(page)
         context_dict = {'debugtalk': objects }
         return render(request,"debugtalk_list.html",context_dict)
+
 
 @csrf_exempt
 def debugtalk_edit(request, id):
@@ -285,7 +288,8 @@ def debugtalk_edit(request, id):
         d.debugtalk = code
         d.save()
         return redirect(reverse('debugtalk_list'))
-    
+
+
 @csrf_exempt
 def config_add(request):
     if request.method == 'GET':
@@ -300,6 +304,7 @@ def config_add(request):
             return HttpResponse(reverse('config_list'))
         else:
             return HttpResponse(msg)
+
 
 @csrf_exempt
 def config_list(request):
@@ -344,7 +349,6 @@ def config_list(request):
         return render(request,"config_list.html",context_dict)
 
 
-
 @csrf_exempt
 def config_delete(request):
     if request.is_ajax():
@@ -353,6 +357,7 @@ def config_delete(request):
         config = TestConfig.objects.get(id=config_id)
         config.delete()
         return HttpResponse(reverse('config_list'))
+
 
 @csrf_exempt
 def config_copy(request):
@@ -390,6 +395,38 @@ def config_edit(request,id):
         else:
             return HttpResponse(msg)
 
+def env_list(request):
+    if request.method == "GET":
+        env_name = request.GET.get('env_name','')
+        info = {'env_name': env_name}
+        if env_name:
+            rs = Env.objects.filter(env_name=env_name).order_by("-update_time")
+        else:
+            rs = Env.objects.all().order_by("-update_time")
+        paginator = Paginator(rs,5)
+        page = request.GET.get('page')
+        objects = paginator.get_page(page)
+        context_dict = {'env': objects, 'info': info }
+        return render(request,"env_list.html",context_dict)
+
+@csrf_exempt
+def env_set(request):
+    """
+    环境设置
+    :param request:
+    :return:
+    """
+
+    if request.is_ajax():
+        env_lists = json.loads(request.body.decode('utf-8'))
+        msg = env_data_logic(**env_lists)
+        if msg == 'ok':
+            return HttpResponse(reverse('env_list'))
+        else:
+            return HttpResponse(msg)
+        
+    elif request.method == 'GET':
+        return render(request, 'env_list.html')
 
 @csrf_exempt
 def case_add(request):
@@ -483,6 +520,7 @@ def case_list(request):
         context_dict = {'case': objects, 'projects': projects, 'info':info}
         return render(request,"case_list.html",context_dict)
 
+
 @csrf_exempt
 def case_edit(request, id):
     if request.method == 'GET':
@@ -513,6 +551,7 @@ def case_delete(request):
         case = TestCase.objects.get(id=case_id)
         case.delete()
         return HttpResponse(reverse('case_list'))
+
 @csrf_exempt
 def case_copy(request):
     if request.is_ajax():
@@ -528,6 +567,7 @@ def case_copy(request):
             case.id = None
             case.save()
             return HttpResponse(reverse('case_list'))
+
 
 @csrf_exempt
 def test_run(request):
@@ -558,7 +598,6 @@ def test_run(request):
         id = request.POST.get('id')
         base_url = request.POST.get('env_name')
         type = request.POST.get('type', 'test')
-
         run_test_by_type(id, base_url, testcase_dir_path, type)
         runner.run(testcase_dir_path)
         #shutil.rmtree(testcase_dir_path)
@@ -566,7 +605,6 @@ def test_run(request):
         print(summary)
 
         return render(request,'report_template.html', summary)
-
 
 @csrf_exempt
 def test_batch_run(request):
@@ -608,113 +646,3 @@ def test_batch_run(request):
         summary = timestamp_to_datetime(runner._summary, type=False)
         print(summary)
         return render(request,'report_template.html', summary)
-
-
-def report_list(request):
-    if request.method == "GET":
-        rs = TestReports.objects.all().order_by("-update_time")
-        paginator = Paginator(rs,5)
-        page = request.GET.get('page')
-        objects = paginator.get_page(page)
-        context_dict = {'report': objects }
-        return render(request,"report_list.html",context_dict)
-
-
-def env_list(request):
-    if request.method == "GET":
-        env_name = request.GET.get('env_name','')
-        info = {'env_name': env_name}
-        if env_name:
-            rs = Env.objects.filter(env_name=env_name).order_by("-update_time")
-        else:
-            rs = Env.objects.all().order_by("-update_time")
-        paginator = Paginator(rs,5)
-        page = request.GET.get('page')
-        objects = paginator.get_page(page)
-        context_dict = {'env': objects, 'info': info }
-        return render(request,"env_list.html",context_dict)
-
-@csrf_exempt
-def env_set(request):
-    """
-    环境设置
-    :param request:
-    :return:
-    """
-
-    if request.is_ajax():
-        env_lists = json.loads(request.body.decode('utf-8'))
-        msg = env_data_logic(**env_lists)
-        if msg == 'ok':
-            return HttpResponse(reverse('env_list'))
-        else:
-            return HttpResponse(msg)
-        
-    elif request.method == 'GET':
-        return render(request, 'env_list.html')
-
-
-def suite_list(request):
-    if request.method == "GET":
-        
-        projects = Project.objects.all().order_by("-update_time")
-        project_name = request.GET.get('project','All')
-        env = Env.objects.all()
-        name = request.GET.get('name', '套件名称')
-        info = {'belong_project': project_name, 'name':name}
-        if project_name != "All":
-            belong_project = Project.objects.get(project_name=project_name)
-            rs = TestSuite.objects.filter(belong_project=belong_project)
-        elif name != "套件名称":
-            rs = TestSuite.objects.filter(suite_name=name)
-        else:
-            rs = projects
-        rs = TestSuite.objects.all().order_by("-update_time")
-        paginator = Paginator(rs,5)
-        page = request.GET.get('page')
-        objects = paginator.get_page(page)
-        context_dict = {'suite': objects, 'info': info, 'project': projects, 'env': env }
-        return render(request,"suite_list.html",context_dict)
-
-@csrf_exempt
-def suite_add(request):
-    if request.is_ajax():
-        kwargs = json.loads(request.body.decode('utf-8'))
-        msg = add_suite_data(**kwargs)
-        if msg == 'ok':
-            return HttpResponse(reverse('suite_list'))
-        else:
-            return HttpResponse(msg)
-
-    elif request.method == 'GET':
-        context_dict = {
-            'project': Project.objects.all().values('project_name').order_by('-create_time')
-        }
-        return render(request, 'suite_add.html', context_dict)
-
-@csrf_exempt
-def suite_edit(request, id=None):
-    if request.is_ajax():
-        kwargs = json.loads(request.body.decode('utf-8'))
-        msg = edit_suite_data(**kwargs)
-        if msg == 'ok':
-            return HttpResponse(reverse('suite_list'))
-        else:
-            return HttpResponse(msg)
-    info = suite_info = TestSuite.objects.get(id=id)
-    context_dict = {
-        'project': Project.objects.all().values('project_name').order_by('-create_time'),
-        'info': info
-    }
-    return render(request, 'suite_edit.html', context_dict)
-
-
-@csrf_exempt
-def suite_delete(request):
-    if request.is_ajax():
-        data = json.loads(request.body.decode('utf-8'))
-        case_id = data.get('id')
-        case = TestSuite.objects.get(id=case_id)
-        case.delete()
-        return HttpResponse(reverse('suite_list'))
-

@@ -1,4 +1,3 @@
-
 from django.urls import path
 from httpapitest import views
 
@@ -9,10 +8,10 @@ urlpatterns = [
     path('project/edit', views.project_edit, name='project_edit'),
     path('project/delete', views.project_delete, name='project_delete'),
     path('module/list', views.module_list, name='module_list'),
+    path('module/search/ajax', views.module_search_ajax, name='module_search_ajax'),
     path('module/add', views.module_add, name='module_add'),
     path('module/edit', views.module_edit, name='module_edit'),
     path('module/delete', views.module_delete, name='module_delete'),
-    path('module/search/ajax', views.module_search_ajax, name='module_search_ajax'),
     path('debugtalk/list', views.debugtalk_list, name='debugtalk_list'),
     path('debugtalk/edit/<int:id>', views.debugtalk_edit, name='debugtalk_edit'),
     path('config/add', views.config_add, name='config_add'),
@@ -20,6 +19,8 @@ urlpatterns = [
     path('config/copy', views.config_copy, name='config_copy'),
     path('config/delete', views.config_delete, name='config_delete'),
     path('config/edit/<int:id>', views.config_edit, name='config_edit'),
+    path('env/list', views.env_list, name='env_list'),
+    path('env/set', views.env_set, name='env_set'),
     path('case/add', views.case_add, name='case_add'),
     path('case/search/ajax', views.case_search_ajax, name='case_search_ajax'),
     path('config/search/ajax', views.config_search_ajax, name='config_search_ajax'),
@@ -29,11 +30,6 @@ urlpatterns = [
     path('case/copy', views.case_copy, name='case_copy'),
     path('test/test_run', views.test_run, name='test_run'),
     path('test/test_batch_run', views.test_batch_run, name='test_batch_run'),
-    path('report/list', views.report_list, name='report_list'),
-    path('env/list', views.env_list, name='env_list'),
-    path('env/set', views.env_set, name='env_set'),
-    path('suite/list', views.suite_list, name='suite_list'),
-    path('suite/add', views.suite_add, name="suite_add"),
-    path('suite/edit/<int:id>', views.suite_edit, name='suite_edit'),
-    path('suite/delete', views.suite_delete, name='suite_delete'),
+    
+
 ]

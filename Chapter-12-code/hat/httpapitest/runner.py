@@ -2,7 +2,7 @@ import os
 
 from django.core.exceptions import ObjectDoesNotExist
 
-from .models import TestCase, Module, Project, DebugTalk,TestConfig, TestSuite
+from .models import TestCase, Module, Project, DebugTalk,TestConfig
 from .utils import dump_python_file, dump_yaml_file
 
 
@@ -36,8 +36,8 @@ def run_by_single(index, base_url, path):
 
     config['config']['name'] = name
 
-    testcase_dir_path = os.path.join(path, project)
-
+    
+    testcase_dir_path = path
     if not os.path.exists(testcase_dir_path):
         os.makedirs(testcase_dir_path)
 
@@ -47,7 +47,9 @@ def run_by_single(index, base_url, path):
             debugtalk = ''
 
         dump_python_file(os.path.join(testcase_dir_path, 'debugtalk.py'), debugtalk)
-
+    testcase_dir_path = os.path.join(path, project)
+    if not os.path.exists(testcase_dir_path):
+        os.makedirs(testcase_dir_path)
     testcase_dir_path = os.path.join(testcase_dir_path, module)
 
     if not os.path.exists(testcase_dir_path):
@@ -58,8 +60,8 @@ def run_by_single(index, base_url, path):
             if isinstance(test_info, dict):
                 config_id = test_info.pop('config')[0]
                 config_request = eval(TestConfig.objects.get(id=config_id).request)
-                config_request.get('config').get('request').setdefault('base_url', base_url)
-                config_request['config']['name'] = name
+                print(base_url)
+                config_request.get('config').setdefault('base_url', base_url)
                 testcase_list[0] = config_request
             else:
                 id = test_info[0]
@@ -72,16 +74,10 @@ def run_by_single(index, base_url, path):
     if request['test']['request']['url'] != '':
         testcase_list.append(request)
 
-    dump_yaml_file(os.path.join(testcase_dir_path, name + '.yml'), testcase_list)
+    dump_yaml_file(os.path.join(testcase_dir_path, name) +'.yml', testcase_list)
 
 
-def run_by_suite(index, base_url, path):
-    obj = TestSuite.objects.get(id=index)
 
-    include = eval(obj.include)
-
-    for val in include:
-        run_by_single(val[0], base_url, path)
 
 
 
@@ -159,7 +155,5 @@ def run_test_by_type(id, base_url, path, type):
         run_by_project(id, base_url, path)
     elif type == 'module':
         run_by_module(id, base_url, path)
-    elif type == 'suite':
-        run_by_suite(id, base_url, path)
     else:
         run_by_single(id, base_url, path)

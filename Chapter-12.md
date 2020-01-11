@@ -1,5 +1,103 @@
 # 第十二天
 
+
+## 环境管理
+
+1.  添加model类
+在models.py中添加
+```
+class Env(BaseTable):
+    class Meta:
+        verbose_name = '环境管理'
+        db_table = 'EnvInfo'
+
+    env_name = models.CharField(max_length=40, null=False, unique=True)
+    base_url = models.CharField(max_length=40, null=False)
+    simple_desc = models.CharField(max_length=50, null=False)
+    objects = EnvManager()
+```
+导入 EvnManager
+在models.py中将`from .managers import TestConfigManager`改为
+`from .managers import TestConfigManager, EnvManager,`
+
+2.  managers.py 添加EnvManager类
+```
+class EnvManager(models.Manager):
+    def insert_env(self, **kwargs):
+        self.create(**kwargs)
+
+    def update_env(self, index, **kwargs):
+        obj = self.get(id=index)
+        obj.env_name = kwargs.pop('env_name')
+        obj.base_url = kwargs.pop('base_url')
+        obj.simple_desc = kwargs.pop('simple_desc')
+        obj.save()
+
+    def get_env_name(self, index):
+        return self.get(id=index).env_name
+
+    def delete_env(self, index):
+        self.get(id=index).delete()
+```
+3.  添加视图
+
+```
+def env_list(request):
+    if request.method == "GET":
+        env_name = request.GET.get('env_name','')
+        info = {'env_name': env_name}
+        if env_name:
+            rs = Env.objects.filter(env_name=env_name).order_by("-update_time")
+        else:
+            rs = Env.objects.all().order_by("-update_time")
+        paginator = Paginator(rs,5)
+        page = request.GET.get('page')
+        objects = paginator.get_page(page)
+        context_dict = {'env': objects, 'info': info }
+        return render(request,"env_list.html",context_dict)
+
+@csrf_exempt
+def env_set(request):
+    """
+    环境设置
+    :param request:
+    :return:
+    """
+
+    if request.is_ajax():
+        env_lists = json.loads(request.body.decode('utf-8'))
+        msg = env_data_logic(**env_lists)
+        if msg == 'ok':
+            return HttpResponse(reverse('env_list'))
+        else:
+            return HttpResponse(msg)
+        
+    elif request.method == 'GET':
+        return render(request, 'env_list.html')
+```
+在utils.py中添加evn_data_logic函数
+[utils.py](./Chapter-12-code/hat/httpapitest/utils.py)
+在utils.py中导入Env
+将`from .models import TestConfig, Module`改为
+`from .models import TestConfig, Module, Env`
+
+在views.py中导入`env_data_logic`
+将`from .utils import config_logic` 改为
+`from .utils import config_logic, env_data_logic,`
+
+在views.py中导入Env 类
+将`from httpapitest.models import Project, DebugTalk, Module, TestConfig`改为
+`from httpapitest.models import Project, DebugTalk, Module, TestConfig, Env`
+
+4. 添加模板 env_list.html
+[env_list.html](./Chapter-12-code/hat/templates/env_list.html)
+
+5. 添加url
+```
+path('env/list', views.env_list, name='env_list'),
+path('env/set', views.env_set, name='env_set'),
+```
+
 ## 用例管理
 测试用例的增删改查
 
@@ -25,7 +123,8 @@ class TestCase(BaseTable):
     objects = TestCaseManager()
 ```
 导入 TestCaseManager 类
-
+修改`from .managers import TestConfigManager, EnvManager`为
+`from .managers import TestConfigManager, EnvManager, TestCaseManager`
 执行数据库迁移命令
 
 ###  添加用例
@@ -96,15 +195,22 @@ def case_copy(request):
 
 
 ```
-导入函数caselogic, 该函数下面在utils.py 中定义
-from .utils import case_logic
-将视图函数module_search_ajax更新
+导入函数case_logic
+在views.py中修改`from .utils import config_logic, env_data_logic` 为
+`from .utils import config_logic, env_data_logic, case_logic`
+导入TestCase
+`from httpapitest.models import Project, DebugTalk, Module, TestConfig, Env`为
+`from httpapitest.models import Project, DebugTalk, Module, TestConfig, Env, TestCase`
 
 
-2. 添加视图函数所使用的函数
+2. 添加视图函数所调用的的函数
 在utils.py 中添加case_logic， add_case_data, update_include函数
 
 [utils.py](./Chapter-12-code/hat/httpapitest/utils.py)
+
+在utils.py中导入TestCase
+修改`from .models import TestConfig, Module, Env`为
+`from .models import TestConfig, Module, Env, TestCase`
 
 
 4. 添加模板文件 case_add.html
@@ -115,10 +221,10 @@ from .utils import case_logic
 
 templatetags/custom_tags.py添加自定义过滤器 convert_eval,id_del
 [custom_tags.py](./Chapter-12-code/hat/httpapitest/templatetags/custom_tags.py)
+并导入函数`from httpapitest.utils import update_include`
 
 6. 在commons.js 中添加case_add.html 中使用的js 函数 case_ajax
 在commons.js中添加函数case_ajax
-修改commons.js 中的auto_load 函数
 
 [commons.js](./Chapter-12-code/hat/static/assets/js/commons.js)
 
@@ -191,14 +297,34 @@ def case_list(request):
 
 添加依赖的url和视图
 ```
+# 在urls.py中添加以下内容
 path('test/test_run', views.test_run, name='test_run'),
 path('test/test_batch_run', views.test_batch_run, name='test_batch_run'),
 
+# 在views.py中添加以下内容
 def test_run(request):
     pass
 
 def test_batch_run(request):
     pass
+```
+在commons.js中添加函数
+```
+function post(url, params) {
+    var temp = document.createElement("form");
+    temp.action = url;
+    temp.method = "post";
+    temp.style.display = "none";
+    for (var x in params) {
+        var opt = document.createElement("input");
+        opt.name = x;
+        opt.value = params[x];
+        temp.appendChild(opt);
+    }
+    document.body.appendChild(temp);
+    temp.submit();
+    return temp;
+}
 ```
 
 ###  编辑功能
@@ -324,6 +450,8 @@ import os,shutil
 ```
 3. 创建要导入的函数
 在utils.py 文件中添加dump_yaml_file，dump_python_file，get_time_stamp，timestamp_to_datetime
+并导入
+`import time,io,yaml,datetime`
 
 [utils.py](./Chapter-12-code/hat/httpapitest/utils.py)
 
@@ -334,199 +462,12 @@ import os,shutil
 
 4. 添加模板文件
 
-[report_tempalte.html](./Chapter-12-code/hat/templates/report_template.html)
+[report_template.html](./Chapter-12-code/hat/templates/report_template.html)
 
-5. 添加url
-```
-path('test/test_run', views.test_run, name='test_run'),
-```
+
 
 测试用例运行
 
-
-## 环境管理
-
-1.  添加model类
-```
-class Env(BaseTable):
-    class Meta:
-        verbose_name = '环境管理'
-        db_table = 'EnvInfo'
-
-    env_name = models.CharField(max_length=40, null=False, unique=True)
-    base_url = models.CharField(max_length=40, null=False)
-    simple_desc = models.CharField(max_length=50, null=False)
-    objects = EnvManager()
-```
-
-2.  managers.py 添加EnvManager类
-```
-class EnvManager(models.Manager):
-    def insert_env(self, **kwargs):
-        self.create(**kwargs)
-
-    def update_env(self, index, **kwargs):
-        obj = self.get(id=index)
-        obj.env_name = kwargs.pop('env_name')
-        obj.base_url = kwargs.pop('base_url')
-        obj.simple_desc = kwargs.pop('simple_desc')
-        obj.save()
-
-    def get_env_name(self, index):
-        return self.get(id=index).env_name
-
-    def delete_env(self, index):
-        self.get(id=index).delete()
-```
-3.  添加视图
-
-```
-def env_list(request):
-    if request.method == "GET":
-        env_name = request.GET.get('env_name','')
-        info = {'env_name': env_name}
-        if env_name:
-            rs = Env.objects.filter(env_name=env_name).order_by("-update_time")
-        else:
-            rs = Env.objects.all().order_by("-update_time")
-        paginator = Paginator(rs,5)
-        page = request.GET.get('page')
-        objects = paginator.get_page(page)
-        context_dict = {'env': objects, 'info': info }
-        return render(request,"env_list.html",context_dict)
-
-@csrf_exempt
-def env_set(request):
-    """
-    环境设置
-    :param request:
-    :return:
-    """
-
-    if request.is_ajax():
-        env_lists = json.loads(request.body.decode('utf-8'))
-        msg = env_data_logic(**env_lists)
-        if msg == 'ok':
-            return HttpResponse(reverse('env_list'))
-        else:
-            return HttpResponse(msg)
-        
-    elif request.method == 'GET':
-        return render(request, 'env_list.html')
-```
-utils.py中添加evn_data_logic函数
-
-4. 添加模板 env_list.html
-[env_list.html](./Chapter-12-code/hat/templates/env_list.html)
-
-5. 添加url
-```
-path('env/list', views.env_list, name='env_list'),
-path('env/set', views.env_set, name='env_set'),
-```
-
-## suite管理
-
-1. 添加model类
-```
-class TestSuite(BaseTable):
-    class Meta:
-        verbose_name = '用例集合'
-        db_table = 'TestSuite'
-
-    belong_project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    suite_name = models.CharField(max_length=100, null=False)
-    include = models.TextField(null=False)
-```
-
-2. 添加视图函数
-
-在views.py中添加视图函数 suite_list,suite_add,suite_edit,suite_delete视图函数
-
-```
-def suite_list(request):
-    if request.method == "GET":
-        
-        projects = Project.objects.all().order_by("-update_time")
-        project_name = request.GET.get('project','All')
-        env = Env.objects.all()
-        name = request.GET.get('name', '套件名称')
-        info = {'belong_project': project_name, 'name':name}
-        if project_name != "All":
-            belong_project = Project.objects.get(project_name=project_name)
-            rs = TestSuite.objects.filter(belong_project=belong_project)
-        elif name != "套件名称":
-            rs = TestSuite.objects.filter(suite_name=name)
-        else:
-            rs = projects
-        rs = TestSuite.objects.all().order_by("-update_time")
-        paginator = Paginator(rs,5)
-        page = request.GET.get('page')
-        objects = paginator.get_page(page)
-        context_dict = {'suite': objects, 'info': info, 'project': projects, 'env': env }
-        return render(request,"suite_list.html",context_dict)
-
-@csrf_exempt
-def suite_add(request):
-    if request.is_ajax():
-        kwargs = json.loads(request.body.decode('utf-8'))
-        msg = add_suite_data(**kwargs)
-        if msg == 'ok':
-            return HttpResponse(reverse('suite_list'))
-        else:
-            return HttpResponse(msg)
-
-    elif request.method == 'GET':
-        context_dict = {
-            'project': Project.objects.all().values('project_name').order_by('-create_time')
-        }
-        return render(request, 'suite_add.html', context_dict)
-
-@csrf_exempt
-def suite_edit(request, id=None):
-    if request.is_ajax():
-        kwargs = json.loads(request.body.decode('utf-8'))
-        msg = edit_suite_data(**kwargs)
-        if msg == 'ok':
-            return HttpResponse(reverse('suite_list'))
-        else:
-            return HttpResponse(msg)
-    info = suite_info = TestSuite.objects.get(id=id)
-    context_dict = {
-        'project': Project.objects.all().values('project_name').order_by('-create_time'),
-        'info': info
-    }
-    return render(request, 'suite_edit.html', context_dict)
-
-
-@csrf_exempt
-def suite_delete(request):
-    if request.is_ajax():
-        data = json.loads(request.body.decode('utf-8'))
-        case_id = data.get('id')
-        case = TestSuite.objects.get(id=case_id)
-        case.delete()
-        return HttpResponse(reverse('suite_list'))
-```
-
-3. 添加模板
-
-添加suite管理所需要的模板文件, suite_add.html,suite_edit.html,suite_list.html
-
-[suite_add.html](./Chapter-12-code/hat/templates/suite_add.html)
-
-[suite_edit.html](./Chapter-12-code/hat/templates/suite_edit.html)
-
-[suite_list.html](./Chapter-12-code/hat/templates/suite_list.html)
-
-4. 添加url
-
-```
-    path('suite/list', views.suite_list, name='suite_list'),
-    path('suite/add', views.suite_add, name="suite_add"),
-    path('suite/edit/<int:id>', views.suite_edit, name='suite_edit'),
-    path('suite/delete', views.suite_delete, name='suite_delete'),
-```
 
 ## 批量运行
 
@@ -575,14 +516,10 @@ def test_batch_run(request):
         return render(request,'report_template.html', summary)
 ```
 
-2. 添加url
-```
-path('test/test_batch_run', views.test_batch_run, name='test_batch_run'),
-```
+
 ### 测试用例批量运行
-
-### suite 批量运行
-
+在views.py中导入
+`from .runner import run_test_by_type,run_by_single,run_by_batch`
 
 ### 模块批量运行功能
 修改module_list.html模板,找到运行按钮添加onclick属性，并在js部分添加下面js代码
@@ -609,15 +546,7 @@ path('test/test_batch_run', views.test_batch_run, name='test_batch_run'),
 
 script 部分                                
 ```     
-        $('#mode').change(function () {
-            if ($('#mode').val() == 'false') {
-                $('#report_name').removeAttr("readonly");
-            } else {
-                $('#report_name').attr('readonly', 'readonly');
-            }
-        });
-
-        function run_test(mode, type) {
+        function run_test(mode,url, type) {
             if (mode === 'batch') {
                 if ($("input:checked").size() === 0) {
                     myAlert("请至少选择一个模块运行！");
@@ -665,11 +594,6 @@ script 部分
                 }
             });
         }
-
-        $('#select_all').click(function () {
-            var isChecked = $(this).prop("checked");
-            $("input[name^='module']").prop("checked", isChecked);
-        })
 ```
 添加id='select_env' 的modal
 ```
