@@ -879,43 +879,6 @@ rpop 移除并返回列表 key 的尾元素
 
 
 
-## celery
 
-Celery 是一个简单、灵活且可靠的，处理大量消息的分布式系统，并且提供维护这样一个系统的必需工具。是一个专注于实时处理的任务队列，同时也支持任务调度。
-
-
-任务队列用作跨线程或机器分配工作的机制。 任务队列的输入是为一个任务。任务队列通过消息系统borker实现。客户端往broker中加任务，worker进程不断监视broker中的任务队列以执行新的任务
-
-
-支持的常见broker
-+ redis
-+ rabbitmq
-+ zookeeper
-
-安装支持redis的celery
-
-pip install celery -i https://pypi.douban.com/simple/
-
-
-
-编写tasks.py
-```
-from celery import Celery
-
-app = Celery('tasks', broker='redis://192.168.1.111:6379/0')
-
-@app.task
-def add(x, y):
-    return x + y
-```
-启动worker
-
-`celery -A tasks worker --loglevel=info  -P eventlet`
-
-client.py
-```
-from tasks import add
-add.delay(2,3) 
-```
 
 

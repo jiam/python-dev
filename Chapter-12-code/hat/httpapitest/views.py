@@ -517,7 +517,7 @@ def case_list(request):
         paginator = Paginator(rs,5)
         page = request.GET.get('page')
         objects = paginator.get_page(page)
-        context_dict = {'case': objects, 'projects': projects, 'info':info}
+        context_dict = {'case': objects, 'projects': projects, 'info':info, 'env':env}
         return render(request,"case_list.html",context_dict)
 
 

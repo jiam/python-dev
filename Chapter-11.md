@@ -845,7 +845,7 @@ Locust 是一个易于使用的分布式用户负载测试工具。它用于对W
 [locuts](https://www.locust.io/)
 
 ### 安装
-`pip install locustio -i https://pypi.douban.com/simple/`
+`pip install locustio==0.12.2  -i https://pypi.douban.com/simple/`
 
 ### 功能
 1. 使用纯Python代码编写用户测试场景
