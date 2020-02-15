@@ -44,7 +44,6 @@ function myAlert(data) {
     });
 }
 
-
 function update_data_ajax(id, url) {
     var data = $(id).serializeJSON();
     $.ajax({
@@ -63,7 +62,8 @@ function update_data_ajax(id, url) {
             else {
                 window.location.reload();
             }
-        },
+        }
+        ,
         error: function () {
             myAlert('Sorry，服务器可能开小差啦, 请重试!');
         }
@@ -96,7 +96,6 @@ function del_data_ajax(id, url) {
         }
     });
 }
-
 
 
 function auto_load(id, url, target, type) {
@@ -190,10 +189,9 @@ function init_acs(language, theme, editor) {
 
 }
 
-
 function config_ajax(type) {
     var dataType = $("#config_data_type").serializeJSON();
-    var configInfo = $("#form_config").serializeJSON();
+    var caseInfo = $("#form_config").serializeJSON();
     var variables = $("#config_variables").serializeJSON();
     var parameters = $('#config_params').serializeJSON();
     var hooks = $('#config_hooks').serializeJSON();
@@ -213,7 +211,7 @@ function config_ajax(type) {
 
     const config = {
         "config": {
-            "name": configInfo,
+            "name": caseInfo,
             "variables": variables,
             "parameters": parameters,
             "request": {
@@ -320,6 +318,7 @@ function add_params(id) {
     newTdObj2.innerHTML = value;
 }
 
+
 function copy_data_ajax(id, url) {
     var data = {
         "data": $(id).serializeJSON(),
@@ -342,7 +341,6 @@ function copy_data_ajax(id, url) {
         }
     });
 }
-
 
 function case_ajax(type, editor) {
     var url = $("#url").serializeJSON();

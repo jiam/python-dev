@@ -1,5 +1,5 @@
 import logging,os, platform
-from .models import TestConfig, Module, TestCase, TestReports, Env, TestSuite, Project
+from .models import TestConfig, Module, TestCase, TestReports, Env,  Project
 from django.db import DataError
 from django.core.exceptions import ObjectDoesNotExist
 import time,io,yaml,datetime
@@ -205,7 +205,7 @@ def add_config_data(type, **kwargs):
                 config_opt.insert_config(belong_module, **kwargs)
                 logger.info('{name}配置添加成功: {kwargs}'.format(name=name, kwargs=kwargs))
             else:
-                return '配置已存在，请重新编辑'
+                return '用例或配置已存在，请重新编辑'
         else:
             index = config_info.get('test_index')
             if name != TestConfig.objects.get(id=index).name \
@@ -217,6 +217,57 @@ def add_config_data(type, **kwargs):
         logger.error('{name}配置信息过长：{kwargs}'.format(name=name, kwargs=kwargs))
         return '字段长度超长，请重新编辑'
     return 'ok'
+
+def env_data_logic(**kwargs):
+    """
+    环境信息逻辑判断及落地
+    :param kwargs: dict
+    :return: ok or tips
+    """
+    id = kwargs.get('id', None)
+    if id:
+        try:
+            Env.objects.delete_env(id)
+        except ObjectDoesNotExist:
+            return '删除异常，请重试'
+        return 'ok'
+    index = kwargs.pop('index')
+    env_name = kwargs.get('env_name')
+    if env_name is '':
+        return '环境名称不可为空'
+    elif kwargs.get('base_url') is '':
+        return '请求地址不可为空'
+    elif kwargs.get('simple_desc') is '':
+        return '请添加环境描述'
+
+    if index == 'add':
+        try:
+            if Env.objects.filter(env_name=env_name).count() < 1:
+                Env.objects.insert_env(**kwargs)
+                logging.info('环境添加成功：{kwargs}'.format(kwargs=kwargs))
+                return 'ok'
+            else:
+                return '环境名称重复'
+        except DataError:
+            return '环境信息过长'
+        #except Exception:
+        #    logging.error('添加环境异常：{kwargs}'.format(kwargs=kwargs))
+        #    logging.error(Exception)
+        #    return '环境信息添加异常，请重试'
+    else:
+        try:
+            if Env.objects.get_env_name(index) != env_name and Env.objects.filter(
+                    env_name=env_name).count() > 0:
+                return '环境名称已存在'
+            else:
+                Env.objects.update_env(index, **kwargs)
+                logging.info('环境信息更新成功：{kwargs}'.format(kwargs=kwargs))
+                return 'ok'
+        except DataError:
+            return '环境信息过长'
+        except ObjectDoesNotExist:
+            logging.error('环境信息查询失败：{kwargs}'.format(kwargs=kwargs))
+            return '更新失败，请重试'
 
 
 def case_logic(type=True, **kwargs):
@@ -358,8 +409,6 @@ def update_include(include):
     return include
 
 
-
-
 def dump_yaml_file(yaml_file, data):
     """ load yaml file and check file content format
     """
@@ -403,95 +452,6 @@ def timestamp_to_datetime(summary, type=True):
     return summary
 
 
-
-def env_data_logic(**kwargs):
-    """
-    环境信息逻辑判断及落地
-    :param kwargs: dict
-    :return: ok or tips
-    """
-    id = kwargs.get('id', None)
-    if id:
-        try:
-            Env.objects.delete_env(id)
-        except ObjectDoesNotExist:
-            return '删除异常，请重试'
-        return 'ok'
-    index = kwargs.pop('index')
-    env_name = kwargs.get('env_name')
-    if env_name is '':
-        return '环境名称不可为空'
-    elif kwargs.get('base_url') is '':
-        return '请求地址不可为空'
-    elif kwargs.get('simple_desc') is '':
-        return '请添加环境描述'
-
-    if index == 'add':
-        try:
-            if Env.objects.filter(env_name=env_name).count() < 1:
-                Env.objects.insert_env(**kwargs)
-                logging.info('环境添加成功：{kwargs}'.format(kwargs=kwargs))
-                return 'ok'
-            else:
-                return '环境名称重复'
-        except DataError:
-            return '环境信息过长'
-        except Exception:
-            logging.error('添加环境异常：{kwargs}'.format(kwargs=kwargs))
-            return '环境信息添加异常，请重试'
-    else:
-        try:
-            if Env.objects.get_env_name(index) != env_name and Env.objects.filter(
-                    env_name=env_name).count() > 0:
-                return '环境名称已存在'
-            else:
-                Env.objects.update_env(index, **kwargs)
-                logging.info('环境信息更新成功：{kwargs}'.format(kwargs=kwargs))
-                return 'ok'
-        except DataError:
-            return '环境信息过长'
-        except ObjectDoesNotExist:
-            logging.error('环境信息查询失败：{kwargs}'.format(kwargs=kwargs))
-            return '更新失败，请重试'
-
-
-def add_suite_data(**kwargs):
-    belong_project = kwargs.pop('project')
-    suite_name = kwargs.get('suite_name')
-    kwargs['belong_project'] = Project.objects.get(project_name=belong_project)
-
-    try:
-        if TestSuite.objects.filter(belong_project__project_name=belong_project, suite_name=suite_name).count() > 0:
-            return 'Suite已存在, 请重新命名'
-        TestSuite.objects.create(**kwargs)
-        logging.info('suite添加成功: {kwargs}'.format(kwargs=kwargs))
-    except Exception:
-        return 'suite添加异常，请重试'
-    return 'ok'
-
-
-def edit_suite_data(**kwargs):
-    id = kwargs.pop('id')
-    project_name = kwargs.pop('project')
-    suite_name = kwargs.get('suite_name')
-    include = kwargs.pop('include')
-    belong_project = Project.objects.get(project_name=project_name)
-
-    suite_obj = TestSuite.objects.get(id=id)
-    try:
-        if suite_name != suite_obj.suite_name and \
-                TestSuite.objects.filter(belong_project=belong_project, suite_name=suite_name).count() > 0:
-            return 'Suite已存在, 请重新命名'
-        suite_obj.suite_name = suite_name
-        suite_obj.belong_project = belong_project
-        suite_obj.include = include
-        suite_obj.save()
-        logging.info('suite更新成功: {kwargs}'.format(kwargs=kwargs))
-    except Exception:
-        return 'suite添加异常，请重试'
-    return 'ok'
-
-
 def add_test_reports(summary, report_name=None):
     """
     定时任务或者异步执行报告信息落地
@@ -503,119 +463,32 @@ def add_test_reports(summary, report_name=None):
     
     
     print("xxx")
-    separator = '\\' if platform.system() == 'Windows' else '/'
-
-    time_stamp = int(summary["time"]["start_at"])
-    summary['time']['start_at'] = datetime.datetime.fromtimestamp(time_stamp).strftime('%Y-%m-%d %H:%M:%S')
-    report_name = report_name if report_name else summary['time']['start_datetime']
-    summary['html_report_name'] = report_name
-
-    report_path = os.path.join(os.getcwd(), "reports{}{}.html".format(separator,time_stamp))
-    #runner.gen_html_report(html_report_template=os.path.join(os.getcwd(), "templates{}extent_report_template.html".format(separator)))
-
-    with open(report_path, encoding='utf-8') as stream:
-        reports = stream.read()
-
-    test_reports = {
-        'report_name': report_name,
-        'status': summary.get('success'),
-        'successes': summary.get('stat').get('testcases').get('success'),
-        'testsRun': summary.get('stat').get('testcases').get('total'),
-        'start_at': summary['time']['start_at'],
-        'reports': reports
-    }
-
-    TestReports.objects.create(**test_reports)
+    try:
+        separator = '\\' if platform.system() == 'Windows' else '/'
+    
+        time_stamp = int(summary["time"]["start_at"])
+        summary['time']['start_at'] = datetime.datetime.fromtimestamp(time_stamp).strftime('%Y-%m-%d %H:%M:%S')
+        report_name = report_name if report_name else summary['time']['start_datetime']
+        summary['html_report_name'] = report_name
+    
+        report_path = os.path.join(os.getcwd(), "reports{}{}.html".format(separator,time_stamp))
+        #runner.gen_html_report(html_report_template=os.path.join(os.getcwd(), "templates{}extent_report_template.html".format(separator)))
+       
+        with open(report_path, encoding='utf-8') as stream:
+            reports = stream.read()
+    
+        test_reports = {
+            'report_name': report_name,
+            'status': summary.get('success'),
+            'successes': summary.get('stat').get('testcases').get('success'),
+            'testsRun': summary.get('stat').get('testcases').get('total'),
+            'start_at': summary['time']['start_at'],
+            'reports': reports
+        }
+        TestReports.objects.create(**test_reports)
+    except Exception as e:
+        print(e)
     return report_path
-
-
-def get_total_values():
-    total = {
-        'pass': [],
-        'fail': [],
-        'percent': []
-    }
-    today = datetime.date.today()
-    for i in range(-11, 1):
-        begin = today + datetime.timedelta(days=i)
-        end = begin + datetime.timedelta(days=1)
-
-        total_run = TestReports.objects.filter(create_time__range=(begin, end)).aggregate(testRun=Sum('testsRun'))[
-            'testRun']
-        total_success = TestReports.objects.filter(create_time__range=(begin, end)).aggregate(success=Sum('successes'))[
-            'success']
-
-        if not total_run:
-            total_run = 0
-        if not total_success:
-            total_success = 0
-
-        total_percent = round(total_success / total_run * 100, 2) if total_run != 0 else 0.00
-        total['pass'].append(total_success)
-        total['fail'].append(total_run - total_success)
-        total['percent'].append(total_percent)
-
-    return total
-
-
-def upload_file_logic(files, project, module, account):
-    """
-    解析yaml或者json用例
-    :param files:
-    :param project:
-    :param module:
-    :param account:
-    :return:
-    """
-
-    for file in files:
-        file_suffix = os.path.splitext(file)[1].lower()
-        if file_suffix == '.json':
-            with io.open(file, encoding='utf-8') as data_file:
-                try:
-                    content = json.load(data_file)
-                except JSONDecodeError:
-                    err_msg = u"JSONDecodeError: JSON file format error: {}".format(file)
-                    logging.error(err_msg)
-
-        elif file_suffix in ['.yaml', '.yml']:
-            with io.open(file, 'r', encoding='utf-8') as stream:
-                content = yaml.load(stream)
-
-        for test_case in content:
-            test_dict = {
-                'project': project,
-                'module': module,
-                'author': account,
-                'include': []
-            }
-            if 'config' in test_case.keys():
-                test_case.get('config')['config_info'] = test_dict
-                variables = test_case.get('config')['variables']
-                variables_list = [ {item:variables[item]} for item in variables]
-                test_case.get('config')['variables'] = variables_list
-
-                add_config_data(type=True, **test_case)
-
-            if 'test' in test_case.keys():  # 忽略config
-                test_case.get('test')['case_info'] = test_dict
-                variables = test_case.get('test')['variables']
-                variables_list = [ {item:variables[item]} for item in variables]
-                test_case.get('test')['variables'] = variables_list
-
-                if 'validate' in test_case.get('test').keys():  # 适配validate两种格式
-                    validate = test_case.get('test').pop('validate')
-                    new_validate = []
-                    for check in validate:
-                        if 'comparator' not in check.keys():
-                            for key, value in check.items():
-                                tmp_check = {"check": value[0], "comparator": key, "expected": value[1]}
-                                new_validate.append(tmp_check)
-
-                    test_case.get('test')['validate'] = new_validate
-
-                add_case_data(type=True, **test_case)
-
 
 def task_logic(**kwargs):
     """

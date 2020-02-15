@@ -872,6 +872,21 @@ rpop 移除并返回列表 key 的尾元素
 3) "a"
 4) "b"
 ```
+4. 集合
++ sadd(key, member)：向名称为key的set中添加元素member
++ srem(key, member) ：删除名称为key的set中的元素member
++ spop(key) ：随机返回并删除名称为key的set中一个元素
++ smove(srckey, dstkey, member) ：移到集合元素
++ scard(key) ：返回名称为key的set的基数
++ sismember(key, member) ：member是否是名称为key的set的元素
++ sinter(key1, key2,…key N) ：求交集
++ sinterstore(dstkey, (keys)) ：求交集并将交集保存到dstkey的集合
++ sunion(key1, (keys)) ：求并集
++ sunionstore(dstkey, (keys)) ：求并集并将并集保存到dstkey的集合
++ sdiff(key1, (keys)) ：求差集
++ sdiffstore(dstkey, (keys)) ：求差集并将差集保存到dstkey的集合
++ smembers(key) ：返回名称为key的set的所有元素
++ srandmember(key) ：随机返回名称为key的set的一个元素
 
 ## 使用pyton操作redis
 

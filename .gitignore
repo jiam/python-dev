@@ -8,6 +8,7 @@ Chapter-*-code/vue-admin/dist
 Chapter-*-code/vue-admin/node_modules
 Chapter-*-code/hat/reports/
 Chapter-*-code/hat/suite/
+Chapter-*-code/hat/httpapitest/migrations/
 .vscode/settings.json
 test.py
 python-dev.code-workspace

@@ -1,56 +1,27 @@
-import json
-from django.shortcuts import render,reverse,redirect
-from django.http import HttpResponse,JsonResponse
-from httpapitest.models import Project,Module,DebugTalk,TestConfig, TestCase, TestReports, Env, TestSuite,UserInfo
+from django.shortcuts import render
+from django.shortcuts import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
+import json
+from httpapitest.models import Project, DebugTalk, Module, TestConfig, Env, TestCase, TestReports
+from django.utils.safestring import mark_safe
+from django.shortcuts import reverse, redirect
 from django.core.paginator import Paginator
-from .utils import config_logic, case_logic, get_time_stamp,timestamp_to_datetime
-from .utils import env_data_logic, add_suite_data,edit_suite_data,get_total_values,upload_file_logic,task_logic
+from .utils import config_logic, env_data_logic, case_logic, task_logic
+from .utils import  get_time_stamp,timestamp_to_datetime
 from httprunner.api import HttpRunner
 from .runner import run_test_by_type,run_by_single,run_by_batch
-from .tasks import main_hrun
 import logging
 import os,shutil
-from django.utils.safestring import mark_safe
+from .tasks import main_hrun
 from django_celery_beat.models import PeriodicTask
 
-logger = logging.getLogger('django')
 
-def login_check(func):
-    def wrapper(request, *args, **kwargs):
-        if not request.session.get('login_status'):
-            return redirect(login)
-        return func(request, *args, **kwargs)
-
-    return wrapper
-
-@login_check
+# Create your views here.
 def index(request):
-    """
-    首页
-    :param request:
-    :return:
-    """
-    project_length = Project.objects.count()
-    module_length = Module.objects.count()
-    test_length = TestCase.objects.count()
-    suite_length = TestSuite.objects.count()
-    
+    return render(request, 'index.html')
 
-    total = get_total_values()
-    manage_info = {
-        'project_length': project_length,
-        'module_length': module_length,
-        'test_length': test_length,
-        'suite_length': suite_length,
-        'total': total
-    }
-
-    
-    return render(request, 'index.html', manage_info)
 
 @csrf_exempt
-@login_check
 def project_add(request):
     if request.is_ajax():
         project = json.loads(request.body.decode('utf-8'))
@@ -95,12 +66,11 @@ def project_add(request):
         return render(request, 'project_add.html')
 
 @csrf_exempt
-@login_check
 def project_list(request):
     if request.method == 'GET':
         projects = Project.objects.all().order_by("-update_time")
         project_name = request.GET.get('project','All')
-        env = Env.objects.all()
+
         user = request.GET.get('user', '负责人')
         info = {'belong_project': project_name, 'user':user}
 
@@ -114,11 +84,10 @@ def project_list(request):
         paginator = Paginator(rs,5)
         page = request.GET.get('page')
         objects = paginator.get_page(page)
-        context_dict = {'project': objects, 'all_projects': projects,'info': info, 'env':env}
+        context_dict = {'project': objects, 'all_projects': projects,'info': info}
         return render(request,"project_list.html",context_dict)
 
 @csrf_exempt
-@login_check
 def project_edit(request):
     if request.is_ajax():
         project = json.loads(request.body.decode('utf-8'))
@@ -153,7 +122,6 @@ def project_edit(request):
             return HttpResponse(msg)
 
 @csrf_exempt
-@login_check
 def project_delete(request):
     if request.is_ajax():
         data = json.loads(request.body.decode('utf-8'))
@@ -162,10 +130,7 @@ def project_delete(request):
         project.delete()
         return HttpResponse(reverse('project_list'))
 
-
-
 @csrf_exempt
-@login_check
 def module_add(request):
     if request.method == 'GET':
         projects = Project.objects.all().order_by("-update_time")
@@ -202,7 +167,6 @@ def module_add(request):
             return HttpResponse(msg)
 
 @csrf_exempt
-@login_check
 def module_list(request):
     if request.method == 'GET':
         
@@ -239,7 +203,29 @@ def module_list(request):
         return render(request,"module_list.html",context_dict)
 
 @csrf_exempt
-@login_check
+def module_search_ajax(request):
+    if request.is_ajax():
+        data = json.loads(request.body.decode('utf-8'))
+        if 'test' in data.keys():
+            project = data["test"]["name"]["project"]
+        if 'config' in data.keys():
+            project = data["config"]["name"]["project"]
+        if 'case' in data.keys():
+            project = data["case"]["name"]["project"]
+        if 'upload' in data.keys():
+            project = data["upload"]["name"]["project"]
+        if 'crontab' in data.keys():
+            project = data["crontab"]["name"]["project"]
+        if  project != "All" and project != "请选择":
+            p = Project.objects.get(project_name=project)
+            modules = Module.objects.filter(belong_project=p)
+            modules_list = ['%d^=%s' % (m.id, m.module_name) for m in modules ]
+            modules_string = 'replaceFlag'.join(modules_list)
+            return HttpResponse(modules_string)
+        else:
+            return HttpResponse('')
+
+@csrf_exempt
 def module_edit(request):
     if request.is_ajax():
         module = json.loads(request.body.decode('utf-8'))
@@ -273,7 +259,6 @@ def module_edit(request):
             return HttpResponse(msg)
 
 @csrf_exempt
-@login_check
 def module_delete(request):
     if request.is_ajax():
         data = json.loads(request.body.decode('utf-8'))
@@ -283,30 +268,6 @@ def module_delete(request):
         return HttpResponse(reverse('module_list'))
 
 
-@csrf_exempt
-@login_check
-def module_search_ajax(request):
-    if request.is_ajax():
-        data = json.loads(request.body.decode('utf-8'))
-        if 'test' in data.keys():
-            project = data["test"]["name"]["project"]
-        if 'config' in data.keys():
-            project = data["config"]["name"]["project"]
-        if 'case' in data.keys():
-            project = data["case"]["name"]["project"]
-        if 'upload' in data.keys():
-            project = data["upload"]["name"]["project"]
-        if 'crontab' in data.keys():
-            project = data["crontab"]["name"]["project"]
-        if  project != "All" and project != "请选择":
-            p = Project.objects.get(project_name=project)
-            modules = Module.objects.filter(belong_project=p)
-            modules_list = ['%d^=%s' % (m.id, m.module_name) for m in modules ]
-            modules_string = 'replaceFlag'.join(modules_list)
-            return HttpResponse(modules_string)
-        else:
-            return HttpResponse('')
-@login_check
 def debugtalk_list(request):
     if request.method == "GET":
         rs = DebugTalk.objects.all().order_by("-update_time")
@@ -316,8 +277,8 @@ def debugtalk_list(request):
         context_dict = {'debugtalk': objects }
         return render(request,"debugtalk_list.html",context_dict)
 
+
 @csrf_exempt
-@login_check
 def debugtalk_edit(request, id):
     if request.method == "GET":
         d = DebugTalk.objects.get(pk=id)
@@ -331,9 +292,9 @@ def debugtalk_edit(request, id):
         d.debugtalk = code
         d.save()
         return redirect(reverse('debugtalk_list'))
-    
+
+
 @csrf_exempt
-@login_check
 def config_add(request):
     if request.method == 'GET':
         context_dict = {
@@ -348,8 +309,8 @@ def config_add(request):
         else:
             return HttpResponse(msg)
 
+
 @csrf_exempt
-@login_check
 def config_list(request):
     if request.method == 'GET':
         projects = Project.objects.all().order_by("-update_time")
@@ -392,9 +353,7 @@ def config_list(request):
         return render(request,"config_list.html",context_dict)
 
 
-
 @csrf_exempt
-@login_check
 def config_delete(request):
     if request.is_ajax():
         data = json.loads(request.body.decode('utf-8'))
@@ -403,8 +362,8 @@ def config_delete(request):
         config.delete()
         return HttpResponse(reverse('config_list'))
 
+
 @csrf_exempt
-@login_check
 def config_copy(request):
     if request.is_ajax():
         data = json.loads(request.body.decode('utf-8'))
@@ -421,7 +380,6 @@ def config_copy(request):
             return HttpResponse(reverse('config_list'))
 
 @csrf_exempt
-@login_check
 def config_edit(request,id):
     if request.method == 'GET':
         config = TestConfig.objects.get(id=id)
@@ -441,9 +399,40 @@ def config_edit(request,id):
         else:
             return HttpResponse(msg)
 
+def env_list(request):
+    if request.method == "GET":
+        env_name = request.GET.get('env_name','')
+        info = {'env_name': env_name}
+        if env_name:
+            rs = Env.objects.filter(env_name=env_name).order_by("-update_time")
+        else:
+            rs = Env.objects.all().order_by("-update_time")
+        paginator = Paginator(rs,5)
+        page = request.GET.get('page')
+        objects = paginator.get_page(page)
+        context_dict = {'env': objects, 'info': info }
+        return render(request,"env_list.html",context_dict)
 
 @csrf_exempt
-@login_check
+def env_set(request):
+    """
+    环境设置
+    :param request:
+    :return:
+    """
+
+    if request.is_ajax():
+        env_lists = json.loads(request.body.decode('utf-8'))
+        msg = env_data_logic(**env_lists)
+        if msg == 'ok':
+            return HttpResponse(reverse('env_list'))
+        else:
+            return HttpResponse(msg)
+        
+    elif request.method == 'GET':
+        return render(request, 'env_list.html')
+
+@csrf_exempt
 def case_add(request):
     if request.method == 'GET':
         context_dict = {
@@ -460,7 +449,6 @@ def case_add(request):
 
 
 @csrf_exempt
-@login_check
 def case_search_ajax(request):
     if request.is_ajax():
         data = json.loads(request.body.decode('utf-8'))
@@ -477,7 +465,6 @@ def case_search_ajax(request):
             return HttpResponse('')
 
 @csrf_exempt
-@login_check
 def config_search_ajax(request):
     if request.is_ajax():
         data = json.loads(request.body.decode('utf-8'))
@@ -494,7 +481,6 @@ def config_search_ajax(request):
             return HttpResponse('')
 
 @csrf_exempt
-@login_check
 def case_list(request):
     if request.method == 'GET':
         env = Env.objects.all()
@@ -535,11 +521,11 @@ def case_list(request):
         paginator = Paginator(rs,5)
         page = request.GET.get('page')
         objects = paginator.get_page(page)
-        context_dict = {'case': objects, 'projects': projects, 'info':info, 'env': env}
+        context_dict = {'case': objects, 'projects': projects, 'info':info, 'env':env}
         return render(request,"case_list.html",context_dict)
 
+
 @csrf_exempt
-@login_check
 def case_edit(request, id):
     if request.method == 'GET':
         case = TestCase.objects.get(id=id)
@@ -562,7 +548,6 @@ def case_edit(request, id):
             return HttpResponse(msg)
 
 @csrf_exempt
-@login_check
 def case_delete(request):
     if request.is_ajax():
         data = json.loads(request.body.decode('utf-8'))
@@ -570,8 +555,8 @@ def case_delete(request):
         case = TestCase.objects.get(id=case_id)
         case.delete()
         return HttpResponse(reverse('case_list'))
+
 @csrf_exempt
-@login_check
 def case_copy(request):
     if request.is_ajax():
         data = json.loads(request.body.decode('utf-8'))
@@ -587,8 +572,8 @@ def case_copy(request):
             case.save()
             return HttpResponse(reverse('case_list'))
 
+
 @csrf_exempt
-@login_check
 def test_run(request):
     """
     运行用例
@@ -611,24 +596,22 @@ def test_run(request):
         type = kwargs.pop('type')
         run_test_by_type(id, base_url, testcase_dir_path, type)
         report_name = kwargs.get('report_name', None)
+        print(testcase_dir_path, report_name)
         main_hrun.delay(testcase_dir_path, report_name)
         return HttpResponse('用例执行中，请稍后查看报告即可,默认时间戳命名报告')
     else:
         id = request.POST.get('id')
         base_url = request.POST.get('env_name')
         type = request.POST.get('type', 'test')
-
         run_test_by_type(id, base_url, testcase_dir_path, type)
         runner.run(testcase_dir_path)
         #shutil.rmtree(testcase_dir_path)
         summary = timestamp_to_datetime(runner._summary, type=False)
-        #print(summary)
+        print(summary)
 
         return render(request,'report_template.html', summary)
 
-
 @csrf_exempt
-@login_check
 def test_batch_run(request):
     """
     批量运行用例
@@ -669,144 +652,17 @@ def test_batch_run(request):
         print(summary)
         return render(request,'report_template.html', summary)
 
-@login_check
-def env_list(request):
-    if request.method == "GET":
-        env_name = request.GET.get('env_name','')
-        info = {'env_name': env_name}
-        if env_name:
-            rs = Env.objects.filter(env_name=env_name).order_by("-update_time")
-        else:
-            rs = Env.objects.all().order_by("-update_time")
-        paginator = Paginator(rs,5)
-        page = request.GET.get('page')
-        objects = paginator.get_page(page)
-        context_dict = {'env': objects, 'info': info }
-        return render(request,"env_list.html",context_dict)
 
-@csrf_exempt
-@login_check
-def env_set(request):
-    """
-    环境设置
-    :param request:
-    :return:
-    """
-
-    if request.is_ajax():
-        env_lists = json.loads(request.body.decode('utf-8'))
-        msg = env_data_logic(**env_lists)
-        if msg == 'ok':
-            return HttpResponse(reverse('env_list'))
-        else:
-            return HttpResponse(msg)
-        
-    elif request.method == 'GET':
-        return render(request, 'env_list.html')
-
-
-def suite_list(request):
-    if request.method == "GET":
-        
-        projects = Project.objects.all().order_by("-update_time")
-        project_name = request.GET.get('project','All')
-        env = Env.objects.all()
-        name = request.GET.get('name', '套件名称')
-        info = {'belong_project': project_name, 'name':name}
-        if project_name != "All":
-            belong_project = Project.objects.get(project_name=project_name)
-            rs = TestSuite.objects.filter(belong_project=belong_project)
-        elif name != "套件名称":
-            rs = TestSuite.objects.filter(suite_name=name)
-        else:
-            rs = projects
-        rs = TestSuite.objects.all().order_by("-update_time")
-        paginator = Paginator(rs,5)
-        page = request.GET.get('page')
-        objects = paginator.get_page(page)
-        context_dict = {'suite': objects, 'info': info, 'project': projects, 'env': env }
-        return render(request,"suite_list.html",context_dict)
-
-@csrf_exempt
-@login_check
-def suite_add(request):
-    if request.is_ajax():
-        kwargs = json.loads(request.body.decode('utf-8'))
-        msg = add_suite_data(**kwargs)
-        if msg == 'ok':
-            return HttpResponse(reverse('suite_list'))
-        else:
-            return HttpResponse(msg)
-
-    elif request.method == 'GET':
-        context_dict = {
-            'project': Project.objects.all().values('project_name').order_by('-create_time')
-        }
-        return render(request, 'suite_add.html', context_dict)
-
-@csrf_exempt
-@login_check
-def suite_edit(request, id=None):
-    if request.is_ajax():
-        kwargs = json.loads(request.body.decode('utf-8'))
-        msg = edit_suite_data(**kwargs)
-        if msg == 'ok':
-            return HttpResponse(reverse('suite_list'))
-        else:
-            return HttpResponse(msg)
-    info = suite_info = TestSuite.objects.get(id=id)
-    context_dict = {
-        'project': Project.objects.all().values('project_name').order_by('-create_time'),
-        'info': info
-    }
-    return render(request, 'suite_edit.html', context_dict)
-
-
-@csrf_exempt
-@login_check
-def suite_delete(request):
-    if request.is_ajax():
-        data = json.loads(request.body.decode('utf-8'))
-        case_id = data.get('id')
-        case = TestSuite.objects.get(id=case_id)
-        case.delete()
-        return HttpResponse(reverse('suite_list'))
-
-
-@csrf_exempt
-@login_check
-def suite_search_ajax(request):
-    if request.is_ajax():
-        data = json.loads(request.body.decode('utf-8'))
-        if 'crontab' in data.keys():
-            project = data["crontab"]["name"]["project"]
-            
-        if   project != "请选择":
-            p = Project.objects.get(project_name=project)
-            suites = TestSuite.objects.filter(belong_project=p)
-            suite_list = ['%d^=%s' % (c.id, c.suite_name) for c in suites ]
-            suite_string = 'replaceFlag'.join(suite_list)
-            return HttpResponse(suite_string)
-        else:
-            return HttpResponse('')
-
-@login_check
 def report_list(request):
     if request.method == "GET":
-        report_name = request.GET.get('report_name','')
-        info = { 'report_name': report_name}
-        if report_name:
-            rs = TestReports.objects.filter(report_name=report_name).order_by("-update_time")
-        else:
-            rs = TestReports.objects.all().order_by("-update_time")
+        rs = TestReports.objects.all().order_by("-update_time")
         paginator = Paginator(rs,5)
         page = request.GET.get('page')
         objects = paginator.get_page(page)
-        context_dict = {'report': objects, 'info': info}
+        context_dict = {'report': objects }
         return render(request,"report_list.html",context_dict)
 
 @csrf_exempt
-@login_check
 def report_delete(request):
     if request.is_ajax():
         data = json.loads(request.body.decode('utf-8'))
@@ -815,7 +671,6 @@ def report_delete(request):
         report.delete()
         return HttpResponse(reverse('report_list'))
 
-@login_check
 def report_view(request, id):
     """
     查看报告
@@ -827,44 +682,6 @@ def report_view(request, id):
     return render(request, 'report_view.html', {"reports": mark_safe(reports)})
 
 @csrf_exempt
-@login_check
-def upload_file(request):
-    
-    if request.method == 'POST':
-        try:
-            project_name = request.POST.get('project')
-            module_name = request.POST.get('module')
-        except KeyError as e:
-            return JsonResponse({"status": e})
-
-        if project_name == '请选择' or module_name == '请选择':
-            return JsonResponse({"status": '项目或模块不能为空'})
-
-        upload_path = os.path.join(os.getcwd(),"upload")
-
-        if os.path.exists(upload_path):
-            shutil.rmtree(upload_path)
-
-        os.mkdir(upload_path)
-
-        upload_obj = request.FILES.getlist('upload')
-        file_list = []
-        for i in range(len(upload_obj)):
-            temp_path = os.path.join(upload_path,upload_obj[i].name)
-            file_list.append(temp_path)
-            try:
-                with open(temp_path, 'wb') as data:
-                    for line in upload_obj[i].chunks():
-                        data.write(line)
-            except IOError as e:
-                return JsonResponse({"status": e})
-
-        upload_file_logic(file_list, project_name, module_name, 'test')
-
-        return JsonResponse({'status': '/httpapitest/case/list'})
-
-@csrf_exempt
-@login_check
 def task_add(request):
     """
     添加任务
@@ -885,7 +702,7 @@ def task_add(request):
         }
         return render(request, 'task_add.html', info)
 
-@login_check
+
 def task_list(request):
     if request.method == 'GET':
         name = request.GET.get('name','')
@@ -902,7 +719,6 @@ def task_list(request):
 
 
 @csrf_exempt
-@login_check
 def task_delete(request):
     if request.is_ajax():
         data = json.loads(request.body.decode('utf-8'))
@@ -912,7 +728,6 @@ def task_delete(request):
         return HttpResponse(reverse('task_list'))
 
 @csrf_exempt
-@login_check
 def task_set(request):
     if request.is_ajax():
         data = json.loads(request.body.decode('utf-8'))
@@ -922,73 +737,3 @@ def task_set(request):
         task.enabled = mode
         task.save()
         return HttpResponse(reverse('task_list'))
-
-def login(request):
-    """
-    登录
-    :param request:
-    :return:
-    """
-    if request.method == 'POST':
-        username = request.POST.get('account')
-        password = request.POST.get('password')
-
-        if UserInfo.objects.filter(username__exact=username).filter(password__exact=password).count() == 1:
-            logger.info('{username} 登录成功'.format(username=username))
-            request.session["login_status"] = True
-            request.session["now_account"] = username
-            return redirect('index')
-        else:
-            logger.info('{username} 登录失败, 请检查用户名或者密码'.format(username=username))
-            return render(request, 'login.html', {'msg': '账号或密码不正确'})
-    elif request.method == 'GET':
-        return render(request, 'login.html')
-
-@csrf_exempt
-def register(request):
-    """
-    注册
-    :param request:
-    :return:
-    """
-    if request.is_ajax():
-        user_info = json.loads(request.body.decode('utf-8'))
-        try:
-            username = user_info.get('account')
-            password = user_info.get('password')
-            email = user_info.get('email')
-    
-            if UserInfo.objects.filter(username__exact=username).filter(status=1).count() > 0:
-                logger.debug('{username} 已被其他用户注册'.format(username=username))
-                msg = '该用户名已被注册，请更换用户名'
-            if UserInfo.objects.filter(email__exact=email).filter(status=1).count() > 0:
-                logger.debug('{email} 昵称已被其他用户注册'.format(email=email))
-                msg = '邮箱已被其他用户注册，请更换邮箱'
-            else:
-                UserInfo.objects.create(username=username, password=password, email=email)
-                logger.info('新增用户：{user_info}'.format(user_info=user_info))
-                msg =  'ok'
-        except Exception as e:
-            logger.error('信息输入有误：{user_info}'.format(user_info=user_info))
-            msg =  e
-        if msg == 'ok':
-            return HttpResponse('恭喜您，账号已成功注册')
-        else:
-            return HttpResponse(msg)
-    elif request.method == 'GET':
-        return render(request, "register.html")
-
-@login_check
-def logout(request):
-    """
-    注销登录
-    :param request:
-    :return:
-    """
-    if request.method == 'GET':
-        logger.info('{username}退出'.format(username=request.session['now_account']))
-        del request.session['now_account']
-        del request.session['login_status']
-        return redirect(login)
-
-

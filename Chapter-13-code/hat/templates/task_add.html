@@ -115,8 +115,6 @@
         $("select[name='project']").on('change', function () {
             if($('#mode').val() === '1') {
                 auto_load('#project', '{%  url 'module_search_ajax' %}', '#belong_module_id', 'module');
-            }else{
-                auto_load('#project', '{% url 'suite_search_ajax' %}', '#belong_module_id', 'suite');
             }
         });
 

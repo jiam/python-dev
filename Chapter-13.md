@@ -55,24 +55,26 @@ from django.utils.safestring import mark_safe
 ```
 
 3. 添加report_list.html模板
-[report_list.html](./Chapter-12-code/hat/templates/report_list.html)
-
+[report_list.html](./Chapter-13-code/hat/templates/report_list.html)
+[report_view.html](./Chapter-13-code/hat/templates/report_view.html)
 4. 添加url
 ```
 path('report/list', views.report_list, name='report_list'),
+path('report/delete', views.report_delete, name='report_delete'),
+path('report/view/<int:id>', views.report_view, name='report_view'),
 ```
 
 ## 添加异步执行功能
-1. 添加异步运行所需要的task.py文件
+1. 添加异步运行所需要的tasks.py文件
 
-[tasks.py](./Chapter-12-code/hat/httpapitest/tasks.py)
+[tasks.py](./Chapter-13-code/hat/httpapitest/tasks.py)
 
 
 
 2. 修改settings.py 添加celery相关配置
-[settings.py](./Chapter-12-code/hat/hat/settings.py)
+[settings.py](./Chapter-13-code/hat/hat/settings.py)
 ```
-CELERY_BROKER_URL = 'redis://192.168.1.111:6379/0'
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0'  #注意这里的127.0.0.1 应该为你redis服务的ip
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 
@@ -95,31 +97,37 @@ def add_test_reports(summary, report_name=None):
     :param kwargs: dict: 报告结果值
     :return:
     """
+    try:
+        separator = '\\' if platform.system() == 'Windows' else '/'
     
-    separator = '\\' if platform.system() == 'Windows' else '/'
-
-    time_stamp = int(summary["time"]["start_at"])
-    summary['time']['start_at'] = datetime.datetime.fromtimestamp(time_stamp).strftime('%Y-%m-%d %H:%M:%S')
-    report_name = report_name if report_name else summary['time']['start_datetime']
-    summary['html_report_name'] = report_name
-
-    report_path = os.path.join(os.getcwd(), "reports{}{}.html".format(separator,time_stamp))
-    #runner.gen_html_report(html_report_template=os.path.join(os.getcwd(), "templates{}extent_report_template.html".format(separator)))
-
-    with open(report_path, encoding='utf-8') as stream:
-        reports = stream.read()
-
-    test_reports = {
-        'report_name': report_name,
-        'status': summary.get('success'),
-        'successes': summary.get('stat').get('testcases').get('success'),
-        'testsRun': summary.get('stat').get('testcases').get('total'),
-        'start_at': summary['time']['start_at'],
-        'reports': reports
-    }
-
-    TestReports.objects.create(**test_reports)
+        time_stamp = int(summary["time"]["start_at"])
+        summary['time']['start_at'] = datetime.datetime.fromtimestamp(time_stamp).strftime('%Y-%m-%d %H:%M:%S')
+        report_name = report_name if report_name else summary['time']['start_datetime']
+        summary['html_report_name'] = report_name
+    
+        report_path = os.path.join(os.getcwd(), "reports{}{}.html".format(separator,time_stamp))
+        #runner.gen_html_report(html_report_template=os.path.join(os.getcwd(), "templates{}extent_report_template.html".format(separator)))
+       
+        with open(report_path, encoding='utf-8') as stream:
+            reports = stream.read()
+    
+        test_reports = {
+            'report_name': report_name,
+            'status': summary.get('success'),
+            'successes': summary.get('stat').get('testcases').get('success'),
+            'testsRun': summary.get('stat').get('testcases').get('total'),
+            'start_at': summary['time']['start_at'],
+            'reports': reports
+        }
+        TestReports.objects.create(**test_reports)
+    except Exception as e:
+        print(e)
     return report_path
+```
+在utils.py 中导入
+```
+import logging,os, platform
+from .models import TestConfig, Module, TestCase, TestReports, Env,  Project
 ```
 
 5. 在hat目录中新增celery.py 文件
@@ -147,10 +155,15 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 # Load task modules from all registered Django app configs.
 app.autodiscover_tasks()
 ```
+在同目录下的__init__.py 添加以下内容
+```
+from .celery import app as celery_app
 
+__all__ = ('celery_app',)
+```
 6.启动celery
 
-`celery -A  hat  worker --loglevel=info  -P eventlet`
+`celery -A  hat  worker --loglevel=info  -P gevent`
 
 打开模块列表,执行模块选择异步
 
@@ -159,7 +172,7 @@ app.autodiscover_tasks()
 1. 使用django-celery-beat 模块
 
 安装
-`pip3 install  django-celery-beat -i https://pypi.douban.com/simple/`
+`pip install  django-celery-beat==1.5.0 -i https://pypi.douban.com/simple/`
 
 在settings.py INSTALLED_APPS 中配置 django_celery_beat
 
@@ -202,7 +215,7 @@ def task_add(request):
         }
         return render(request, 'task_add.html', info)
 
-@login_check
+
 def task_list(request):
     if request.method == 'GET':
         name = request.GET.get('name','')
@@ -237,22 +250,6 @@ def task_set(request):
         task.enabled = mode
         task.save()
         return HttpResponse(reverse('task_list'))
-
-@csrf_exempt
-def suite_search_ajax(request):
-    if request.is_ajax():
-        data = json.loads(request.body.decode('utf-8'))
-        if 'crontab' in data.keys():
-            project = data["crontab"]["name"]["project"]
-            
-        if   project != "请选择":
-            p = Project.objects.get(project_name=project)
-            suites = TestSuite.objects.filter(belong_project=p)
-            suite_list = ['%d^=%s' % (c.id, c.suite_name) for c in suites ]
-            suite_string = 'replaceFlag'.join(suite_list)
-            return HttpResponse(suite_string)
-        else:
-            return HttpResponse('')
 ```
 
 veiws.py 新增导入
@@ -311,7 +308,10 @@ def task_logic(**kwargs):
         return create_task(name, 'httpapitest.tasks.project_hrun', kwargs, crontab, desc)
 ```
 在utils.py 导入
-`from .tasks_opt import create_task`
+```
+from .tasks_opt import create_task
+from django_celery_beat.models import PeriodicTask
+```
 
 3. 在httpapitest目录下添加tasks_opt.py
 ```
@@ -339,7 +339,7 @@ def create_task(name, task, task_args, crontab_time, desc):
         crontab = celery_models.CrontabSchedule.objects.create(**crontab_time)
     task.crontab = crontab  # 设置crontab
     task.enabled = True  # 开启task
-    task.kwargs = json.dumps(task_args, ensure_ascii=False)  # 传入task参数
+    task.kwargs = json.dumps(task_args.values(), ensure_ascii=False)  # 传入task参数
     task.description = desc
     task.save()
     return 'ok'
@@ -375,117 +375,10 @@ def delete_task(name):
     except celery_models.PeriodicTask.DoesNotExist:
         return 'error'
 
-```
-
-2. 更改module_search_ajax 视图
-```
-@csrf_exempt
-@login_check
-def module_search_ajax(request):
-    if request.is_ajax():
-        data = json.loads(request.body.decode('utf-8'))
-        if 'test' in data.keys():
-            project = data["test"]["name"]["project"]
-        if 'config' in data.keys():
-            project = data["config"]["name"]["project"]
-        if 'case' in data.keys():
-            project = data["case"]["name"]["project"]
-        if 'upload' in data.keys():
-            project = data["upload"]["name"]["project"]
-        if 'crontab' in data.keys():
-            project = data["crontab"]["name"]["project"]
-        if  project != "All" and project != "请选择":
-            p = Project.objects.get(project_name=project)
-            modules = Module.objects.filter(belong_project=p)
-            modules_list = ['%d^=%s' % (m.id, m.module_name) for m in modules ]
-            modules_string = 'replaceFlag'.join(modules_list)
-            return HttpResponse(modules_string)
-        else:
-            return HttpResponse('')
-```
-添加内容为
-```
-        if 'crontab' in data.keys():
-            project = data["crontab"]["name"]["project"]
-```
-
-3. 修改commons.js auto_load函数
-```
-function auto_load(id, url, target, type) {
-    var data = $(id).serializeJSON();
-    if (id === '#pro_filter') {
-        data = {
-            "test": {
-                "name": data,
-                "type": type
-            }
-        }
-    } else if (id === '#form_config') {
-        data = {
-            "config": {
-                "name": data,
-                "type": type
-            }
-        }
-    } else if (id === '#belong_message' || id === '#form_message') {
-        data = {
-            "case": {
-                "name": data,
-                "type": type
-            }
-        }
-    } else if (id === '#upload_project_info'){
-        data = {
-            "upload": {
-                "name": data,
-                "type": type
-            }
-        }
-    } else if (id ==='#project') {
-        data = {
-            "crontab": {
-                "name": data,
-                "type": type
-            }
-        }
-    }
-    $.ajax({
-        type: 'post',
-        url: url,
-        data: JSON.stringify(data),
-        contentType: "application/json",
-        success: function (data) {
-        
-                show_module(data, target)
-        }
-        ,
-        error: function () {
-            myAlert('Sorry，服务器可能开小差啦, 请重试!');
-        }
-    });
-
-}
-```
-增加内容为
-```
-    else if (id === '#upload_project_info'){
-        data = {
-            "upload": {
-                "name": data,
-                "type": type
-            }
-        }
-    } else if (id ==='#project') {
-        data = {
-            "crontab": {
-                "name": data,
-                "type": type
-            }
-        }
-    }
 
 ```
-注： uplaod 暂时不用
+
+
 
 4. 添加模板
 
@@ -512,10 +405,9 @@ function auto_load(id, url, target, type) {
 def project_sum(pro_name):
    
     module_count = str(Module.objects.filter(belong_project__project_name__exact=pro_name).count())
-    suite_count = str(TestSuite.objects.filter(belong_project__project_name__exact=pro_name).count())
     test_count = str(TestCase.objects.filter(belong_project__exact=pro_name).count())
     config_count = str(TestConfig.objects.filter(belong_project__exact=pro_name).count())
-    sum = module_count + '/ ' + suite_count + '/' + test_count + '/ ' + config_count
+    sum = module_count +  '/' + test_count + '/ ' + config_count
     return sum
 
 
@@ -528,8 +420,8 @@ def module_sum(id):
     return sum
 ```
 
-2. 将project_list.html 中的0/0/0/0 修改为 `{{ foo.project_name | project_sum }}`
-3. 将module_list.html中的0/0 修改为`{{ foo.id | module_sum }}`
+2. 将project_list.html 中的0/0/0/0 修改为 `{{ foo.project_name | project_sum }}` 并在文件头部添加`{% load custom_tags %}`
+3. 将module_list.html中的0/0 修改为`{{ foo.id | module_sum }}` 并在文件头部添加`{% load custom_tags %}`
 
 ## 导入httprunner配置
 
