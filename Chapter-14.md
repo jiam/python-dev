@@ -13,6 +13,8 @@ rm -f ./*.repo
 wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
 yum clean all
 ```
+如果没有wget 可使用curl
+` curl http://mirrors.aliyun.com/repo/Centos-7.repo -o /etc/yum.repos.d/CentOS-Base.repo`
 
 cetos6
 ```
@@ -30,7 +32,13 @@ yum clean all
 在linux中安装lrzsz `yum install lrzsz`
 
 执行rz 命令上传代码
+### 安装redis
+ ```
+yum install epel-release
+yum install redis
+systemctl start redis
 
+```
 
 ### 安装mysql
 centos7
@@ -50,6 +58,9 @@ yum install mysql-devel
 ### anacoda 
 一个python的发行版可快速在linux系统中配置python环境
 https://repo.anaconda.com/archive/
+
+下周anaconda linux版
+`wget https://repo.anaconda.com/archive/Anaconda3-2019.07-Linux-x86_64.sh`
 
 安装anacod
 ```
@@ -105,6 +116,9 @@ cd /opt
 source env/bin/activate
 (env) [root@python-dev opt]#
 ```
+### 从git上clone 项目
+`yum install git`
+`git clone https://github.com/jiam/hat.git`
 
 ### 查看项目依赖模块版本
 `pip freeze`
@@ -139,12 +153,16 @@ cd /opt/hat
 mysql -uroot -p
 # 创建数据库
 create database hat /*!40100 DEFAULT CHARACTER SET utf8 */;
+
+# 授权
+grant all on hat.* to hatuser@`%` identified by 'hat2019'
+grant all on hat.* to hatuser@`localhost` identified by 'hat2019'
 # 退出数据库
 quit
 ```
 
 初始化书库表
-
+`python manage.py makemigrations`
 `python manage.py  migrate`
 
 ### 启动django应用
@@ -193,7 +211,7 @@ systemctl start nginx
 ```
 
 ### 配置nginx
-vi /etc/nginx/conf.d/default.conf
+cat /etc/nginx/conf.d/default.conf
 
 ```
 cat << EOF>/etc/nginx/conf.d/default.conf
@@ -237,7 +255,9 @@ yum install docker-ce docker-ce-cli containerd.io
 ```
 
 ### 配置docker 
+
 ```
+mkdir /etc/docker
 cat << EOF> /etc/docker/daemon.json
 {
   "insecure-registries" : ["127.0.0.1:5000", "192.168.10.3:5000", "120.132.114.214:5000"],
@@ -339,6 +359,7 @@ EOF
 `docker build . -t hat:1.0`
 
 运行镜像
+systemctl stop nginx
 `docker run -d -p 80:80  --name hat hat:1.0`
 
 

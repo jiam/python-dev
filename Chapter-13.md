@@ -339,41 +339,11 @@ def create_task(name, task, task_args, crontab_time, desc):
         crontab = celery_models.CrontabSchedule.objects.create(**crontab_time)
     task.crontab = crontab  # 设置crontab
     task.enabled = True  # 开启task
-    task.kwargs = json.dumps(task_args.values(), ensure_ascii=False)  # 传入task参数
+    task.kwargs = json.dumps(task_args, ensure_ascii=False)  # 传入task参数
     task.description = desc
     task.save()
     return 'ok'
 
-
-def change_task_status(name, mode):
-    '''
-    任务状态切换：open or close
-    :param name: 任务名称
-    :param mode: 模式
-    :return: ok or error
-    '''
-    try:
-        task = celery_models.PeriodicTask.objects.get(name=name)
-        task.enabled = mode
-        task.save()
-        return 'ok'
-    except celery_models.PeriodicTask.DoesNotExist:
-        return 'error'
-
-
-def delete_task(name):
-    '''
-    根据任务名称删除任务
-    :param name: task name
-    :return: ok or error
-    '''
-    try:
-        task = celery_models.PeriodicTask.objects.get(name=name)
-        task.enabled = False  # 设置关闭
-        task.delete()
-        return 'ok'
-    except celery_models.PeriodicTask.DoesNotExist:
-        return 'error'
 
 
 ```
@@ -420,8 +390,8 @@ def module_sum(id):
     return sum
 ```
 
-2. 将project_list.html 中的0/0/0/0 修改为 `{{ foo.project_name | project_sum }}` 并在文件头部添加`{% load custom_tags %}`
-3. 将module_list.html中的0/0 修改为`{{ foo.id | module_sum }}` 并在文件头部添加`{% load custom_tags %}`
+2. 将project_list.html 中的0 修改为 `{{ foo.project_name | project_sum }}` 并在文件头部添加`{% load custom_tags %}`
+3. 将module_list.html中的0修改为`{{ foo.id | module_sum }}` 并在文件头部添加`{% load custom_tags %}`
 
 ## 导入httprunner配置
 
