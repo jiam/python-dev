@@ -91,7 +91,8 @@ ip:8080/jenkins
 
 改为
 
-`https://mirrors.tuna.tsinghua.edu.cn/jenkins/updates/update-center.json`
+`http://mirrors.tuna.tsinghua.edu.cn/jenkins/updates/update-center.json`
+
 
 重启tomcat
 ```
@@ -142,7 +143,7 @@ export PATH=$MAVEN_HOME/bin:$JAVA_HOME/bin:$PATH
 
 源代码管理 选择git 并输入git地址
 
-`git@github.com:jiam/hello-world.git`
+`https://github.com/jiam/hello-world.git`
 
 ![img](./Chapter-15-code/pics/jenkins10.png)
 
