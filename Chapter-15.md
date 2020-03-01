@@ -301,7 +301,7 @@ pipeline {
     stages {
         stage('git checkout') {
             steps {
-                checkout([$class: 'GitSCM', branches: [[name: 'refs/tags/$tag']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: 'git@github.com:jiam/hat.git']]])
+                checkout([$class: 'GitSCM', branches: [[name: 'refs/tags/$tag']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/jiam/hat.git']]])
         
             }    
         }
