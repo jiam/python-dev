@@ -105,6 +105,11 @@ ip:8080/jenkins
 ![img](./Chapter-15-code/pics/jenkins3.png)
 选择推荐,开始安装
 ![img](./Chapter-15-code/pics/jenkins4.png)
+这个时候从国外下载插件很慢
+执行以下命令
+` sed -i 's#http://updates.jenkins-ci.org/download#http://mirrors.tuna.tsinghua.edu.cn/jenkins#g'  /root/.jenkins/updates/default.json`
+然后重启tomcat，进入安装插件界面后选恢复
+
 
 设置账号
 ![img](./Chapter-15-code/pics/jenkins5.png)
