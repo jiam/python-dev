@@ -261,7 +261,7 @@ mkdir /etc/docker
 cat << EOF> /etc/docker/daemon.json
 {
   "insecure-registries" : ["127.0.0.1:5000", "192.168.10.3:5000", "120.132.114.214:5000"],
-  "registry-mirror": "https://docker.mirrors.ustc.edu.cn",
+  "registry-mirrors": [ "https://docker.mirrors.ustc.edu.cn" ],
   "storage-driver": "overlay2",
   "log-driver": "json-file",
   "log-opts": {

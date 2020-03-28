@@ -42,7 +42,13 @@ export PATH=$MAVEN_HOME/bin:$JAVA_HOME/bin:$PATH
 ![img](./Chapter-16-code/pics/jenkins6.png)
 
 指定节点执行项目
+自由项目
 ![img](./Chapter-16-code/pics/jenkins7.png)
+
+pipeline 项目
+```
+ agent { label 'node1'}
+```
 
 ## 使用docker 启动jenkins
 
@@ -51,6 +57,7 @@ export PATH=$MAVEN_HOME/bin:$JAVA_HOME/bin:$PATH
 ```
 docker run \
   --rm \
+  --name jenkins \
   -u root \
   -p 8080:8080 \
   -v /root/.jenkins:/var/jenkins_home \
@@ -67,7 +74,7 @@ URL: /job/{job_name}/api/json
 
 ### 获取job 配置文件
 方法: GET
-URL: /job/{job_name}/config.xml/api/json
+URL: /job/{job_name}/config.xml
 
 ### 获取build 信息
 
@@ -77,7 +84,7 @@ URL:  /job/{job_name}/{id}/api/json
 ### 获取日志信息
 
 方法: GET
-URL: /job/{job_name}/{build_number}/logText/progressiveText/api/json
+URL: /job/{job_name}/{id}/logText/progressiveText
 
 ### 运行job
 
@@ -96,7 +103,7 @@ json='{
 
 需要禁止csrf否则返回403这个与django一样
 禁止csrf
-jenkins-系统配置-全局安全配置-跨站请求伪造保护 去掉勾
+jenkins-系统管理-全局安全配置-跨站请求伪造保护 去掉勾
 
 否则需要先获取crumb
 /crumbIssuer/api/json?pretty=true
@@ -184,3 +191,9 @@ URL: jenkins/job/{hat}/config.xml/api/json
 数据内容:
 与创建job相同
 
+
+练习：
+使用python 编写脚本现实以上接口调用，完成的同学截个图
+
+作业：
+写构建部署平台使用django
