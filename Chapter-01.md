@@ -1,33 +1,111 @@
-# 第一天
-## 一、git
+## 第一天
+### 一、git基本操作
 #### 1. 版本控制
 什么是版本控制？版本控制是一种记录一个或若干文件内容变化，以便将来查阅特定版本修订情况的系统。
-在本书所展示的例子中，我们仅对保存着软件源代码的文本文件作版本控制管理，但实际上，你可以对任何类型的文件进行版本控制。
 
-版本控制解决的问题，许多人习惯用复制整个项目目录的方式来保存不同的版本，或许还会改名加上备份时间以示区别。
-这么做唯一的好处就是简单。不过坏处也不少：有时候会混淆所在的工作目录，一旦弄错文件丢了数据就没法撤销恢复。
+解决什么问题？
+
+要把文档还原到编辑前的状态，大家都是怎么做的呢？
+最简单的方法就是先备份编辑前的文档。使用这个方法时，我们通常都会在备份的文档名或目录名上添加编辑的日期。但是，每次编辑文档都要事先复制，这样非常麻烦，也很容易出错。
+![img](./Chapter-01-code/pics/vcs.jpg)
+
+再加上，如果像上图那样毫无命名规则的话，就无法区分哪一个文档是最新的了。而且，如果是共享文件的话，应该加上编辑者的名字。还有，那些文档名字没有体现修改内容。
+
+另外，如果两个人同时编辑某个共享文件，先进行编辑的人所做的修改内容会被覆盖，相信大家都有这样的经历
+
 
 常见版本控制系统，git，svn，vcs
 
-什么是git? linux开源社区， Linus Torvalds为linux内核项目，开发的一个分布式版本控制系统
-* 速度
-* 简单
-* 支持大量并行开发分支
-* 完全分布式
-* 支持超大规模的项目，如linux内核项目
-#### 2. 安装git
-windows 安装git
-````
-https://git-scm.com/
-````
-点击download下载，下一步，下一步即可
+什么是git? 
 
-#### 3. 创建git项目
-两种创建git项目的方法
+Git是一个分布式版本管理系统，是Linus Torvalds为了更好地管理Linux内核开发而创立的。
+
+Git可以在任何时间点，把文档的状态作为更新记录保存起来。因此可以把编辑过的文档复原到以前的状态，也可以显示编辑前后的内容差异。
+
+而且，编辑旧文件后，试图覆盖较新的文件的时候（即上传文件到服务器时），系统会发出警告，因此可以避免在无意中覆盖了他人的编辑内容
+
+
+基本概念
+1. 本地仓库，自己机器上的仓库
+
+* Index
+Index（索引，或暂存区）是工作区和版本区的中间cache,缓存区存储在 .git 文件夹中
+
+* 工作区
+工作区就是当前项目目录 在你将修改提交到暂存区并记录到历史之前，可以随意更改。
+
+* 版本区
+版本区，提交(git commit)后,数据进入版本区，纳入版本管理，每个commit都是一个版本，版本区在.git文件夹中
+
+2. 远程仓库
+配有专用的服务器，为了多人共享而建立的仓库
+
+![img](./Chapter-01-code/pics/arch.png)
+
+3. 文件状态
+git中的文件有以下几种状态：
+
+* 未跟踪（untrack）：表示文件为新增加的。
+
+* 已修改（modified）：表示修改了文件，但还没保存到git仓库中。
+
+* 已暂存（staged）：表示对一个已修改文件的当前版本做了标记，使之包含在下次提交的快照中。 
+
+* 已提交（committed）：表示文件已保存在git仓库中。
+
+#### 2. 安装git
+1. windows
+打开`https://git-scm.com/download/win`下载，完成后，双击安装
+2. mac
+先安装homebrew，homebrew是一个包管理管理工具，可以使用命令安装软件,打开mac终端执行以下命令
+`/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"`
+安装git
+`brew install git`
+3. linux
+* centos发行版 `yum install git`
+* ubuntu发行版 `apt install git`
+yum和apt 分别为centos和ubuntu的包管理工具
+
+windows下的git会安装一个git-bash，用于从命令行运行Git。 git-bash中使用git，就像在LINUX和UNIX(mac 是一种unix)环境中使用git一样
+
+git-bash 使用minGW实现的windows版的bash并包含git命令
+minGW是将GCC编译器(一种c语言编译器)和GNU Binutils(一整套开源的linux工具)移植到Windows平台下的产物，包括一系列头文件、库和可执行文件。
+
+
+
+#### 3.初次运行git前的配置
+
+配置name和email，这个会出现在commit里
+
+```
+git config --global user.name "John Doe"
+git config --global user.email johndoe@example.com
+```
+检查配置信息
+```
+git config  --list
+```
+这个配置信息会存放在
+`~/.gitconfig` 文件
+查看文件内容
+```
+ cat ~/.gitconfig
+[user]
+        email = jiaminqiangx@163.com
+        name = jiaminqiangtest
+[core]
+        autocrlf = input
+        safecrlf = true
+
+```
+
+#### 4. 创建git项目
+两种方式，本地创建和从远程克隆
+
 * git init
 * git clone
 
-**对现有项目，开始使用git，打开git bash进入项目目录**
+**对已有项目，开始使用git，打开git bash进入项目目录**
 
 初始化项目目录
 ````
@@ -45,14 +123,16 @@ git commit -m 'init this project'
 ````
 * git add 对文件进行跟踪，添加到暂存区
 * git commit 提交到本地仓库
-**从现有项目克隆**
-如果想从现有项目复制，就需要用到git clone
+**从已有远程git仓库克隆**
+
 ````
 git clone https://github.com/jiam/python-dev.git
 ````
 当前目录就会出现python-dev这个项目 `https://github.com/jiam/python-dev.git` 为远程仓库的地址
 
-#### 4. 将本地的git项目push到远程仓库如：github
+注：远程仓库有两种地址一种是https的，一种git的，比如上面的git地址为`git@github.com:jiam/python-dev.git`
+
+#### 5. 将本地的git项目push到远程仓库如：github
 * 在github注册账号
 * 登陆github
 * 创建一个github项目与本地项目同名
@@ -64,33 +144,58 @@ git commit -m "first commit"
 git remote add origin https://github.com/jiam/test.git
 git push -u origin master
 ````
-* git remote add  origin 为远程仓库起名字，  https://github.com/jiam/test.git为远程仓库的url
-* git push -u 将本地仓库的master 分支推送的远程名字为 origin 仓库master分支，第一次推送的时候执行，以后直接使用`git push`
--u 为--set-upstream 的缩写既将本地master 分支与 远程origin仓库的master分支关联
+* `echo "# test" >> README.md`  创建一个文件名字为README.md，内容为`# test`
+* `git init` 创建一个本地仓库
+* `git add README.md` 将README.md提交到暂存区，README.md项目介绍文件
+* `git commit -m "first commit"` 将暂存区的变更提交到本地仓库
+* `git remote add  origin` 为本地仓库添加一个管理的远程仓库，  https://github.com/jiam/test.git为远程仓库的url,origin就是这个远程仓库的别名
+* `git push -u` 将本地仓库的master 分支推送的远程名字为 origin 仓库master分支，第一次推送的时候执行，以后直接使用`git push`
+-u 为--set-upstream 的缩写既将本地master 分支与 远程origin仓库的master分支关联，origin是本地仓库的上游
  
 
-#### 5. git的回滚
-* 工作区
+#### 6. git的回滚
+* 工作区 
 * 暂存区
 * 已提交区
 
 工作区即当前目录，使用git add 命令后，文件被追踪，状态为在暂存；git commit后提交到仓库
-**只修改文件为执行git add**
-````
+**只修改文件未执行git add**
+```
 git checkout filename
-````
+```
 **修改文件后，执行git add 但未执行git commit**
-````
-git reset HEAD
-git checkout filename
-````
-**修改文件后，执行了git add和git commit**
-````
-git reset --hard HEAD^
-````
+```
+git reset HEAD # 恢复暂存区
+git checkout filename #恢复工作区
+```
+或者
+```
+git restore --staged filename #恢复暂存区
+git restore filename # 恢复工作区
 
-#### 6. 分支管理
-在仓库中添加一个新的分支
+```
+
+**修改文件后，执行了git add和git commit**
+将本地仓库的，已提交区、暂存区、工作区全部还原
+````
+git reset --hard HEAD^1  
+````
+HEAD 为一个指针默认指向当前分支的最新commit,HEAD^1即当前commit的上一个commit,当然页可以直接指定上一个commit的commitid 
+`git reset --hard 3d5e56c5e16c5434dd574b6e6af0f4ed03576c4c`
+
+
+## 分支
+在开发软件时，可能有多人同时为同一个软件开发功能或修复BUG，可能存在多个Release版本，并且需要对各个版本进行维护，这是就得引入分支。
+
+分支是为了将修改记录的整体流程分叉保存。分叉后的分支不受其他分支的影响，所以在同一个仓库里可以同时进行多个分支
+
+![img](./Chapter-01-code/pics/git_branch_1.png)
+
+这里a-b-c是一个分支，a-b-o，a-b-x也是分支，a,b,o,x为commit
+仓库初始化是会创建一个名字为master的本地分支
+### 分支基本操作
+
+在仓库中添加一个新的分支dev
 ````
 git branch dev
 ````
@@ -141,16 +246,27 @@ git checkout dev
 git checkout master
 git merge dev
 ````
-#### 8. 配置git密码
-````
-.git/config
+注意这里有可能会产生文件冲突，冲突后需要手动合并冲突
 
-[credential]
-    helper = store
-````
-添加以上配置后git会记录使用http连接时，使用的账号密码
 
-#### 9. 配置密钥
+### 认证配置
+git两种常见认证
+1. 使用账户密码-用于http协议
+2. 使用ssh密钥-用于git协议
+#### 配置git密码
+1. 配置全局密码 
+```
+git config --global user.name 'jiam'
+git config --global user.password 'xxxx'
+```
+2. 配置记录手动输入的密码
+```
+git config --gloabal credential.helper store
+```
+
+注：第一种方法为明文保存的密码
+
+#### 配置密钥
 ```
 ssh-keygen
 # 然后连续回车在~/.ssh下会生成两个文件id_rsa,id_rsa.pub
@@ -158,10 +274,12 @@ cat  ~/.ssh/id_rsa.pub
 
 # 复制内容添加到github中的ssh认证中，使用git协议地址不需要密码
 ```
+推荐使用密钥配置
 
 ## 二、 pycharm中使用git
 #### 1. 新建git项目
 打开pycharm->vcs->checkout from versin control->git 
+
 填写git的url，和本地的项目目录
 
 #### 2. git add
