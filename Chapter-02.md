@@ -22,6 +22,11 @@ if __name__ == "__main__":
     test()
 ````
 RecursionError: maximum recursion depth exceeded 递归异常，超过最大递归深度
+查看递归最大次数
+```
+>>> import sys
+>>> sys.getrecursionlimit()
+```
 
 x的n次幂 等于x 的n-1次幂乘x，x的0次幂等于1
 ````
@@ -43,10 +48,9 @@ if __name__ == "__main__":
 ## 装饰器
 
 
-装饰器是可调用的对象，其参数是另一个函数（被装饰的函数），装饰器可以处理被装饰的函数，然后把它返回，
-也可以将其替换成另一个函数或可调用对象
+装饰器是可调用的对象，其参数是另一个函数（被装饰的函数），装饰器可以处理被装饰的函数，然后把它返回一个函数
 
-例子
+将targett的替换为inner
 ````
 def deco(func):
     def inner():
@@ -304,8 +308,8 @@ for dirpath, dirames, filenames  in os.walk("d:/py/peixun/python-dev"):
 ## 线程
 线程是中轻量级的进程，所有线程均在同一个进程中，共享全局内存，用于任务并行
 ###  常见线程用法
-实例1 
-````buildoutcfg
+实例1 不同任务并行
+```
 import threading
 import time
 
@@ -319,7 +323,7 @@ t = threading.Thread(target=helloworld)
 t.start()
 print("main thread")
 
-````
+```
 注意：这里有两个线程一个是主线程，一个是通过threading模块产生的t线程，
 这里程序并没有阻塞在helloword函数，主线程和t线程并行运行
 
@@ -344,7 +348,7 @@ print("main thread")
 
 实例3 线程间同步
 
-````buildoutcfg
+```
 import threading, time
 
 count = 0
@@ -352,14 +356,16 @@ count = 0
 def adder():
     global count
     count = count + 1
-    time.sleep(0.5)
+    time.sleep(0.1)
     count = count + 1
 
 threads = []
-for i in range(10):
+for i in range(1000):
     thread = threading.Thread(target=adder)
-    thread.start()
     threads.append(thread)
+
+for thread in threads:
+    thread.start()
 
 for thread in threads:
     thread.join()
@@ -368,7 +374,7 @@ print(count)
 ````
 
 加锁
-````buildoutcfg
+```
 import threading, time
 
 count = 0
@@ -385,8 +391,10 @@ addlock = threading.Lock()
 threads = []
 for i in range(100):
     thread = threading.Thread(target=adder,args=(addlock,))
-    thread.start()
     threads.append(thread)
+    
+for thread in threads:
+     thread.start()
 
 for thread in threads:
     thread.join()
@@ -411,8 +419,10 @@ addlock = threading.Lock()
 threads = []
 for i in range(100):
     thread = threading.Thread(target=adder,args=(addlock,))
-    thread.start()
     threads.append(thread)
+
+for thread in threads:
+     thread.start()
 
 for thread in threads:
     thread.join()
@@ -425,7 +435,7 @@ print(count)
 
 实际上带有线程的程序通常由一系列生产者和消费者组成，它们通过将数据存入一个共享队列中或者从中取出来进行通信。
 
-````buildoutcfg
+```
 import threading, queue
 import time
 
@@ -476,7 +486,7 @@ if __name__ == "__main__":
 ## 多进程
 ###  multiprocessing  模块
 多进程模块
-````buildoutcfg
+```
 import os
 
 from multiprocessing import Process, Lock
@@ -493,7 +503,7 @@ if __name__ == '__main__':
     for i in range(5):
         p = Process(target=whoami, args=('child', lock))
         p.start()
-````
+```
 
 
 队列
@@ -588,3 +598,35 @@ if __name__ == '__main__':
 ##作业
 复制目录数,拷贝目录a到a.bak
 使用多进程写一个并发http，get请求的程序， 可设置并发数和请求总数，返回请求状态码
+
+
+编写一个pemit装饰器实现权限认证
+```
+def test(info):
+    if info.username == 'root' and 'info.passwd'=='1223':
+        print('你有权限')
+    else:
+        print('你没有权限')
+        return 
+    return data = "1,2,3" 
+
+
+def test2(info):
+    if info.username == 'root' and info.passwd=='1223':
+        print('你有权限')
+    else:
+        print('你没有权限')
+        return 
+    return data2 = "4,5,6" 
+
+
+@permit
+def test2(info)
+    return data2 = "4,5,6" 
+
+@permit
+def test(info)
+    return data = "123"
+   
+实现permit装饰器对权限进行验证
+```
