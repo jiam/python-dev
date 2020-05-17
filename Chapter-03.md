@@ -36,20 +36,7 @@ HTTPS的全称是Hyper Text Transfer Protocol over Secure Socket Layer，是以�
 6. 浏览器解析html代码，并请求html代码中的资源
 7. 浏览器对页面进行渲染呈现给用户
 
-### URI和URL
-
-URI的全称为Uniform Resource Identifier，即统一资源标志符，URL的全称为Universal Resource Locator，即统一资源定位符举例来说，
-https://github.com/favicon.ico 是GitHub的网站图标链接，它是一个URL，也是一个URI。即有这样的一个图标资源，我们用URL/URI来
-唯一指定了它的访问方式，这其中包括了访问协议https、访问路径（/即根目录）和资源名称favicon.ico。通过这样一个链接，我们便可以
-从互联网上找到这个资源，这就是URL/URI。
-
-URL是URI的子集，也就是说每个URL都是URI，但不是每个URI都是URL。那么，怎样的URI不是URL呢？URI还包括一个子类叫作URN，它的全称
-为Universal Resource Name，即统一资源名称。URN只命名资源而不指定如何定位资源，比如favicon.ico只是个文件名称
-
-URI可以分为URL,URN或同时具备locators 和names特性的一个东西。URN作用就好像一个人的名字，URL就像一个人的地址。换句话说：
-URN确定了东西的身份，URL提供了找到它的方式。
-
-![img](./Chapter-03-code/pics/url-uri-miessler2018-e1541689316436.png)
+### URL
 
 URL 格式
 ```
@@ -412,11 +399,16 @@ import requests
 
 url = "https://movie.douban.com/"
 
-r = requests.get(url)
+headers= {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36'
+}
+
+r = requests.get(url, headers=headers)
 html_doc = r.text
 soup = BeautifulSoup(html_doc, 'html.parser')
 
 element = soup.select('#billboard > div.billboard-bd > table')[0]
+
 for item in element.find_all('a'):
     print(item.text)
 

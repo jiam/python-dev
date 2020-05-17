@@ -407,7 +407,8 @@ required 属性 必填
 ```
 + 单选按钮
 ```
-<input type="radio" checked id="soup" name="meal">
+<input type="radio"  id="soup1" name="meal" value=1>
+<input type="radio"  id="soup2" name="meal" value=2>
 ```
 + 按钮
 
@@ -539,6 +540,7 @@ h2, p {color:gray;}
 当选择器组合时，应该从右到左阅读.最右边的选择器直接位于花括号之前，被称为key选择器。
 key选择器确切地标识样式将应用于哪个元素。key 选择器左侧的任何选择器都将用作预选者
 
+[css选择器](http://www.w3school.com.cn/cssref/css_selectors.asp)
 
 
 ### html中使用css
@@ -953,7 +955,7 @@ aside {
 有两列我们可以将一列向左浮动而另一列向右浮动，但是如果列数更多，我们必须改变我们的方法
 比方说，我们希望在`<header>`和`<footer>`元素之间有一行三列。
 
-如果我们删除<aside>元素并使用三个<section>元素，我们的HTML可能如下所示
+如果我们删除`<aside>`元素并使用三个`<section>`元素，我们的HTML可能如下所示
 
 ````
 <header>...</header>
