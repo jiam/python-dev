@@ -98,7 +98,7 @@ JavaScript在设计之初，为了方便初学者学习，并不强制要求用v
 i = 10; // i现在是全局变量
 ```
 
-在同一个页面的不同的JavaScript文件中，如果都不用var申明，恰好都使用了变量i，将造成变量i互相影响，产生难以调试的错误结果。
+在同一个页面的不同的JavaScript文件中，恰好都使用了变量i，将造成变量i互相影响，产生难以调试的错误结果。
 
 使用var申明的变量则不是全局变量，它的范围被限制在该变量被申明的函数体内（函数的概念将稍后讲解），同名变量在不同的函数体内互不冲突。
 
@@ -181,26 +181,9 @@ s[0] = 'X';
 alert(s); // s仍然为'Test'
 ```
 
-toLowerCase
-```
-var s = 'Hello';
-var lower = s.toLowerCase(); // 返回'hello'并赋值给变量lower
-lower; // 'hello'
-```
 
-indexOf
-```
-var s = 'hello, world';
-s.indexOf('world'); // 返回7
-s.indexOf('World'); // 没有找到指定的子串，返回-1
-```
 
-substring
 
-```
-var s = 'hello, world'
-s.substring(0, 5); // 从索引0开始到5（不包括5），返回'hello'
-s.substring(7); // 从索引7开始到结束，返回'world'
 ```
 
 
@@ -660,7 +643,7 @@ abs(-9, 'haha', 'hehe', null); // 返回9
 abs(); // 返回NaN
 ```
 
-此时abs(x)函数的参数x将收到undefined，计算结果为NaN。
+此时abs()函数的参数x将收x到undefined，计算结果为NaN。
 
 要避免收到undefined，可以对参数进行检查：
 ```
@@ -807,10 +790,10 @@ function getAge() {
 var xiaoming = {
     name: '小明',
     birth: 1990,
-    age: getAge
+    //age: getAge
 };
 
-xiaoming.age(); // 29
+//xiaoming.age(); // 29
 getAge.apply(xiaoming); // 29, this指向xiaoming, 参数为空
 getAge.call(xiaoming);
 ```
