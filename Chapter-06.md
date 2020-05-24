@@ -1,5 +1,5 @@
 # 第6天
-
+浏览器里的javascript，如何操作html，css，如何发出ajax请求
 ## 浏览器环境
 JavaScript可以获取浏览器环境提供的很多对象，并进行操作。
 
@@ -115,6 +115,8 @@ document.cookie;
 history对象保存了浏览器的历史记录，JavaScript可以调用history对象的back()或forward ()，相当于用户点击了浏览器的“后退”或“前进”按钮。
 
 ## 操作dom
+
+[DOM](https://www.runoob.com/htmldom/htmldom-tutorial.html)
 由于HTML文档被浏览器解析后就是一棵DOM树，要改变HTML的结构，就需要通过JavaScript来操作DOM。
 ![img](./Chapter-06-code/pics/pic_htmltree.gif)
 
@@ -522,7 +524,7 @@ request.send()
 
 
 
-发功一个post请求
+发一个post请求
 ```
 function encodeFormData(o){
    var s="";
@@ -840,7 +842,7 @@ $('tr.red,tr.green'); // 把<tr class="red">和<tr class="green">都选出来
 ```
 
 
-#### 层级选择器（Descendant Selector）
+#### 层级选择器（Descendant Selector）后代选择器
 如果两个DOM元素具有层级关系，就可以用$('ancestor descendant')来选择，层级之间用空格隔开。例如：
 ```
 <html>
