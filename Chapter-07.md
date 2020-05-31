@@ -325,7 +325,7 @@ TEMPLATES = [
 
 更好的方法是使用 Python 内置的函数自动找出 templates 目录的路径。这样无论你把 Django 项目的代码放在何处，最终都能得到一个绝对路径。因此，项目的可移植性更高。
 
-settings.py 文件的顶部有个名为 BASE_DIR 的变量，它的值是 settings.py 文件所在目录的路径。这里用到了 Python 的特殊属性 __file__，它的值是所在文件的绝对路径。调用 os.path.dirname()的作用是获取 settings.py 文件所在目录的绝对路径，再调用一次 os.path.dirname() 又去掉一层，
+settings.py 文件的顶部有个名为 BASE_DIR 的变量，它的值就是项目目录的路径。这里用到了 Python 的特殊属性 __file__，它的值是所在文件的绝对路径。调用 os.path.dirname()的作用是获取 settings.py 文件所在目录的绝对路径，再调用一次 os.path.dirname() 又去掉一层，
 因此 BASE_DIR 最终的值是项目目录。
 
 有了 BASE_DIR 之后，我们便可以轻易引用 Django 项目中的文件和目录。我们可以定义一个名为TEMPLATE_DIR 的变量，指向 templates 目录的位置。这里还要使用 os.path.join() 函数拼接多个路径片段。 TEMPLATE_DIR 变量的定义如下：
@@ -972,9 +972,9 @@ Django 还支持其他数据库引擎。
 ## 练习
 1. 更新 Category 模型，加上 views 和 likes 字段，二者的默认值均是零。
 2. 创建迁移，然后执行，提交此次改动。
-3. 更新填充脚本，把“Python”分类的查看次数设为 128、点赞次数设为 64，把“Django”
-分类的查看次数设为 64、点赞次数设为 32，把“Other Frameworks”分类的查看次数设
-为 32、点赞次数设为 16。
+3. 更新填充脚本，把“Python”分类的查看次数(views)设为 128、点赞次数(likes)设为 64，把“Django”
+分类的查看次数(views)设为 64、点赞次数设为(likes) 32，把“Other Frameworks”分类的查看次数(vies)设
+为 32、点赞次数设为(likes) 16。
 4. 删除数据库，然后重新创建，再使用填充脚本填充数据。
 
 ## 答案
