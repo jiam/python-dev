@@ -231,7 +231,7 @@ def show_category(request, category_name_slug):
     {% endif %}
     </div>
   </body>
-</html
+</html>
 ```
 
 上述 HTML 代码再次展示了如何通过 `{{ }}` 标签使用模板上下文中的数据。我们访问了 category和 pages 对象，以及它们的字段，例如 `category.name` 和 `page.url`。如果 category 存在，再检查分类下有没有网页。如果有，使用模板标签 `{% for page in pages %}`迭代网页，显示 pages 列表中各网页的 title 和 url 属性。网页的信息在一个 HTML 无序列表（` <ul>` 标签）中显示。
@@ -479,7 +479,7 @@ def index(request):
       <a href="/navigation/">首页</a><br />
     </div>
   </body>
-</html
+</html>
 ```
 ##  模板进阶
 

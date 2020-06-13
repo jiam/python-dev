@@ -1003,6 +1003,8 @@ class Page(models.Model):
 
     def __str__(self):
         return self.title
+
+------------------------------------------
 # populate.py
 
 import os
