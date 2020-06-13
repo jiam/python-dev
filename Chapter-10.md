@@ -30,15 +30,28 @@ INSTALLED_APPS = [
 
 访问127.0.0.1:8000，显示django界面说明，一切ok
 
-5. 创建数据库
-安装mysql，windows系统在群里下载mysql文件，解压即可
+5. 数据库
+安装mysql
 
-    `CREATE DATABASE `hat` /*!40100 DEFAULT CHARACTER SET utf8 */;`
-
-    安装python 的mysqlclient 模块；python通过改模块连接mysql数据库
+windows系统在群里下载mysql文件，解压即可
+安装python 的mysqlclient 模块；python通过改模块连接mysql数据库
 
     `pip install --only-binary :all: mysqlclient`
     --only-binary 安装编译好的二进制
+mac 系统
+```
+brew install mysql
+brew services start mysql
+pip3 install mysqlclient
+```
+如果没有brew命令,执行以下命令进行安装
+`/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"`
+
+创建数据库
+
+    `CREATE DATABASE `hat` /*!40100 DEFAULT CHARACTER SET utf8 */;`
+
+    
 
 6. 配置mysql数据库
 
