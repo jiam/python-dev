@@ -29,7 +29,9 @@ INSTALLED_APPS = [
     `python manage.py runserver`
 
 访问127.0.0.1:8000，显示django界面说明，一切ok
+
 5. 创建数据库
+安装mysql，windows系统在群里下载mysql文件，解压即可
 
     `CREATE DATABASE `hat` /*!40100 DEFAULT CHARACTER SET utf8 */;`
 

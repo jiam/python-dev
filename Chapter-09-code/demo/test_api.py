@@ -13,7 +13,7 @@ def get_token():
     sign = get_sign(device_sn,os_platform,app_version)
     data = {'sign': sign}
     proxies = {'http': '127.0.0.1:8888'}
-    r = requests.post(url,json=data,headers=headers,proxies=proxies)
+    r = requests.post(url,json=data,headers=headers)
     return r.json()
 
 def create_user(id, name, password,token):
@@ -23,7 +23,15 @@ def create_user(id, name, password,token):
         'token': token}
     data = {'name': name, 'password': password}
     proxies = {'http': '127.0.0.1:8888'}
-    r = requests.post(url,json=data, headers=headers,proxies=proxies)
+    r = requests.post(url,json=data, headers=headers)
+    return r.json()
+
+def get_users(token):
+    device_sn = '1234567'
+    url = 'http://127.0.0.1:5000/api/users'
+    headers = {'device_sn':device_sn,
+        'token': token}
+    r = requests.get(url,headers=headers)
     return r.json()
     
 
@@ -31,7 +39,9 @@ def create_user(id, name, password,token):
 if __name__ == '__main__':
     content = get_token()
     print(content)
-    content2 = create_user(1000, 'test', 'test', content['token'])
-    print(content2)
+    #content2 = create_user(1000, 'test', 'test', content['token'])
+    #print(content2)
+    content3 = get_users(content['token'])
+    print(content3)
     
     

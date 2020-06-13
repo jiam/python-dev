@@ -93,7 +93,7 @@ def get_token():
     app_version = request.headers.get('app_version', "")
     data = request.get_json()
     sign = data.get('sign', "")
-
+    print(sign)
     expected_sign = get_sign(device_sn, os_platform, app_version)
 
     if expected_sign != sign:
@@ -118,6 +118,7 @@ def get_token():
 @app.route('/api/users')
 @validate_request
 def get_users():
+    print(users_dict)
     users_list = [user for uid, user in users_dict.items()]
     users = {
         'success': True,
