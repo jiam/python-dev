@@ -41,7 +41,7 @@ if __name__ == '__main__':
     print(content)
     #content2 = create_user(1000, 'test', 'test', content['token'])
     #print(content2)
-    content3 = get_users(content['token'])
-    print(content3)
+    #content3 = get_users(content['token'])
+    #print(content3)
     
     

@@ -479,14 +479,10 @@ def project_add(request):
             p.simple_desc = project.get('simple_desc')
             p.other_desc = project.get('other_desc')
             p.save()
-            d = DebugTalk()
-            d.belong_project = p
-            d.save()
-            msg = 'ok'
-        if msg == 'ok':
+            #d = DebugTalk()
+            #d.belong_project = p
+            #d.save()
             return HttpResponse("添加成功")
-        else:
-            return HttpResponse(msg)
 
     if request.method == 'GET':
         return render(request, 'project_add.html')
@@ -498,6 +494,7 @@ import json
 from httpapitest.models import Project
 ```
 ### 新建project_add.html 模板
+templates/project_add.html
 ```
 {% extends "base.html" %}
 {% block title %}新增项目{% endblock %}
@@ -596,6 +593,7 @@ from httpapitest.models import Project
 ```
 
 ### commons.js文件
+static/assets/js/common.js
 ```
 /*表单信息异步传输*/
 function info_ajax(id, url) {
@@ -615,16 +613,11 @@ function info_ajax(id, url) {
         data: JSON.stringify(data),
         contentType: "application/json",
         success: function (data) {
-            if (data !== 'ok') {
-                if (data.indexOf('/httpapitest/') !== -1) {
+            if (data.indexOf('/httpapitest/') !== -1) {
                     window.location.href = data;
-                } else {
+            } else {
                     myAlert(data);
-                }
-            }
-            else {
-                window.location.reload();
-            }
+            }    
         }
         ,
         error: function () {
@@ -823,7 +816,6 @@ def project_list(request):
 ### 修改project_add试图
 添加成功后跳转到项目列表页
 ```
-if msg == 'ok':
     return HttpResponse(reverse('project_list'))
 ```
 导入reverse 将`from django.shortcuts import render`改为
@@ -963,16 +955,11 @@ function update_data_ajax(id, url) {
         data: JSON.stringify(data),
         contentType: "application/json",
         success: function (data) {
-            if (data !== 'ok') {
-                if (data.indexOf('/httpapitest/') !== -1) {
+            if (data.indexOf('/httpapitest/') !== -1) {
                     window.location.href = data;
-                } else {
+            } else {
                     myAlert(data);
-                }
-            }
-            else {
-                window.location.reload();
-            }
+            }    
         }
         ,
         error: function () {
@@ -1013,11 +1000,8 @@ def project_edit(request):
             p.simple_desc = project.get('simple_desc')
             p.other_desc = project.get('other_desc')
             p.save()
-            msg = 'ok'
-        if msg == 'ok':
             return HttpResponse(reverse('project_list'))
-        else:
-            return HttpResponse(msg)
+        
 ```
 
 点击编辑测试
@@ -1061,17 +1045,13 @@ function del_data_ajax(id, url) {
         data: JSON.stringify(data),
         contentType: "application/json",
         success: function (data) {
-            if (data !== 'ok') {
-                if (data.indexOf('/httpapitest/') !== -1) {
+            if (data.indexOf('/httpapitest/') !== -1) {
                     window.location.href = data;
-                } else {
+            } else {
                     myAlert(data);
-                }
-            }
-            else {
-                window.location.reload();
-            }
-        },
+            }    
+        }
+        ,
         error: function () {
             myAlert('Sorry，服务器可能开小差啦, 请重试!');
         }
@@ -1838,11 +1818,7 @@ def module_edit(request):
             m.simple_desc = module.get('simple_desc')
             m.other_desc = module.get('other_desc')
             m.save()
-            msg = 'ok'
-        if msg == 'ok':
             return HttpResponse(reverse('module_list'))
-        else:
-            return HttpResponse(msg)
 ```
 
 点击编辑测试
