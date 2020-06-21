@@ -354,8 +354,9 @@ LOGGING = {
             'formatter': 'standard',
         },
         'console': {
+            'level': 'DEBUG',
             'class': 'logging.StreamHandler',
-
+            'formatter': 'standard'
         },
     },
     'loggers': {
