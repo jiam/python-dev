@@ -32,7 +32,7 @@ class DebugTalk(BaseTable):
 def debugtalk_list(request):
     pass
 
-def debugtalk_edit(request, id)：
+def debugtalk_edit(request, id):
     pass
 ```
 
@@ -906,10 +906,10 @@ class WebsiteUser(HttpLocust):
 启动locust
 locustfile.py 位于当前目录
 
-`locust --host=http://127.0.0.1  --web-host="127.0.0.1"`
+`locust --host=http://127.0.0.1   `
 
-+ --host 目标主机
-+ --web-host locust web端口
++ --host 目标主机(被测服务的域名/ip)
++ --web-host locust web界面界面监听地址
 
 如果 Locust 文件位于一个子目录或者使用了其他的名称，那么可以使用 -f 参数来指定
 
@@ -920,10 +920,10 @@ locustfile.py 位于当前目录
 `locust -f ./locustfile.py --master --host=http://127.0.0.1  --web-host="127.0.0.1"`
 
 然后，我们就可以启动任意数量的从属进程了：
-`locust -f ./locustfile.py --slave --host=http://127.0.0.1`
+`locust -f ./locustfile.py --slave --host=http://ip`
 
 如果我们想在多台机器上运行 Locust，我们还必须在启动从机时指定主机，将下面的masterip替换为master机器的ip
-`locust -f ./locustfile.py --slave  --master-host=masterip --host=http://127.0.0.1`
+`locust -f ./locustfile.py --slave  --master-host=masterip --host=http://ip`
 
 
 ### 编写一个locustfile
@@ -1033,96 +1033,21 @@ class WebsiteUser(HttpLocust):
     max_wait = 9000
 ```
 
-### 发起xml-rpc 请求
-locustxmlfile.py
+
+### 使用httprunner 的locusts 启动locust
+`locusts.exe -f  test_server.yaml --web-host="127.0.0.1"`
 
 ```
-import time
-from xmlrpc import client
-
-from locust import Locust, TaskSet, events, task
-
-
-class XmlRpcClient(client.ServerProxy):
-    """
-    Simple, sample XML RPC client implementation that wraps xmlrpclib.ServerProxy and 
-    fires locust events on request_success and request_failure, so that all requests 
-    gets tracked in locust's statistics.
-    """
-    def __getattr__(self, name):
-        func = client.ServerProxy.__getattr__(self, name)
-        def wrapper(*args, **kwargs):
-            start_time = time.time()
-            try:
-                result = func(*args, **kwargs)
-            except Exception as e:
-                total_time = int((time.time() - start_time) * 1000)
-                events.request_failure.fire(request_type="xmlrpc", name=name, response_time=total_time, exception=e)
-            else:
-                total_time = int((time.time() - start_time) * 1000)
-                events.request_success.fire(request_type="xmlrpc", name=name, response_time=total_time, response_length=0)
-                # In this example, I've hardcoded response_length=0. If we would want the response length to be 
-                # reported correctly in the statistics, we would probably need to hook in at a lower level
-        
-        return wrapper
-
-
-class XmlRpcLocust(Locust):
-    """
-    This is the abstract Locust class which should be subclassed. It provides an XML-RPC client
-    that can be used to make XML-RPC requests that will be tracked in Locust's statistics.
-    """
-    def __init__(self, *args, **kwargs):
-        super(XmlRpcLocust, self).__init__(*args, **kwargs)
-        self.client = XmlRpcClient(self.host)
-
-
-class ApiUser(XmlRpcLocust):
-    
-    host = "http://127.0.0.1:8877"
-    min_wait = 100
-    max_wait = 1000
-    
-    class task_set(TaskSet):
-        @task(10)
-        def get_time(self):
-            self.client.get_time()
-        
-        @task(5)
-        def get_random_number(self):
-            self.client.get_random_number(0, 100)
-
-
+-   config:
+        name: test
+-   test:
+        name: test
+        request:
+            method: GET
+            url: http://127.0.0.1
+        validate:
+        -   check: status_code
+            comparator: equals
+            expect: 200
 ```
 
-服务端代码
-
-```
-import random
-import time
-from xmlrpc.server import SimpleXMLRPCServer
-
-
-def get_time():
-    time.sleep(random.random())
-    return time.time()
-
-def get_random_number(low, high):
-    time.sleep(random.random())
-    return random.randint(low, high)
-
-server = SimpleXMLRPCServer(("localhost", 8877))
-print("Listening on port 8877...")
-server.register_function(get_time, "get_time")
-server.register_function(get_random_number, "get_random_number")
-server.serve_forever()
-```
-
-启动被测服务段
-
-python server.py
-
-
-启动locust
-
- locust -f ./locustxmlfile.py   --web-host="127.0.0.1" 
