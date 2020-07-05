@@ -1,7 +1,8 @@
 import json
-from httpapitest.models import TestConfig, Module, TestCase, TestReports, Env, Project
+
 from django import template
 from httpapitest.utils import update_include
+from httpapitest.models import TestConfig, Module, TestCase, TestReports, Env, TestSuite, Project
 
 register = template.Library()
 
@@ -15,6 +16,12 @@ def data_type(value):
     :return: the type of value
     """
     return str(type(value).__name__)
+
+
+@register.filter(name='json_dumps')
+def json_dumps(value):
+    return json.dumps(value, indent=4, separators=(',', ': '), ensure_ascii=False)
+
 
 @register.filter(name='convert_eval')
 def convert_eval(value):
@@ -33,25 +40,13 @@ def id_del(value):
         return False
 
 
-@register.filter(name='json_dumps')
-def json_dumps(value):
-    return json.dumps(value, indent=4, separators=(',', ': '), ensure_ascii=False)
-
-
-@register.filter(name='is_del')
-def id_del(value):
-    if value.endswith('已删除'):
-        return True
-    else:
-        return False
-
 @register.filter(name='project_sum')
 def project_sum(pro_name):
    
     module_count = str(Module.objects.filter(belong_project__project_name__exact=pro_name).count())
     test_count = str(TestCase.objects.filter(belong_project__exact=pro_name).count())
     config_count = str(TestConfig.objects.filter(belong_project__exact=pro_name).count())
-    sum = module_count +  '/' + test_count + '/ ' + config_count
+    sum = module_count + '/ ' + '/' + test_count + '/ ' + config_count
     return sum
 
 
@@ -62,3 +57,8 @@ def module_sum(id):
     config_count = str(TestConfig.objects.filter(belong_module=module).count())
     sum = test_count + '/ ' + config_count
     return sum
+
+
+
+
+

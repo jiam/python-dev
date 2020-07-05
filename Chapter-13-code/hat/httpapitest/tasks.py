@@ -5,7 +5,7 @@ from celery import shared_task
 from django.core.exceptions import ObjectDoesNotExist
 from .utils import timestamp_to_datetime,get_time_stamp
 from .utils import add_test_reports
-from .runner import run_by_project, run_by_module
+from .runner import run_by_project, run_by_module, run_by_suite
 from httprunner.api import HttpRunner
 from httprunner.logger import logger
 from httpapitest.models import Project
@@ -96,3 +96,37 @@ def module_hrun(name, base_url, module):
     os.remove(report_path)
 
 
+@shared_task
+def suite_hrun(name, base_url, suite):
+    """
+    异步运行模块
+    :param env_name: str: 环境地址
+    :param project: str：项目所属模块
+    :param module: str：模块名称
+    :return:
+    """
+    logger.setup_logger('INFO')
+    kwargs = {
+        "failfast": False,
+    }
+    runner = HttpRunner(**kwargs)
+    suite = list(suite)
+
+    testcase_dir_path = os.path.join(os.getcwd(), "suite")
+    testcase_dir_path = os.path.join(testcase_dir_path, get_time_stamp())
+
+    try:
+        for value in suite:
+            run_by_suite(value[0], base_url, testcase_dir_path)
+    except ObjectDoesNotExist:
+        return '找不到Suite信息'
+
+    runner.run(testcase_dir_path)
+
+    shutil.rmtree(testcase_dir_path)
+
+    runner.summary = timestamp_to_datetime(runner.summary)
+    report_path = add_test_reports(runner, report_name=name)
+
+   
+    os.remove(report_path)

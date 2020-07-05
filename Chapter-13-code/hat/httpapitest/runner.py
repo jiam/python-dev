@@ -2,7 +2,7 @@ import os
 
 from django.core.exceptions import ObjectDoesNotExist
 
-from .models import TestCase, Module, Project, DebugTalk,TestConfig
+from .models import TestCase, Module, Project, DebugTalk,TestConfig, TestSuite
 from .utils import dump_python_file, dump_yaml_file
 
 
@@ -77,7 +77,13 @@ def run_by_single(index, base_url, path):
     dump_yaml_file(os.path.join(testcase_dir_path, name) +'.yml', testcase_list)
 
 
+def run_by_suite(index, base_url, path):
+    obj = TestSuite.objects.get(id=index)
 
+    include = eval(obj.include)
+
+    for val in include:
+        run_by_single(val[0], base_url, path)
 
 
 
@@ -90,7 +96,8 @@ def run_by_batch(test_list, base_url, path, type=None, mode=False):
     :param mode: boolean：True 同步 False: 异步
     :return: list
     """
-    if mode:           
+
+    if mode:
         for index in range(len(test_list) - 2):
             form_test = test_list[index].split('=')
             value = form_test[1]
@@ -142,7 +149,6 @@ def run_by_project(id, base_url, path):
     :param base_url: 环境地址
     :return: list
     """
-    
     obj = Project.objects.get(id=id)
     module_index_list = Module.objects.filter(belong_project=obj).values_list('id')
     for index in module_index_list:
@@ -155,5 +161,7 @@ def run_test_by_type(id, base_url, path, type):
         run_by_project(id, base_url, path)
     elif type == 'module':
         run_by_module(id, base_url, path)
+    elif type == 'suite':
+        run_by_suite(id, base_url, path)
     else:
         run_by_single(id, base_url, path)

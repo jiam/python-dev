@@ -1,5 +1,5 @@
 from django.db import models
-from .managers import TestConfigManager, EnvManager, TestCaseManager
+from .managers import TestConfigManager, TestCaseManager, EnvManager, UserInfoManager
 
 # Create your models here.
 
@@ -24,8 +24,6 @@ class Project(BaseTable):
     publish_app = models.CharField('发布应用', max_length=100, null=False)
     simple_desc = models.CharField('简要描述', max_length=100, null=True)
     other_desc = models.CharField('其他信息', max_length=100, null=True)
-
-
 
 class Module(BaseTable):
     class Meta:
@@ -59,15 +57,6 @@ class TestConfig(BaseTable):
     request = models.TextField('请求信息', null=False)
     objects = TestConfigManager()
 
-class Env(BaseTable):
-    class Meta:
-        verbose_name = '环境管理'
-        db_table = 'EnvInfo'
-
-    env_name = models.CharField(max_length=40, null=False, unique=True)
-    base_url = models.CharField(max_length=40, null=False)
-    simple_desc = models.CharField(max_length=50, null=False)
-    objects = EnvManager()
 
 class TestCase(BaseTable):
     class Meta:
@@ -92,3 +81,36 @@ class TestReports(BaseTable):
     testsRun = models.IntegerField()
     successes = models.IntegerField()
     reports = models.TextField()
+
+
+class Env(BaseTable):
+    class Meta:
+        verbose_name = '环境管理'
+        db_table = 'EnvInfo'
+
+    env_name = models.CharField(max_length=40, null=False, unique=True)
+    base_url = models.CharField(max_length=40, null=False)
+    simple_desc = models.CharField(max_length=50, null=False)
+    objects = EnvManager()
+
+
+class TestSuite(BaseTable):
+    class Meta:
+        verbose_name = '用例集合'
+        db_table = 'TestSuite'
+
+    belong_project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    suite_name = models.CharField(max_length=100, null=False)
+    include = models.TextField(null=False)
+
+   
+class UserInfo(BaseTable):
+    class Meta:
+        verbose_name = '用户信息'
+        db_table = 'UserInfo'
+
+    username = models.CharField('用户名', max_length=20, unique=True, null=False)
+    password = models.CharField('密码', max_length=20, null=False)
+    email = models.EmailField('邮箱', null=False, unique=True)
+    status = models.IntegerField('有效/无效', default=1)
+    objects = UserInfoManager()
