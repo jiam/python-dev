@@ -670,6 +670,7 @@ Celery 是一个简单、灵活且可靠的，处理大量消息的分布式系�
 安装支持redis的celery
 ```
 pip install celery -i https://pypi.douban.com/simple/
+pip install redis -i https://pypi.douban.com/simple/
 pip install  eventlet -i https://pypi.douban.com/simple/
 ```
 
@@ -678,7 +679,7 @@ pip install  eventlet -i https://pypi.douban.com/simple/
 ```
 from celery import Celery
 
-app = Celery('tasks', broker='redis://ip:6379/0')
+app = Celery('tasks', broker='redis://127.0.0.1:6379/0')
 
 @app.task
 def add(x, y):

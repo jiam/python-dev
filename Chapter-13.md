@@ -85,7 +85,7 @@ CELERYD_CONCURRENCY = 1 if DEBUG else 10 # celery worker的并发数 也是命�
 CELERYD_MAX_TASKS_PER_CHILD = 100  # 每个worker执行了多少任务就会死掉
 ```
 
-4. 添加异步报告函数
+3. 添加异步报告函数
 
 在utils.py 中添加
 ```
