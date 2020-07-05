@@ -10,17 +10,16 @@ centos7
 ```
 cd /etc/yum.repos.d/
 rm -f ./*.repo
-wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
+curl http://mirrors.aliyun.com/repo/Centos-7.repo -o /etc/yum.repos.d/CentOS-Base.repo
 yum clean all
 ```
-如果没有wget 可使用curl
-` curl http://mirrors.aliyun.com/repo/Centos-7.repo -o /etc/yum.repos.d/CentOS-Base.repo`
+
 
 cetos6
 ```
 cd /etc/yum.repos.d/
 rm -f ./*.repo
-wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-6.repo
+curl http://mirrors.aliyun.com/repo/Centos-7.repo -o /etc/yum.repos.d/CentOS-Base.repo
 yum clean all
 ```
 

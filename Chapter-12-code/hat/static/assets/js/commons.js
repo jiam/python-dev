@@ -16,16 +16,11 @@ function info_ajax(id, url) {
         data: JSON.stringify(data),
         contentType: "application/json",
         success: function (data) {
-            if (data !== 'ok') {
-                if (data.indexOf('/httpapitest/') !== -1) {
+            if (data.indexOf('/httpapitest/') !== -1) {
                     window.location.href = data;
-                } else {
+            } else {
                     myAlert(data);
-                }
-            }
-            else {
-                window.location.reload();
-            }
+            }    
         }
         ,
         error: function () {
@@ -52,16 +47,11 @@ function update_data_ajax(id, url) {
         data: JSON.stringify(data),
         contentType: "application/json",
         success: function (data) {
-            if (data !== 'ok') {
-                if (data.indexOf('/httpapitest/') !== -1) {
+            if (data.indexOf('/httpapitest/') !== -1) {
                     window.location.href = data;
-                } else {
+            } else {
                     myAlert(data);
-                }
-            }
-            else {
-                window.location.reload();
-            }
+            }    
         }
         ,
         error: function () {
@@ -80,22 +70,19 @@ function del_data_ajax(id, url) {
         data: JSON.stringify(data),
         contentType: "application/json",
         success: function (data) {
-            if (data !== 'ok') {
-                if (data.indexOf('/httpapitest/') !== -1) {
+            if (data.indexOf('/httpapitest/') !== -1) {
                     window.location.href = data;
-                } else {
+            } else {
                     myAlert(data);
-                }
-            }
-            else {
-                window.location.reload();
-            }
-        },
+            }    
+        }
+        ,
         error: function () {
             myAlert('Sorry，服务器可能开小差啦, 请重试!');
         }
     });
 }
+
 
 
 function auto_load(id, url, target, type) {

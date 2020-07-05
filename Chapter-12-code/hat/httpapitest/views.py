@@ -52,11 +52,8 @@ def project_add(request):
             d = DebugTalk()
             d.belong_project = p
             d.save()
-            msg = 'ok'
-        if msg == 'ok':
             return HttpResponse(reverse('project_list'))
-        else:
-            return HttpResponse(msg)
+       
 
     if request.method == 'GET':
         return render(request, 'project_add.html')
@@ -111,11 +108,8 @@ def project_edit(request):
             p.simple_desc = project.get('simple_desc')
             p.other_desc = project.get('other_desc')
             p.save()
-            msg = 'ok'
-        if msg == 'ok':
             return HttpResponse(reverse('project_list'))
-        else:
-            return HttpResponse(msg)
+        
 
 @csrf_exempt
 def project_delete(request):
@@ -156,11 +150,8 @@ def module_add(request):
             m.simple_desc = module.get('simple_desc')
             m.other_desc = module.get('other_desc')
             m.save()
-            msg = 'ok'
-        if msg == 'ok':
             return HttpResponse(reverse('module_list'))
-        else:
-            return HttpResponse(msg)
+        
 
 @csrf_exempt
 def module_list(request):
@@ -248,11 +239,8 @@ def module_edit(request):
             m.simple_desc = module.get('simple_desc')
             m.other_desc = module.get('other_desc')
             m.save()
-            msg = 'ok'
-        if msg == 'ok':
             return HttpResponse(reverse('module_list'))
-        else:
-            return HttpResponse(msg)
+       
 
 @csrf_exempt
 def module_delete(request):

@@ -1,6 +1,7 @@
 import logging
 from .models import TestConfig, Module, Env, TestCase
 from django.db import DataError
+from django.core.exceptions import ObjectDoesNotExist
 import time,io,yaml,datetime
 
 logger = logging.getLogger('django')

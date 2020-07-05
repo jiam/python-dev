@@ -843,10 +843,11 @@ def id_del(value):
 Locust 是一个易于使用的分布式用户负载测试工具。它用于对Web站点（或其他系统）进行负载测试，并计算出一个系统可以处理多少并发用户。Locust 完全基于事件，因此可以在一台机器上支持数千个并发用户。与许多其他基于事件的应用程序相比，它不使用回调，而是使用基于 gevent 的轻量级进程。每个 Locust 都在自己的进程中运行（正确的说法是greenlet）。这允许你用Python编写非常有表现力的场景，而不用使用回调使代码复杂化。
 
 
-[locuts](https://www.locust.io/)
+[locuts](https://docs.locust.io/en/0.12.2/writing-a-locustfile.html)
 
 ### 安装
 `pip install locustio==0.12.2  -i https://pypi.douban.com/simple/`
+`pip install HttpRunner==2.2.2 -i https://pypi.douban.com/simple/`
 
 ### 功能
 1. 使用纯Python代码编写用户测试场景
@@ -906,7 +907,7 @@ class WebsiteUser(HttpLocust):
 启动locust
 locustfile.py 位于当前目录
 
-`locust --host=http://127.0.0.1   `
+`locust --host=http://127.0.0.1 `
 
 + --host 目标主机(被测服务的域名/ip)
 + --web-host locust web界面界面监听地址
@@ -920,7 +921,7 @@ locustfile.py 位于当前目录
 `locust -f ./locustfile.py --master --host=http://127.0.0.1  --web-host="127.0.0.1"`
 
 然后，我们就可以启动任意数量的从属进程了：
-`locust -f ./locustfile.py --slave --host=http://ip`
+`locust -f ./locustfile.py --slave --host=http://127.0.0.1`
 
 如果我们想在多台机器上运行 Locust，我们还必须在启动从机时指定主机，将下面的masterip替换为master机器的ip
 `locust -f ./locustfile.py --slave  --master-host=masterip --host=http://ip`
