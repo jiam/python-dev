@@ -30,6 +30,9 @@ yum clean all
 
 在linux中安装lrzsz `yum install lrzsz`
 
+或者使用scp
+
+
 执行rz 命令上传代码
 ### 安装redis
  ```
@@ -187,6 +190,7 @@ nohup celery -A  hat  beat  --loglevel=info >logs/celery_beat.log 2>&1 &
 关闭iptables
 ```
 # centos7
+systemctl disable firewalld
 systemctl stop firewalld
 # centos6
 /etc/init.d/iptables stop
@@ -195,6 +199,7 @@ systemctl stop firewalld
 关闭selinux
 
 `setenforce 0`
+`sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config`
 
 ### 安装nginx
 
@@ -359,7 +364,7 @@ EOF
 
 运行镜像
 systemctl stop nginx
-`docker run -d -p 80:80  --name hat hat:1.0`
+`docker run -d --network=host  --name hat hat:1.0`
 
 
 ### mysql创建用户并授权

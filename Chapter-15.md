@@ -64,6 +64,7 @@ ln -s apache-tomcat-8.5.43 tomcat
 mkdir /opt/tomcat/webapps/jenkins
 cp /opt/soft/jenkins.war /opt/tomcat/webapps/jenkins
 cd  /opt/tomcat/webapps/jenkins
+yum install unzip
 unzip jenkins.war
 ```
 重启tomcat
@@ -124,6 +125,7 @@ ip:8080/jenkins
 cd /opt/soft
 tar zxvf  apache-maven-3.6.1-bin.tar.gz
 mv apache-maven-3.6.1 /opt
+cd /opt
 ln -s apache-maven-3.6.1 maven
 
 ```
@@ -281,7 +283,7 @@ pipeline {
 
 ## 安装blueocean插件
 
-jenkins -系统管理 -插件管理 - 可选插件 - 搜索bule 选择bule ocean
+jenkins -系统管理 -插件管理 - 可选插件 - 搜索blue 选择blue ocean
 
 ![img](./Chapter-15-code/pics/jenkins20.png)
 
@@ -333,11 +335,41 @@ pipeline {
 
 
 使用commit id发布
+修改参数tag 为commit
 
 ```
-                checkout([$class: 'GitSCM', branches: [[name: 'b762a5b9025206112eaede1e8e736c04fb30c42e']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: 'git@github.com:jiam/hat.git']]])
+pipeline {
+    agent any
+   
+    stages {
+        stage('git checkout') {
+            steps {
+                checkout([$class: 'GitSCM', branches: [[name: '$commit']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/jiam/hat.git']]])
+        
+            }    
+        }
+        stage('Build image') {
+            steps {
+                sh '''
+                      docker build . -t hat:$commit
+                      
+                   '''
+            }
+        }
+        stage('deloy hat') {
+            steps {
+                sh '''
+                      
+                      ssh 127.0.0.1 "docker stop hat; docker rm hat; docker run -d -p 80:80  --name hat hat:$commit"
+                      
+                   '''
+            }
+        }
+    }
+}
 
 ```
+
 
 
 
