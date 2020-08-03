@@ -173,6 +173,12 @@ URL: /job/{job_name}/{id}/logText/progressiveText
 
 3. 开始构建
 
+非参数话
+方法: POST 
+URL: /job/{job_name}/build/api/json
+
+
+参数化构建
 方法: POST 
 URL: /job/{job_name}/build/api/json
 数据类型: x-www-form-urlencoded
