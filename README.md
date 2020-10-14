@@ -5,42 +5,42 @@
 * 开发环境pycharm+git
 * 练习编写通讯录程序
 * 使用面向对象编写通讯录程序
-* python序列化pickle
-* 使用pickle来保持通讯录数据文件
 
 
-### 第二天
+###  第二天
 * 递归
 * 装饰器
 * 可迭代的对象、迭代器
 * 生成器
-* 文件处理模块os和os.path
-* 多线程，多进程
-* 练习找出单个目录中的最大文件
+* 序列化
+* 系统编程
+* 练习使用序列化，来保存通讯录数据
 * 练习找出目录树中的最大文件
+
+### 第三天
+* 并发编程（多进程，多线程）
+* 网络编程 (tcp,udp服务)
+* 聊天程序
 * 练习实现http一个压力测试脚本2
 
 ## 前端
-### 第三天 web基础知识
-* http协议
+### 第四天 web基础知识
 * tcp/ip协议栈
-* 域名，ip，dns
+* http协议
+* dns
 * 网页的基础知识
 * python与web交互
 
-### 第四天
+### 第五天
 * html
 * css
 * bootstrap
 
-### 第五天  javascript基础
+### 第六天  javascript
 * 变量和数据类型
 * 控制语句
 * 函数
 * 对象
-
-
-### 第六天 js前端
 * 浏览器对象
 * 操作html文档
 * AJAX
@@ -58,6 +58,7 @@ django基础
 
 ## 10-13天
 
+mysql redis celery
 实战： 自动化接口测试平台
 
 * 项目管理
@@ -74,8 +75,9 @@ django基础
 cicd
 * nginx、redis、mysql，linux环境部署
 * django 项目线上部署
-* jenkins介绍
-* 通过jenkins 实现构建，部署
+* gitlab,jenkins,nexus
 * Jenkins 部署java项目
 * Jenkins 部署django项目
+* docker 技术
+* jenkins docker部署
 * jenkins httpapi 详解
