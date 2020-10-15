@@ -159,6 +159,7 @@ git push -u origin master
 * 已提交区
 
 工作区即当前目录，使用git add 命令后，文件被追踪，状态为在暂存；git commit后提交到仓库
+
 **只修改文件未执行git add**
 ```
 git checkout filename
@@ -192,7 +193,8 @@ HEAD 为一个指针默认指向当前分支的最新commit,HEAD^1即当前commi
 ![img](./Chapter-01-code/pics/git_branch_1.png)
 
 这里a-b-c是一个分支，a-b-o，a-b-x也是分支，a,b,o,x为commit
-仓库初始化是会创建一个名字为master的本地分支
+
+仓库初始化既执行`git init`时创建一个名字为master的本地分支
 ### 分支基本操作
 
 在仓库中添加一个新的分支dev
