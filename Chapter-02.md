@@ -150,7 +150,7 @@ func()
 ````
 参数123传给函数out_f  返回装饰器decorator，@out_f("123")  就是@decorator
 
-### 可迭代的对象，迭代器
+## 可迭代的对象，迭代器
 迭代的意思是重复做一些事很多次，for循环就是一种迭代，列表，字典，元组都是可迭代对象
 实现__iter__方法的对象都是可迭代的对象。 __iter__ 返回一个迭代器，所谓迭代器就是具有next方法的对象
 在掉用next方法的时，迭代器会返回它的下一个值，如果没有值了，则返回StopIteration
@@ -192,7 +192,7 @@ for f in fibs:
         break
 ````
 
-### 生成器
+## 生成器
 1. 生成器函数
 生成器是一种用函数语法定义的迭代器; 调用生成器函数返回一个迭代器
 yield语句挂起生成器函数并向调用者发送一个值，迭代器的_next__继续运行函数
@@ -208,21 +208,6 @@ for num in flat(L):
     print(num)
 ````
 
-生成器send方法
-
-````
-def gen():
-    for i in range(10):
-        x = (yield i)
-        print(x)
-
-g = gen()
-next(g)
-print(g.send(11))
-print(g.send(22))
-````
-生成器函数执行到yield 时就会暂停，执行send收继续运行到下一次循环yield时再暂停，send的值付给x
-
 2. 生成器表达式
 ````
 >>> f = ( x ** 2 for x in range(4))
@@ -236,8 +221,101 @@ print(g.send(22))
 9
 ````
 
+##  序列化
 
-### os 和os.path
+### json
+
+### pickle
+pickle模块是一种的对象序列化工具；对于内存中几乎任何的python对象，都能把对象转化为字节串，
+这个字节串可以随后用来在内存中重建最初的对象。pickle模块能够处理我们用的任何对象，列表，字典
+嵌套组合以及类和实例
+
+#### 1. dumps和 loads
+列表对象
+````
+>>> import pickle
+>>> l = [1,2,3]
+>>> pickle.dumps(l)
+b'\x80\x03]q\x00(K\x01K\x02K\x03e.'
+>>> b = pickle.dumps(l)
+>>> b
+b'\x80\x03]q\x00(K\x01K\x02K\x03e.'
+>>> pickle.loads(b)
+````
+
+字典对象
+````
+>>> d = {"id":1, "name": "贾敏强", "phone_number":"15801396646"}
+>>> pickle.dumps(d)
+b'\x80\x03}q\x00(X\x02\x00\x00\x00idq\x01K\x01X\x04\x00\x00\x00nameq\x02X\t\x00\x00\x00\xe8\xb4\xbe\xe6\x95\x8f\xe5\xbc\xbaq\x03X\x0c\x00\x00\x00phone_numberq\x04X\x0b\x00\x00\x0015801396646q\x05u.'
+>>> b = pickle.dumps(d)
+>>> pickle.loads(b)
+{'id': 1, 'name': '贾敏强', 'phone_number': '15801396646'}
+````
+
+类和实例
+````
+import pickle
+
+
+class Record:
+    def __init__(self, name, phone_number):
+        self.name = name
+        self.phone_number = phone_number
+
+
+R = pickle.dumps(Record)
+print(R)
+print(pickle.loads(R))
+
+record = Record("贾敏强", "15801396646")
+r = pickle.dumps(record)
+print(r)
+print(pickle.loads(r))
+````
+
+#### 2. dump 和load
+````
+import pickle
+
+L = [1, 2, 3]
+with open("d://L.dat", "wb") as f:
+    pickle.dump(L, f)
+with open("d://L.dat", "rb") as f:
+    print(pickle.load(f))
+
+
+class Record:
+    def __init__(self, name, phone_number):
+        self.name = name
+        self.phone_number = phone_number
+
+
+with open("d:/Record.dat", "wb") as f:
+    pickle.dump(Record, f)
+with open("d:/Record.dat", "rb") as f:
+    print(pickle.load(f))
+
+record = Record("贾敏强", "15801396646")
+with open("d:/record.dat", "wb") as f:
+    pickle.dump(record, f)
+with open("d:/record.dat", "rb") as f:
+    print(pickle.load(f))
+
+
+records = []
+records.append(record)
+with open("d:/records.dat", "wb") as f:
+    pickle.dump(records, f)
+
+with open("d:/records.dat", "rb") as f:
+    print(pickle.load(f))
+
+````
+
+## 系统编程
+
+### 文件操作
 
 os 模块
 1.  返回当前目录
@@ -252,10 +330,6 @@ os 模块
 `os.rename('1.py','2.py')`
 6.  删除文件
 `os.remove('2.py')`
-7. 执行系统命令
-`os.system("dir")`
-8. 退出程序
-`os._exit(0)`
 9. 遍历目录中的所有文件
 `os.walk` 返回一个3元组生成器
 当前目录的名称，当前目录中子目录的列表，当前目录中文件的列表
@@ -296,7 +370,68 @@ for dirpath, dirames, filenames  in os.walk("d:/py/peixun/python-dev"):
         print(os.path.join(dirpath, filename))
 ````
 
+### 调用系统命令
 
+os.systm
+
+`os.system('dir')` 
+
+该命令没有返回值
+`print(os.system('dir'))`
+
+```python
+import os
+r = os.system('dir')
+print("返回值", r)
+```
+os.popen
+
+`os.popen('dir')`
+
+该命令没有输出
+```python
+import os
+r = os.popen('dir')
+print(r.read())
+```
+
+subprocess
+
+windows
+`subprocess.call('cmd /C dir')`
+
+mac/linux
+`subprocess.call('dir')`
+
+
+```python
+import subprocess
+
+pipe = subprocess.Popen('cmd /C dir', stdout=subprocess.PIPE)
+r = pipe.stdout.read()
+print(r.decode('gbk')) # mac 字符集 utf8
+
+```
+
+### 命令行参数
+
+```python
+import sys
+args = sys.argv
+print(args)
+print(args[0],args[1])
+```
+注意: sys.argv 的返回值 是个list
+
+### 环境变量
+
+```python
+import os
+
+r = os.environ
+print(r)
+print(r["PATH"])
+```
 
 
 ### 练习
@@ -305,301 +440,10 @@ for dirpath, dirames, filenames  in os.walk("d:/py/peixun/python-dev"):
 * 练习找出目录树中的最大文件
 
 
-## 线程
-线程是中轻量级的进程，所有线程均在同一个进程中，共享全局内存，用于任务并行
-###  常见线程用法
-实例1 不同任务并行
-```
-import threading
-import time
 
-
-def helloworld():
-    time.sleep(2)
-    print("helloworld")
-
-
-t = threading.Thread(target=helloworld)
-t.start()
-print("main thread")
-
-```
-注意：这里有两个线程一个是主线程，一个是通过threading模块产生的t线程，
-这里程序并没有阻塞在helloword函数，主线程和t线程并行运行
-
-
-实例2 同种任务并行
-
-````buildoutcfg
-import threading
-import time
-
-
-def helloworld(id):
-    time.sleep(2)
-    print("thread %d helloworld" % id)
-
-
-for i in range(5):
-    t = threading.Thread(target=helloworld, args=(i,))
-    t.start()
-print("main thread")
-````
-
-实例3 线程间同步
-
-```
-import threading, time
-
-count = 0
-
-def adder():
-    global count
-    count = count + 1
-    time.sleep(0.1)
-    count = count + 1
-
-threads = []
-for i in range(1000):
-    thread = threading.Thread(target=adder)
-    threads.append(thread)
-
-for thread in threads:
-    thread.start()
-
-for thread in threads:
-    thread.join()
-
-print(count)
-````
-
-加锁
-```
-import threading, time
-
-count = 0
-
-def adder(addlock):
-    global count
-    addlock.acquire()
-    count = count + 1
-    time.sleep(0.1)
-    count = count + 1
-    addlock.release()
-
-addlock = threading.Lock()
-threads = []
-for i in range(100):
-    thread = threading.Thread(target=adder,args=(addlock,))
-    threads.append(thread)
-    
-for thread in threads:
-     thread.start()
-
-for thread in threads:
-    thread.join()
-
-print(count)
-````
-使用with 加锁
-
-````buildoutcfg
-import threading, time
-
-count = 0
-
-def adder(addlock):
-    global count
-    with addlock:
-        count = count + 1
-        time.sleep(0.1)
-        count = count + 1
-
-addlock = threading.Lock()
-threads = []
-for i in range(100):
-    thread = threading.Thread(target=adder,args=(addlock,))
-    threads.append(thread)
-
-for thread in threads:
-     thread.start()
-
-for thread in threads:
-    thread.join()
-
-print(count)
-````
-
-
-### queue 模块
-
-实际上带有线程的程序通常由一系列生产者和消费者组成，它们通过将数据存入一个共享队列中或者从中取出来进行通信。
-
-```
-import threading, queue
-import time
-
-
-numconsumers = 20
-numproducers = 20
-nummessages = 4
-
-lock = threading.Lock()
-dataQueue = queue.Queue()
-
-
-def producer(idnum):
-    for msgnum in range(nummessages):
-        dataQueue.put("producer id=%d, count=%d" % (idnum, msgnum))
-
-
-def consumer(idnum):
-    while True:
-        try:
-            data = dataQueue.get(block=False)
-        except queue.Empty:
-            break
-        with lock:
-            print("consumer", idnum, "got => ", data)
-        time.sleep(0.1)
-        dataQueue.task_done()
-
-
-if __name__ == "__main__":
-    consumerThreads = []
-    producerThreads = []
-    for i in  range(numproducers):
-        t = threading.Thread(target=producer, args=(i,))
-        producerThreads.append(t)
-        t.start()
-    for i in range(numconsumers):
-        t = threading.Thread(target=consumer, args=(i,))
-        consumerThreads.append(t)
-        t.start()
-
-    dataQueue.join()
-````
-
-
-练习: 使用多线程写一个并发http，get请求的程序，
-可设置并发数和请求总数，返回请求状态码
-## 多进程
-###  multiprocessing  模块
-多进程模块
-```
-import os
-
-from multiprocessing import Process, Lock
-
-def whoami(label, lock):
-    msg = '%s: name:%s, pid:%s'
-    with lock:
-        print(msg % (label, __name__,os.getpid()))
-
-
-if __name__ == '__main__':
-    lock = Lock()
-
-    for i in range(5):
-        p = Process(target=whoami, args=('child', lock))
-        p.start()
-```
-
-
-队列
-
-```
-from multiprocessing import Process, Queue, Lock
-import queue
-import time
-
-numconsumers = 20
-numproducers = 20
-nummessages = 4
-
-
-
-
-def producer(idnum,dataQueue):
-    for msgnum in range(nummessages):
-        dataQueue.put("producer id=%d, count=%d" % (idnum, msgnum))
-
-
-def consumer(idnum,dataQueue,lock):
-    while True:
-        try:
-            data = dataQueue.get(block=False)
-        except queue.Empty:
-            break
-        with lock:
-            print("consumer", idnum, "got => ", data)
-        time.sleep(0.1)
-
-
-if __name__ == "__main__":
-    lock = Lock()
-    dataQueue = Queue()
-    consumers = []
-    producers = []
-    for i in range(numproducers):
-        p = Process(target=producer, args=(i,dataQueue))
-        producers.append(p)
-        p.daemon=True
-        p.start()
-    for i in range(numconsumers):
-        p = Process(target=consumer, args=(i,dataQueue,lock))
-        consumers.append(p)
-        p.daemon=True
-        p.start()
-
-    for p in consumers:
-        p.join()
-    for p in producers:
-        p.join()
-
-```
-
-
-进程池
-```
-from multiprocessing import Pool
-import time
-
-def func(num):
-    print("hello world %d" % num)
-    time.sleep(3)
-    
-
-if __name__ == '__main__':
-   
-    pool = Pool(processes=4)
-    
-    for i in range(100):
-        pool.apply_async(func, (i,))
-    pool.close()
-    pool.join()
-    
-
-```
-pool.map
-
-```
-from multiprocessing import Pool
-import time
-def f(x):
-    time.sleep(0.5)
-    return x*x
-
-if __name__ == '__main__':
-    with Pool(5) as p:
-        print(p.map(f, range(10)))
-```
 
 ##作业
 复制目录数,拷贝目录a到a.bak
-使用多进程写一个并发http，get请求的程序， 可设置并发数和请求总数，返回请求状态码
-
-
 编写一个pemit装饰器实现权限认证
 ```
 def test(info):
