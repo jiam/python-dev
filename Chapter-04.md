@@ -1,1005 +1,525 @@
-# 第四天 html
+# 第四天
 
 
-## html 基础
+1. tcp/ip协议
+2. 域名与dns
+3. HTTP协议
+4. 网页的基础知识
+5. 使用python与web交互
 
-HTML 是一种相当简单的、由不同元素组成的标记语言，它可用于表示文本片段，使文本在文档中具有不同的含义（段落、项目列表、表格），将文档结构化为逻辑块（头部、主体、导航菜单），并且可以将图片，影像等内容嵌入到页面中。
+## tcp/ip
 
-HTML由一系列的元素组成, 可以使用它来封装，标记内容的不同部分
+计算机使用TCP/IP 协议栈进行通信
+
+TCP/IP参考模型是一个抽象的分层模型，这个模型中，所有的TCP/IP系列网络协议都被归类到4个抽象的"层"中。每一抽象层创建在低一层提供的服务上，并且为高一层提供服务。 完成一些特定的任务需要众多的协议协同工作，这些协议分布在参考模型的不同层中的，因此有时称它们为一个协议栈
+### tcp/ip 模型
++ 应用层 （ftp http smtp）
++ 传输层 （tcp，udp）
++ 网络层 （ip,arp）
++ 链路层
+
+当通过http发起一个请求时，应用层、传输层、网络层和链路层的相关协议依次对该请求进行包装并携带对应的首部，最终在链路层生成以太网数据包，以太网数据包通过物理介质传输给对方主机，对方接收到数据包以后，然后再一层一层采用对应的协议进行拆包，最后把应用层数据交给应用程序处理
+
+![img](./Chapter-03-code/pics/3-2.png)
+
+首部和数据是报文的组成部分既header和data
+![img](./Chapter-03-code/pics/3-3.png)
+![img](./Chapter-03-code/pics/3-4.png)
+
+协议封装
+tcp/ip 协议栈从上往下逐层封帐
+
+![img](./Chapter-03-code/pics/3-6.png)
+
+
+### osi模型
+
++ 应用层
++ 标识层
++ 会话层
++ 传输层
++ 网络层
++ 链路层
++ 物理层
+
+![img](./Chapter-03-code/pics/3-5.png)
+
+
+### 概念
+#### IP地址
+
+由32位二进制数组成，为便于使用，常以XXX.XXX.XXX.XXX形式表现，每组XXX代表小于或等于255的10进制数，该表示方法称为点分十进制。例如维基媒体的一个IP地址是208.80.152.2。IP地址是唯一的。当前IPv4技术可能使用的IP地址最多可有4,294,967,296个（即2的32次方）
+
+#### mac 地址
+以太网地址（Ethernet Address）或物理地址（Physical Address），它是一个用来确认网络设备位置的地址。在OSI模型中，第三层网络层负责IP地址，第二层数据链接层则负责MAC地址。MAC地址用于在网络中唯一标示一个网卡，一台设备若有一或多个网卡，则每个网卡都需要并会有一个唯一的MAC地址
+
+#### arp协议
+地址解析协议（ARP）是一个通过ip地址来定位mac地址的协议，
+
+同一局域网中的一台主机要和另一台主机进行直接通信，必须要知道目标主机的MAC地址。而在TCP/IP协议中，网络层和传输层只关心目标主机的IP地址。这就导致在网络中使用IP协议时，数据链路层接到上层IP协议提供的数据中，只包含目的主机的IP地址。于是需要一种方法，根据目的主机的IP地址，获得其MAC地址。这就是ARP协议要做的事情。所谓地址解析（address resolution）就是主机在发送帧前将目标IP地址转换成目标MAC地址的过程。
+
+#### ip协议
+IP是在TCP/IP协议族中网络层的主要协议，任务仅仅是根据源主机和目的主机的地址来传送数据。
+
+#### tcp协议
+是一种面向连接的、可靠的、基于字节流的传输层通信协议
+建立连接，每个数据包都确认，丢包重传
+
+![img](./Chapter-03-code/pics/tcpip.gif)
+
+#### upd协议
+
+是一种无连接的、不可靠的、基于字节流的传输层通信协议
 
 
 
-### html 元素
+## 域名，DNS
 
-![img](./Chapter-04-code/pic/grumpy-cat-small.png)
 
-1. 元素的构成
+网域名称（英语：Domain Name，简称：Domain），简称域名.是由一串用点分隔的字符组成的互联网上某一台计算机或计算机组的名称，用于在数据传输时标识计算机的电子方位。域名可以说是一个IP地址的代称，目的是为了便于记忆后者。例如，www.baidu.com是一个域名，和一个IP地址相对应。人们可以直接访问www.baidu.com来代替IP地址，然后域名系统（DNS）就会将它转化成便于机器识别的IP地址。这样，人们只需要记忆wikipedia.org这一串带有特殊含义的字符，而不需要记忆没有含义的数字。
 
-* 开始标签 `<p>` 表示一个段落的开始
-* 结束标签 `</p>` 表示一个段落结束
-* 内容 开始标签和结束标签之间的部分
-* 元素  开始标签+内容+结束标签 
+域名的核心是域名系统（英语：Domain Name System，缩写：DNS），域名系统中的任何名称都是域名。在域名系统的层次结构中，各种域名都隶属于域名系统根域的下级。域名的第一级是顶级域，它包括通用顶级域，例如.com、.net和.org；以及国家和地区顶级域，例如.us、.cn和.tk。顶级域名下一层是二级域名，一级一级地往下。这些域名向人们提供注册服务，人们可以用它创建公开的互联网资源或运行网站。顶级域名的管理服务由对应的域名注册管理机构（域名注册局）负责，注册服务通常由域名注册商负责
 
-2. 嵌套元素
+![img](./Chapter-03-code/pics/3-1.jpg)
 
-元素里可以嵌套另一个元素
 
-`<p>我的<strong>html</strong></p>`
+dns解析过程
+![img](./Chapter-03-code/pics/3-2.jpg)
 
-所有的元素都需要正确的打开和关闭
 
-3. 块级元素和行内元素
 
-* 块级元素在页面中以块的形式展现 —— 相对与其前面的内容它会出现在新的一行，其后的内容也会被挤到下一行展现。块级元素通常用于展示页面上结构化的内容，例如段落、列表、导航菜单、页脚等等。一个以block形式展现的块级元素不会被嵌套进内联元素中，但可以嵌套在其它块级元素中
+## http
 
-* 行内元素通常出现在块级元素中并包裹文档内容的一小部分，而不是一整个段落或者一组内容。内联元素不会导致文本换行：它通常出现在一堆文字之间例如超链接元素`<a>`或者强调元素`<em>`
+HTTP的全称是Hyper Text Transfer Protocol，中文名叫作超文本传输协议
 
-看下面例子
+
+通俗来讲，http是计算机通过网络进行通信的规则，是一个基于请求与响应，无状态的，短连接，应用层的协议，常基于TCP/IP协议传输数据。
+
+四个基于：
+
++ 请求与响应：客户端发送请求，服务器端响应数据
+
++ 无状态的：协议对于事务处理没有记忆能力，客户端第一次与服务器建立连接发送请求时需要进行一系列的安全认证匹配等，因此增加页面等待时间，当客户端向服务器端发送请求，服务器端响应完毕后，两者断开连接，也不保存连接状态，一刀两断！恩断义绝！从此路人！下一次客户端向同样的服务器发送请求时，由于他们之前已经遗忘了彼此，所以需要重新建立连接。
+
++ 应用层：Http是属于应用层的协议，配合TCP/IP使用。
+
++ TCP/IP：Http使用TCP作为它的支撑运输协议。HTTP客户机发起一个与服务器的TCP连接，一旦连接建立，浏览器（客户机）和服务器进程就可以通过套接字接口访问TCP。
+
+
+HTTPS的全称是Hyper Text Transfer Protocol over Secure Socket Layer，是以安全为目标的HTTP通道，简单讲是HTTP的安全版，即HTTP下加入SSL层，简称为HTTPS。
+
+
+### 浏览器打开一个网页的请求过程
+准备打开浏览器输入一个url
+
+1. 域名解析
+2. 发起tcp连接(三次握手建立连接)
+3. 建立TCP连接后发起http请求
+4. 服务器端响应http请求，浏览器得到html代码
+5. 关闭tcp连接（非keepalive）
+6. 浏览器解析html代码，并请求html代码中的资源
+7. 浏览器对页面进行渲染呈现给用户
+
+### URL
+
+URL 格式
 ```
-<em>一</em><em>二</em><em>三</em>
-
-<p>四</p><p>五</p><p>六</p>
+<scheme>://<user>:<password>@<host>:<port>/<path>;<params>?<query>#<frag>
+<方案>://<用户>:<密码>@<主机>:<端口>/<路径>;<参数>?<查询>#<片段>
 ```
+URL最重要的3个部分是方案(scheme)、主机(host)、和路径(path)
 
-`<em>` 是一个行内元素，所以就像你在下方可以看到的，第一行代码中的三个元素都没有间隙的展示在了同一行。而`<p>`是一个块级元素，所以第二行代码中的每个元素分别都另起了新的一行展现，并且每个段落间都有空行
++ scheme  获取资源时要使用哪种协议（http，https，ftp，mailto，）
++ user  访问资源时需要的用户名
++ password  用户名后面可能要包含的密码，中间由冒号(:)分隔
++ host         域名/ip
++ port          端口
++ path         资源路径
++ ;params    参数，键/值对。URL中可以包含多个参数字段，它们相互之间以及与路径的其他部分之间用分号(;)分隔 
++ query    查询字符串，用"?"将其与URL的其余部分分隔开来 
++ frag    片段，一个网页中一部分资源的名字（访问html中的锚点）
 
-块级元素与行内元素有几个关键区别：
-+ 格式：
-默认情况下，块级元素会新起一行。
-+ 内容模型：
-一般块级元素可以包含行内元素和其他块级元素。这种结构上的包含继承区别可以使块级元素创建比行内元素更”大型“的结构。
-
-4. 空元素
-不是所有元素都拥有开始标签，内容和结束标签. 一些元素只有一个标签，通常用来在此元素所在位置插入/嵌入一些东西 。例如：元素<img>是用来在元素<img>所在位置插入一张指定的图片。例子如下：
+使用python解析url
 ```
-<img src="https://www.python.org/static/img/python-logo.png">
-```
-
-### 属性
-元素可以有属性
-
-![img](./Chapter-04-code/pic/grumpy-cat-attribute-small.png)
-
-属性包含元素的额外信息，这些信息不会出现在实际的内容中。在上述例子中，这个class属性给元素赋了一个识别的名字，这个名字可以css所使用
-
-一个属性必须包含如下内容：
-
-* 在元素和属性之间有个空格 (如果有一个或多个已存在的属性，就与前一个属性之间有一个空格)
-* 属性后面紧跟着一个=号
-* 有一个属性值,由一对引号""引起来
-
-例子
-
-```
-<a href="https://github.com/jiam/python-dev" title="python-dev" target="_blank">教程</a>
-```
-
-* href: 这个属性声明超链接的web地址，当这个链接被点击浏览器会跳转至href声明的web地址
-* title: 标题title 属性为超链接声明额外的信息
-* target: 目标target 属性指定将用于打开链接的方式,target="_blank" 将在新标签页中打开链接
-
-
-布尔属性
-
-有时你会看到没有值的属性，这些属性被称为布尔属性，他们只能有跟它的属性名一样的属性值。例如 disabled 属性，他们可以标记表单输入使之变为不可用(变灰色)，此时用户不能向他们输入任何数据
-```
-<input type="text" disabled="disabled">
-<input type="text">
-```
-
-### html文档结构
-```
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <title>我的测试页</title>
-  </head>
-  <body>
-    <p>这是我的一个页面</p>
-  </body>
-</html>
-```
-
-* `<!DOCTYPE html>`: 声明文档类型
-* `<html></html>: <html>`元素。这个元素包裹了整个完整的页面，是一个根元素。  
-* `<head></head>: <head>`元素. 这个元素是一个容器，它包含了所有你想包含在HTML页面中但不想在HTML页面中显示的内容。
-这些内容包括你想在搜索结果中出现的关键字和页面描述，CSS样式，字符集声明等等。
-* `<meta charset="utf-8">`: 这个元素设置文档使用utf-8字符集编码
-
-* `<title></title>`: 设置页面标题，出现在浏览器标签上，当你标记/收藏页面时它可用来描述页面。
-* `<body></body>: <body>`元素。 包含了访问页面时所有显示在页面上的内容，文本，图片，音频，游戏等等
-
-### HTML中的空白
-
-无论你用了多少空白(包括空白字符，包括换行), 当渲染这些代码的时候，HTML解释器会将连续出现的空白字符减少为一个单独的空格符
-
-```
-<p>Dogs are silly.</p>
-
-<p>Dogs        are
-         silly.</p>
-```
-这面两个写法效果是相同的
-
-### html中的特殊字符
-
-常见特殊字符
-![img](./Chapter-04-code/pic/timg.jpg)
-
-### HTML注释
-为了将一段HTML中的内容置为注释，你需要将其用特殊的记号`<!--和-->`包括起来， 比如：
-```
-<p>I'm not inside a comment</p>
-
-<!-- <p>I am!</p> -->
-```
-
-### html 元数据
-
-
-![img](./Chapter-04-code/pic/meta.jpg)
-```
-<meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="application-name" content="Python.org">
-```
-
-
-
-### 在HTML中应用CSS和JavaScript
-
-你使用的所有网站都会使用 CSS 让网页更加炫酷, 使用JavaScript让网页有交互功能, 比如视频播放器，地图，游戏以及更多功能。
-这些应用在网页中很常见，它们分别使用 `<link>`元素以及` <script> `元素
-
-```
-<!-- 本地新闻 -->
-<script src="//www.163.com/special/00774J00/index_news_keys.js" charset="gbk"></script>
-<!-- 第三方合作新闻推荐 -->
-<link href="https://static.ws.126.net/f2e/www/index20170701/collect/head~DIhBY9NJYLhd.css" rel="stylesheet" />
+from urllib.parse import urlparse
+obj = urlparse('https://baike.baidu.com/item/统一资源定位系统/5937042?fromtitle=url&fromid=110640')
+print(obj)
+print(obj.path)
+print(obj.scheme)
 ```
 
 
-### HTML 文本格式元素
+URL编码 
 
-标题、段落
+url中只能出现以下字符
+
+保留字符， 保留字符是那些具有特殊含义的字符，例如：/用于URL不同部分的分割符，还有? ; & 等等这些字符在url中有特殊意义
 ```
-<h1>The Crushing Bore</h1>
-
-<p>By Chris Mills</p>
-
-<h2>Chapter 1: The Dark Night</h2>
-
-<p>It was a dark night. Somewhere, an owl hooted. The rain lashed down on the ...</p>
-
-<h2>Chapter 2: The eternal silence</h2>
-
-<p>Our protagonist could not so much as a whisper out of the shadowy figure ...</p>
-
-<h3>The specter speaks</h3>
-
-<p>Several more hours had passed, when all of a sudden the specter sat bolt upright and exclaimed, "Please have mercy on my soul!"</p>
+!	*	'	(	)	;	:	@	&	=	+	$	,	/	?	#	[	]
+```
+非保留字符
+```
+A	B	C	D	E	F	G	H	I	J	K	L	M	N	O	P	Q	R	S	T	U	V	W	X	Y	Z
+a	b	c	d	e	f	g	h	i	j	k	l	m	n	o	p	q	r	s	t	u	v	w	x	y	z
+0	1	2	3	4	5	6	7	8	9	-	_	.	~
 ```
 
-无序列表
+除了以上字符其它字符和 出现在其它位置的保留字符（比如查询字符串里出现@,+，&）均需要进行编码。
 
-```
-<ul>
-  <li>牛奶</li>
-  <li>鸡蛋</li>
-  <li>面包</li>
-  <li>鹰嘴豆泥</li>
-</ul>
+ascii
+首先需要把该字符的ASCII的值表示为两个16进制的数字，然后在其前面放置转义字符("%")，置入URI中的相应位置。
+如`;`的编码为 `hex(ord(';'))`
 
+非ascii码
+对于非ASCII字符, 需要转换为UTF-8字节序,然后在其前面放置转义字符("%")
 ```
-有序列表
+>>> s='中国'
+>>> s.encode('utf-8')
+b'\xe4\xb8\xad\xe5\x9b\xbd
+```
+在百度中搜索中国然后在开发者工具中查看请求的url
 
+python url编码
+对参数(key=value)编码
 ```
-<ol>
-  <li>行驶到这条路的尽头</li>
-  <li>向右转</li>
-  <li>直行穿过第一个双环形交叉路</li>
-  <li>在第三个环形交叉路左转</li>
-  <li>学校就在你的右边，300米处</li>
-</ol>
-```
-
-嵌套列表
-
-```
-<ol>
-  <li>Remove the skin from the garlic, and chop coarsely.</li>
-  <li>Remove all the seeds and stalk from the pepper, and chop coarsely.</li>
-  <li>Add all the ingredients into a food processor.</li>
-  <li>Process all the ingredients into a paste.
-    <ul>
-      <li>If you want a coarse "chunky" humous, process it for a short time.</li>
-      <li>If you want a smooth humous, process it for a longer time.</li>
-    </ul>
-  </li>
-</ol>
-```
-
-斜体字、粗体字、下划线
-```
-<!-- scientific names -->
-<p>
-  The Ruby-throated Hummingbird (<i>Archilocus colubris</i>)
-  is the most common hummingbird in Eastern North America.
-</p>
-
-<!-- foreign words -->
-<p>
-  The menu was a sea of exotic words like <i lang="uk-latn">vatrushka</i>,
-  <i lang="id">nasi goreng</i> and <i lang="fr">soupe à l'oignon</i>.
-</p>
-
-<!-- a known misspelling -->
-<p>
-  Someday I'll learn how to <u>spel</u> better.
-</p>
-
-<!-- Highlight keywords in a set of instructions -->
-<ol>
-  <li>
-    <b>Slice</b> two pieces of bread off the loaf.
-  </li>
-  <li>
-    <b>Insert</b> a tomato slice and a leaf of
-    lettuce between the slices of bread.
-  </li>
-</ol>
-```
-
-### 表格
-
-```
-<table>
-<tr>
-<th>选择器</th>
-<th>例子</th>
-<th>例子描述</th>
-<th>CSS</th>
-</tr>
-
-<tr>
-<td><a href="/cssref/selector_class.asp" title="CSS .class 选择器">.<i>class</i></a></td>
-<td>.intro</td>
-<td>选择 class=&quot;intro&quot; 的所有元素。</td>
-<td>1</td>
-</tr>
-
-<tr>
-<td><a href="/cssref/selector_id.asp" title="CSS #id 选择器">#<i>id</i></a></td>
-<td>#firstname</td>
-<td>选择 id=&quot;firstname&quot; 的所有元素。</td>
-<td>1</td>
-</tr>
-</table>
-```
-
-### 表单
-
-用户提交数据
-
-```
-<form action="http://foo.com" method="get">
-  <div>
-    <label for="say">What greeting do you want to say?</label>
-    <input name="say" id="say" value="Hi">
-  </div>
-  <div>
-    <label for="to">Who do you want to say it to?</label>
-    <input name="to" id="to" value="Mom">
-  </div>
-  <div>
-    <button>Send my greetings</button>
-  </div>
-</form>
-```
-* action 属性: 数据要提交到额url，在本例中，数据被发送到 —— http://foo.com
-* method属性:  提交数据使用的http方法 ，本例get
-```
-GET /?say=Hi&to=Mom HTTP/1.1
-Host: foo.com
-
-POST / HTTP/1.1
-Host: foo.com
-Content-Type: application/x-www-form-urlencoded
-Content-Length: 13
-
-say=Hi&to=Mom
-```
-
-发送文件
-```
-<form method="post" enctype="multipart/form-data">
-  <div>
-    <label for="file">Choose a file</label>
-    <input type="file" id="file" name="myFile">
-  </div>
-  <div>
-    <button>Send the file</button>
-  </div>
-</form>
-```
-* enctype 该属性允许指定在提交表单时所生成的请求中的Content-Type的HTTP数据头的值，默认值application/x-www-form-urlencoded。
-意思是为发送的数据指定编码格式
-
-校验数据
-
-强制必填
-```
-<form>
-  <label for="choose">Would you prefer a banana or cherry?</label>
-  <input id="choose" name="i_like" required>
-  <button>Submit</button>
-</form
-```
-
-required 属性 必填
-
-限制长度
-```
-<form>
-  <div>
-    <label for="choose">Would you prefer a banana or a cherry?</label>
-    <input id="choose" name="i_like" required minlength="6" maxlength="6">
-  </div>
-  <div>
-    <label for="number">How many would you like?</label>
-    <input type="number" id="number" name="amount" value="1" min="1" max="10">
-  </div>
-  <div>
-    <button>Submit</button>
-  </div>
-</form>
-```
-
-### 表单组件
-
-+ 文本输入
-```
-<input type="text" id="comment" name="comment" value="I'm a text field">
-```
-
-+ E-mail 地址
-```
-<input type="email" id="email" name="email" multiple>
-```
-通过包括multiple属性，可以让用户将多个电子邮件地址输入相同的输入(以逗号分隔)
-
-+ 密码
-```
-<input type="password" id="pwd" name="pwd">
-```
-
-+ 搜索
-```
-<input type="search" id="search" name="search">
-```
-+ 多行文本
-```
-<textarea cols="30" rows="10"></textarea>
-```
-
-+ 下拉选择框
-```
-<select id="simple" name="simple">
-  <option>Banana</option>
-  <option>Cherry</option>
-  <option>Lemon</option>
-</select>
-```
-
-+ 多选框
-```
-<select multiple id="multi" name="multi">
-  <option>Banana</option>
-  <option>Cherry</option>
-  <option>Lemon</option>
-</select>
-```
-
-+ 复选框
-```
-<input type="checkbox" checked id="carrots" name="carrots" value="carrots">
-```
-+ 单选按钮
-```
-<input type="radio"  id="soup1" name="meal" value=1>
-<input type="radio"  id="soup2" name="meal" value=2>
-```
-+ 按钮
-
-提交
-```
-<button type="submit">
-    This a <br><strong>submit button</strong>
-</button>
-
-<input type="submit" value="This is a submit button">
-```
-
-重置
-```
-<button type="reset">
-    This a <br><strong>reset button</strong>
-</button>
-
-<input type="reset" value="This is a reset button">
-```
-
-## css
-CSS 指层叠样式表 (Cascading Style Sheets),它允许我们将布局和设计添加到html页面，
-并且它允许我们从元素到页面共享这些样式。
-在我们了解所有功能之前，我们先来了解几个概念
-
-### 选择器
-当元素被添加到网页中时，可以使用CSS进行样式化。选择器用来定位HTML中的哪些元素应用样式（例如颜色，大小和位置）
-选择器可以包含不同限定符（元素类型，class，id）的组合，以选择独特的元素。例如，我们可能希望选择页面上的每个段落，或者我们可能只想在页面上选择一个特定的段落。
-选择器通常以属性值为目标，例如id或class值，或者定位元素的类型，例如`<h1>`或`<p>`
-
-在CSS中，选择器后跟大括号{}，其中包含要应用于所选元素的样式。下面的选择器是针对所有的`<p>`元素
-
-```
-p {
-  color: orange;
-  font-size: 16px;
+from urllib.parse import urlencode
+data = {
+    'kw': '中国'
 }
+print(urlencode(data))
+
+```
+对字符进行编码
+```
+from urllib.parse import quota
+print(quote('中国'))
+```
+
+
+http封装
+![img](./Chapter-03-code/pics/3-9.jpg)
+
+### HTTP协议
+
+![img](./Chapter-03-code/pics/1522052700.jpg)
+
+http请求方法
+
+常见的请求方法有两种：GET和POST
+其它请求方法
+
+![img](./Chapter-03-code/pics/1522052793.jpg)
+
+报文
+
+![img](./Chapter-03-code/pics/143006_LICd_1469576.jpg)
++ start line 其实行
++ header     头部
++ body       报文实体 
+
+Header
+![img](./Chapter-03-code/pics/3-8.jpg)
+
+状态码
+
+![img](./Chapter-03-code/pics/1522052892.jpg)
+
+常见body类型
+
++ application/x-www-form-urlencoded 表单
++ multipart/form-data
++ application/json
++ text/xml
+
+表单
+```
+POST http://www.example.com HTTP/1.1
+Content-Type: application/x-www-form-urlencoded;charset=utf-8
+
+title=test&sub%5B%5D=1&sub%5B%5D=2&sub%5B%5D=3
 
 ```
 
-在CSS中，我们的规则集以选择器开头，后面紧跟着大括号。在这些大括号内是由属性和值对组成的声明，每个声明都以一个属性开头，后面跟着冒号，属性值，最后是分号。
-![img](./Chapter-04-code/css-syntax-outline.png)
-
-**使用选择器**
-
-如前所述，选择器表示对哪些HTML元素进行样式化。充分了解如何使用选择器以及如何利用选择器非常重要。
-第一步是熟悉不同类型的选择器。我们将从最常见的选择器开始：类型，类和ID选择器。
-
-Type Selectors
-
-类型选择器按元素类型定位元素。例如，如果我们希望定位所有的div元素，我们将使用div的类型选择器
-以下代码显示了除法元素的类型选择器以及它选择的相应HTML
-
-````
-# css
-div { ... }
-
-# html
-<div>...</div>          
-<div>...</div>
-````
-
-Class Selectors
-
-类选择器允许我们根据元素的类属性值选择一个元素。类选择器比类型选择器更具体，因为它们选择一组特定的元素而不是一种类型的所有元素。类选择器允许我们通过跨多个元素使用相同的类属性值，一次将相同的样式应用于不同的元素。
-在CSS中，类由前导点表示，后跟类属性值。下面类选择器将选择包含awesome类属性值的任何元素，包括分割元素和段落元素
-
-````
-# css
-.awesome { ... }
-# html
-<div class="awesome">...</div>
-<p class="awesome">...</p>
-````
-ID Selectors
-
-ID选择器比类选择器更精确，因为它们一次只能定位一个独特的元素。就像类选择器使用元素的类属性值作为选择器一样，ID选择器使用元素的id属性值作为选择器。无论它们出现在哪种类型的元素上，每个页面使用的id属性值必须唯一。如果使用它们应该保留用于重要元素。
-在CSS中，ID选择符由前导散列符号＃表示，后跟id属性值。这里ID选择器将只选择包含shayhowe的id属性值的元素。
-
-````
-# css
-#shayhowe { ... }
-<div id="shayhowe">...</div>
-````
-分组选择器
-可以选择器进行分组
-假设希望 `<h2>` 元素和 `<p>`都是灰色。为达到这个目的，最容易的做法是使用以下声明
+使用表单上传文件时
 ```
-h2, p {color:gray;}
+POST http://www.example.com HTTP/1.1
+Content-Type:multipart/form-data; boundary=----WebKitFormBoundaryrGKCBY7qhFd3TrwA
+
+------WebKitFormBoundaryrGKCBY7qhFd3TrwA
+Content-Disposition: form-data; name="text"
+
+title
+------WebKitFormBoundaryrGKCBY7qhFd3TrwA
+Content-Disposition: form-data; name="file"; filename="chrome.png"
+Content-Type: image/png
+
+PNG ... content of chrome.png ...
+------WebKitFormBoundaryrGKCBY7qhFd3TrwA--
+
 ```
-将 `<h2>` 和 `<p>` 选择器放在规则左边，然后用逗号分隔，就定义了一个规则。其右边的样式（color:gray;）将应用到这两个选择器所引用的元素
-。逗号告诉浏览器，规则中包含两个不同的选择器。如果没有这个逗号，那么规则的含义将完全不同
 
-[示例](./Chapter-04-code/css-example11.html)
+json数据
+```
+POST http://www.example.com HTTP/1.1 
+Content-Type: application/json;charset=utf-8
 
-[示例](./Chapter-04-code/css-example12.html)
+{"title":"test","sub":[1,2,3]}
+```
 
-通配符选择器
-通配选择器，显示为一个星号（*）。该选择器可以与任何元素匹配，就像是一个通配符。例如，下面的规则可以使文档中的每个元素都为红色：
+xml 数据
+```
+POST http://www.example.com HTTP/1.1 
+Content-Type: text/xml
 
-[示例](./Chapter-04-code/css-example13.html)
+<?xml version="1.0"?>
+<methodCall>
+    <methodName>examples.getStateName</methodName>
+    <params>
+        <param>
+            <value><i4>41</i4></value>
+        </param>
+    </params>
+</methodCall>
 
-后代选择器
+```
 
-后代选择器（descendant selector）又称为包含选择器。后代选择器可以选择作为某元素后代的元素
-我们可以定义后代选择器来创建一些规则，使这些规则在某些文档结构中起作用，而在另外一些结构中不起作用。
 
-举例来说，如果您希望只对 h1 元素中的 em 元素应用样式，可以这样写
+## 网页的基础知识
 
-[示例](./Chapter-04-code/css-example14.html)
+网页可以分为三大部分——HTML、CSS和JavaScript
+HTML是用来描述网页的一种语言，其全称叫作Hyper Text Markup Language，即超文本标记语言。网页包括文字、按钮、图片和视频等各种复杂的元素
 
-[示例](./Chapter-04-code/css-example15.html)
+不同类型的文字通过不同类型的标签来表示，如图片用img标签表示，视频用video标签表示，段落用p标签表示，它们之间的布局又常通过布局标签div嵌套组合而成，各种标签通过不同的排列和嵌套才形成了网页的框架
 
-子元素选择器
+HTML定义了网页的结构，但是只有HTML页面的布局并不美观，可能只是简单的节点元素的排列，为了让网页看起来更好看一些，这里借助了CSS。
 
-如果不希望选择任意的后代元素，而是希望缩小范围，只选择某个元素的子元素，请使用子元素选择器（Child selector）。
-例如，如果希望选择只作为 h1 元素子元素的 strong 元素，可以这样写：
-[示例](./Chapter-04-code/css-example16.html)
+CSS，全称叫作Cascading Style Sheets，即层叠样式表。“层叠”是指当在HTML中引用了数个样式文件，并且样式发生冲突时，浏览器能依据层叠顺序处理。“样式”指网页中文字大小、颜色、元素间距、排列等格式
 
-组合选择器
-到目前为止，我们已经看过如何分别使用不同类型的选择器，但我们也需要知道如何一起使用这些选择器。通过组合选择器，我们可以更具体地了解我们想要选择的元素或元素组。
+JavaScript，简称JS，是一种脚本语言。HTML和CSS配合使用，提供给用户的只是一种静态信息，缺乏交互性。我们在网页里可能会看到一些交互和动画效果，如下载进度条、提示框、轮播图等，这通常就是JavaScript的功劳
 
-例如，假设我们要选择位于具有hotdog class属性值的元素内的所有`<p>`元素，并将其背景颜色设置为棕色。
-如果其中一个`<p>`碰巧具有mustard的class属性值，我们希望将其背景颜色设置为黄色。
 
-[示例](./Chapter-04-code/css-example4.html)
 
-当选择器组合时，应该从右到左阅读.最右边的选择器直接位于花括号之前，被称为key选择器。
-key选择器确切地标识样式将应用于哪个元素。key 选择器左侧的任何选择器都将用作预选者
+### 静态页面
+在网页中我们能看到各种各样的信息，最常见的便是常规网页，它们对应着HTML代码，而最常抓取的便是HTML源代码。
+此外，我们还可以看到各种二进制数据，如图片、视频和音频等。另外，还可以看到各种扩展名的文件，如CSS、JavaScript和配置文件等，
+
+
+
+### 动态页面
+
+有时候，我们查看网页的源代码实际和浏览器中看到的不一样。
+
+这是一个非常常见的问题。现在网页越来越多地采用Ajax、前端模块化工具来构建，整个网页可能都是由JavaScript渲染出来的，也就是说原始的HTML代码就是一个空壳
+比如 https://www.12306.cn/index/
+
+### 带认证的页面（cookie、session）
+
+HTTP的一个特点，叫作无状态。HTTP的无状态是指HTTP协议对事务处理是没有记忆能力的，也就是说服务器不知道客户端是什么状态。当我们向服务器发送请求后，服务器解析此请求，然后返回对应的响应，服务器负责完成这个过程，而且这个过程是完全独立的，服务器不会记录前后状态的变化，也就是缺少状态记录。
+
+两个用于保持HTTP连接状态的技术就出现了，它们分别是Session和Cookies。Session在服务端，也就是网站的服务器，用来保存用户的会话信息；Cookies在客户端，也可以理解为浏览器端，有了Cookies，浏览器在下次访问网页时会自动附带上它发送给服务器，服务器通过识别Cookies并鉴定出是哪个用户，然后再判断用户是否是登录状态，然后返回对应的响应。
+
+
+我们可以理解为Cookies里面保存了登录的凭证，有了它，只需要在下次请求携带Cookies发送请求而不必重新输入用户名、密码等信息重新登录了。
+
+
+## python与web交互
+python 有各种与web交互的模块
++ requests模块，发起http请求并取得相应
++ beautifulsoup4(bs4) 解析html内容提取元素
++ selenium 模拟浏览器操作
+
+
+### Request模块
+
+[requests](http://docs.python-requests.org/zh_CN/latest/user/quickstart.html)
+文档
+
+get 请求
+```
+import requests
+
+r = requests.get("https://www.baidu.com")
+print(r.text)
+print(r.status_code)
+print(r.cookies)
+```
+
+带参数的get请求
+
+```
+import requests
+
+data = {'name': 'test', 'age': 18}
+
+r = requests.get("http://httpbin.org/get", params=data)
+print(r.text)
+
+```
+
+post请求
+
+```
+import requests
+
+data = {'name': 'test', 'age': 18}
+
+r = requests.post("http://httpbin.org/post", data=data)
+print(r.text)
+
+```
+
+自定义header
+```
+import requests
+
+r = requests.get('https://www.zhihu.com/explore')
+print(r.text)
+
+import requests
+
+headers= {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36'
+}
+r = requests.get('https://www.zhihu.com/explore', headers=headers)
+
+print(r.text)
+```
+
+
+### Beautiful Soup模块
+
+[bs4](https://beautifulsoup.readthedocs.io/zh_CN/v4.4.0/)文档
+
+```
+from bs4 import BeautifulSoup
+
+html_doc = """
+<html><head><title>The Dormouse's story</title></head>
+<body>
+<p class="title"><b>The Dormouse's story</b></p>
+
+<p class="story">Once upon a time there were three little sisters; and their names were
+<a href="http://example.com/elsie" class="sister" id="link1">Elsie</a>,
+<a href="http://example.com/lacie" class="sister" id="link2">Lacie</a> and
+<a href="http://example.com/tillie" class="sister" id="link3">Tillie</a>;
+and they lived at the bottom of a well.</p>
+
+<p class="story">...</p>
+"""
+
+soup = BeautifulSoup(html_doc, 'html.parser')
+
+print(soup.title)
+print(soup.p)
+print(soup.p['class'])
+print(soup.find_all('a'))
+```
 
 [css选择器](http://www.w3school.com.cn/cssref/css_selectors.asp)
 
-
-### html中使用css
-
-+ 外部样式表(External style sheet)
-+ 内部样式表(Internal style sheet)
-+ 行内样式(Inline style)
-
-#### 外部样式表
-
-
-使用CSS的最佳做法是将所有样式包含在单个外部样式表中，该样式表从我们的HTML文档的`<head>`元素中引用
-使用单个外部样式表可以让我们在整个网站上使用相同的样式，并在整个网站范围内快速进行更改。
-要创建我们的外部CSS样式表，我们需要创建一个扩展名为.css的文件，我们的CSS文件应保存在我们的HTML文件所在的相同文件夹或子文件夹中
-
-在HTML文档的`<head>`元素中，`<link>`元素用于定义HTML文件和CSS文件之间的关系
-因为我们链接到CSS，我们使用rel属性和stylesheet的值来指定它们的关系。
-此外，href属性用于标识CSS文件的位置或路径。
-
-考虑下面一个引用单个外部样式表的HTML文档`<head>`元素的例子。
-```
-<head>
-  <link rel="stylesheet" href="main.css">
-</head>
+抓取例子
 
 ```
-
-为了CSS正确呈现，href属性值的路径必须直接关联到我们的CSS文件保存的位置，
-在前面的示例中，main.css文件存储在与HTML文件相同的位置。
-
-如果我们的CSS文件位于子目录或子文件夹内，则href属性值需要相应地与此路径相关联。
-例如，如果我们的main.css文件存储在名为stylesheets的子目录中，那么href属性值将是stylesheets/main.css
-
-#### 内部样式表
-当单个文档需要特殊的样式时，就应该使用内部样式表。你可以使用` <style>` 标签在文档头部定义内部样式表
-
-```
-<head>
-<style>
-hr {border: 5px solid red;}
-p {margin-left:20px;}
-</style>
-</head>
-<hr>
-<p>内部样式表</p>
-```
-
-#### 行内样式表
-```
-<p style="color:sienna;margin-left:20px">这是一个段落。</p>`
-```
+from bs4 import BeautifulSoup
+import requests
 
 
-### css 颜色
-我们已经使用了一些常用的CSS属性值，例如红色和绿色。
+url = "https://movie.douban.com/"
 
-CSS中的所有颜色值都是在标准的红色，绿色和蓝色的颜色空间中定义的
-这个空间内的颜色是通过将红色，绿色和蓝色通道混合在一起形成的，如显示器，电视机
-通过混合不同等级的红色，绿色和蓝色，我们可以创造出数百万种颜色，并找到几乎任何我们想要的颜色。
-
-目前，在CSS中有三种主要方式来表示颜色：名称，十六进制表示法以及RGB
-
-这些名称及其相应的颜色由CSS规范确定。最常见的颜色，都有关键字名称。
-这些名称的完整列表可以在CSS规范中找到
-
-[名称](https://www.w3.org/TR/css-color-3/)。
-
-![img](./Chapter-04-code/css-colors.png)
-
-在这里，我们将褐色背景应用于具有task class属性值和将yellow背景应用于具有count class属性值
-
-[示例](./Chapter-04-code/css-example6.html)
-
-```
-.task {
-  background: maroon;
-}
-.count {
-  background: yellow;
+headers= {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36'
 }
 
-```
-虽然名字颜色值很简单，但它们提供的选项有限，因此不是最受欢迎的颜色值选择
+r = requests.get(url, headers=headers)
+html_doc = r.text
+soup = BeautifulSoup(html_doc, 'html.parser')
 
-#### 十六进制颜色值 
+element = soup.select('#billboard > div.billboard-bd > table')[0]
 
-十六进制颜色值由一个＃，后跟一个三或六个字符的数字组成。
-数字使用数字0到9以及字母a到f，大写或小写。这些值映射到红色，绿色和蓝色
-在六个字符的表示法中，前两个字符代表红色通道，第三个和第四个字符代表绿色通道，后两个字符代表蓝色
-在三字符表示法中，第一个字符代表红色通道，第二个字符代表绿色通道，最后一个字符代表蓝色
+for item in element.find_all('a'):
+    print(item.text)
 
-如果以六字符表示，前两个字符是匹配对，第三个和第四个字符是匹配对，并且最后两个字符是匹配对，
-则六个字符的数字可以缩短为三个字符的数字，例如，由十六进制颜色＃ff6600表示的橙色阴影也可以写为＃f60。
-![url](./Chapter-04-code/hexadecimal-syntax.png)
-
-要从之前创建相同背景颜色，我们可以用十六进制颜色值替换名称颜色值，如此处所示
-
-[示例](./Chapter-04-code/css-example7.html)
 
 ```
-.task {
-  background: #800000;
+### 如何访问有认证的页面
+```
+import requests
+from bs4 import BeautifulSoup
+
+headers= {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36'
 }
-.count {
-  background: #ff0;
+url = "http://116.196.114.148:8000/admin/login/?next=/admin/"
+s = requests.session()
+r = s.get(url)
+bs = BeautifulSoup(r.content, 'html.parser')
+e = bs.select('#login-form > input[type=hidden]')
+csrftoken = e[0].attrs["value"]
+
+data = {
+    "csrfmiddlewaretoken": csrftoken,
+    "username": "admin",
+    "password": "jia12345",
+    "next": "/admin/"
+
 }
+
+rt = s.post(url,headers=headers,data=data)
+print(rt.status_code)
+
+
 
 ```
 
-#### RGB 颜色值 
-RGB颜色值使用rgb（）函数表示，该函数代表红色，绿色和蓝色
-该函数接受三个以逗号分隔的值，每个值都是0到255之间的整数。值0将为纯黑色; 255的值将是纯白色的。
+### 简单爬虫
+```
+import requests
+from bs4 import BeautifulSoup
+import queue
 
-如果我们要从前面重新创建一个RGB颜色值的橙色阴影，它将表示为rgb（255,102,0）
-第一个代表红色，第二个绿色，三个蓝色
-要从之前创建相同背景颜色，我们可以rgb表示
+start_page = "http://www.163.com"
+domain = "163.com"
+url_queue = queue.Queue()
+seen = set()
 
-[示例](./Chapter-04-code/css-example8.html)
+seen.add(start_page)
+url_queue.put(start_page)
 
-````
-.task {
-  background: rgb(128, 0, 0);
-}
-.count {
-  background: rgb(255, 255, 0);
-}
-````
 
-通过使用rgba（）函数，RGB颜色值还可以包含a透明度。 rgba（）函数需要第四个值，
-该值必须是介于0和1之间的值,0表示完全透明的颜色，表示它是不可见的，1表示完全不透明的颜色。 
-0到1之间的任何十进制值都会创建半透明颜色。
+def sotre(url):
+    pass
 
-以下代码将.task背景色设置为25％不透明，并将.count 背景色保留为100％不透明
+def extract_urls(url):
+    urls = []
+    html = requests.get(url)
+    soup = BeautifulSoup(html.content, "html.parser")
+    for e in soup.findAll('a'):
+        url = e.attrs.get('href', '#')
+        urls.append(url)
+    return urls
+
+
+
+while True:
+
+    if not url_queue.empty():
+
+        current_url = url_queue.get()
+        print(current_url)
+        sotre(current_url)
+        for next_url in extract_urls(current_url):
+            if next_url not in seen and domain in next_url:
+                seen.add(next_url)
+                url_queue.put(next_url)
+    else:
+        break
 
 ```
-.task {
-  background: rgba(128, 0, 0, .25);
-}
-.count {
-  background: rgba(255, 255, 0, 1);
-}
 
-```
-RGB颜色值越来越流行，尤其是由于能够使用RGBa创建半透明颜色。
 
 
-目前，十六进制颜色值仍然是最受欢迎的，因为它们得到广泛支持
-当需要用于透明度的alpha通道时，RGBa颜色值是优选的
 
-### css中的单位
-CSS中的长度有几种不同的值，长度值有两种不同的形式，绝对和相对，每种形式使用不同的度量单位。
 
-#### 像素
-绝对长度值是最简单的长度值，因为它们固定为物理测量值，例如英寸，厘米或毫米。
-最流行的绝对测量单位称为像素，由px单位表示法表示
 
-像素已经存在了相当长的时间，并且通常与少数不同的属性一起使用。此处的代码使用像素将所有段落的字体大小设置为14像素
 
-````
-p {
-  font-size: 14px;
-}
-````
-
-随着观看设备的不断变化和不同的屏幕尺寸，像素已经失去了一些受欢迎程度.作为绝对的度量单位，它们不提供太多的灵活性
-
-#### 百分比
-
-除了绝对长度值之外，还有相对长度值。相对长度值稍微复杂一些，因为它们不是固定的测量单位;它们依赖于另一种测量的长度。
-
-以％单位表示的百分比是最受欢迎的相对值之一，百分比长度是根据另一个对象的长度定义的。
-例如，要将元素的宽度设置为50％，我们必须知道其父元素的宽度，它嵌套在其中的元素，然后标识父元素宽度的50％。
-```
-#main{
- width:50%;
- }
-```
-在这里，我们将id 为main的元素设置为50％的元素宽度。这50％将相对于元素父级的宽度进行计算（这里相对于屏幕）。
-
-
-
-### CSS 文本格式
-+ 文本的颜色
-+ 文本的对齐方式
-+ 文本修饰
-+ 文本转换
-+ 文本缩进
-
-[教程](https://www.runoob.com/css/css-text.html)
-
-
-### CSS 字体
-
-+ 字体类型
-+ 字体样式
-+ 字体大小
-
-### Box Model 盒子模型
-
-#### 如何显示元素
-
-如何显示元素，由display属性决定。每个元素都有一个默认的display属性值;但是，与所有其属性的值一样，该值可能会被覆盖。最常见的是block, inline, inline-block, 和none
-
-每个元素都有默认的display值，根据display的值可分为 块（block）元素，行内（inline）元素和 内嵌（inline-block）元素
-
-block元素独占一行，并且可以设置width,height，margin，padding属性。
-
-inline元素不会独占一行，多个相邻的行内元素会排列在同一行里，直到一行排列不下，才会新换一行，其宽度随元素的内容而变化，
-inline元素设置width,height属性无效
-
-inline-block 元素呈现为inline对象，让block元素不再独占一行，多个block元素可以同排一行，且元素具有block的属性，
-可设置width、height是block和inline元素的综合体
-
-none 使元素不显示
-
-
-我们可以通过在CSS中设置显示display的值来更改元素的显示属性值。
-
-[示例](./Chapter-04-code/example1.html)
-
-#### 什么是Box Model(盒子模型)
-
-根据盒子模型概念，页面上的每个元素都是一个矩形框，并且可以具有width(宽度)，height(高度)，padding(填充)，border(边框)和margin(边距)。
-*页面上的每个元素都是一个矩形框* 每个页面上的每个元素都符合盒子模型
-
-每个元素都是一个矩形框，并且有width、height、padding、border、margin几个属性决定了该框的大小.
-
-````
-div {
-  border: 6px solid #949599;
-  height: 100px;
-  margin: 20px;
-  padding: 20px;
-  width: 400px;
-}
-
-````
-
-#### Width & Height
-
-元素宽度
-
-````
-div {
-  width: 400px;
-}
-````
-元素高度
-````
-div {
-  height: 100px;
-}
-
-````
-Margin(边距) & Padding(填充)
-
-根据元素的不同，浏览器可以将默认边距和填充应用于元素，以帮助提高易读性和清晰度。
-margin属性允许我们设置元素周围的空间量，元素的边距（margin）落在边框（border）之外，并且颜色完全透明。
-边距可用于帮助将元素定位在页面上的特定位置，与所有其他元素保持安全距离。
-````
-div {
-  margin: 20px;
-}
-
-````
-
-填充（padding）属性与边距（margin）属性非常相似;但是，如果元素具有边框（border），则它落在元素的边框（border）内。
-
-
-
-#### 设置magrin和padding
-
-````
-div {
-  margin: 20px;
-}
-````
-以上方式设置元素的4个方向margin值均为20px
-
-如果上下和左右的值不同,设置方式如下
-````
-div {
-  margin: 10px 20px;
-}
-
-````
-
-10px 为上下的值，20px为左右的值
-
-如果上下左右各不同。设置方式如下
-````
-div {
-  margin: 10px 20px 0 15px;
-}
-
-````
-
-上（top） 10px，右（right）20px，下（bottom）0,左（left）15px  方向为顺时针
-
-也可以单独设置某个方向的值，如：
-````
-div {
-  margin-top: 10px;
-  padding-left: 6px;
-}
-
-````
-
-边距（magin）和填充（padding）是完全透明的，不接受任何颜色值。但是，它们显示相对元素的背景颜色
-对于边距，我们看到父元素的背景颜色，对于填充，我们看到应用填充的元素的背景颜色
-
-#### Borders
-
-边框（border）位于填充（padding）和边距（margin）之间，提供围绕元素的轮廓。
-边框（border）属性需要三个值：宽度（width），样式（style）和颜色（color）。
-````
-div {
-  border: 6px solid #949599;
-}
-
-````
-
-边框（border）的style常见的有solid, double, dashed, dotted, 和 none
-
-[示例](./Chapter-04-code/example3.html)
-
-
-单独设置border的各个边，border-top, border-right, border-bottom, 和 border-left
-````
-div {
-  border-bottom: 6px solid #949599;
-}
-
-````
-
-另外，可以将各个边界侧的样式控制在更精细的水平。例如，如果我们只希望更改底部边框的宽度，我们可以使用以下代码
-````
-div {
-  border-bottom-width: 12px;
-}
-
-````
-可选top, right, bottom, 和left
-
-border-radius属性，使我们能够对元素的角进行圆角处理。border-radius属性接受长度单位，包括百分比和像素，用于标识元素的角的半径
-````
-div {
-  border-radius: 5px;
-}
-
-````
-
-[示例](./Chapter-04-code/example4.html)
-
-### css定位
-
-**浮动定位**
-在页面上定位元素的一种方法是使用float属性。浮动属性非常通用，可以以多种不同方式使用。
-从本质上讲，float属性允许我们获取一个元素，将其从页面的正常流中移除，并将其放置在其父元素的左侧或右侧
-
-
-
-当float属性同时用于多个元素时，它提供了通过直接相邻或相对浮动元素来创建布局的能力，如多列布局中所示
-
-````
-img {
-  float: left;
-}
-
-````
-未使用float属性
-
-[示例](./Chapter-04-code/example5.html)
-
-这里的`<section>`和`<aside>`元素作为块级元素.默认情况下，它们将堆叠在一起
-但是，我们希望这些元素并排放置。将`<section>`浮动到左侧，将`<aside>`浮动到右侧.我们的CSS应该是这样的
-
-````
-section {
-  float: left;
-}
-aside {
-  float: right;
-}
-````
-
-当一个元素浮动之后，它会被移出正常的文档流，然后向左或者向右平移，一直平移直到碰到了所处的容器的边框，或者碰到另外一个浮动的元素。
-
-当我们浮动一个元素时，我们将它从HTML文档的正常流程中取出。这会导致该元素的宽度默认为其中内容的宽度。
-
-有时，例如当我们为可重用布局创建列时，不希望出现这种情况.可以通过向每列添加固定宽度属性值来更正它。
-
-另外，为了防止浮动元素彼此接触，导致一个元素的内容直接位于另一个元素的内容旁边，我们可以使用margin属性在元素之间创建空间。
-在这里，我们扩展了前面的代码块，为每列添加了边距和宽度，以更好地塑造我们期望的结果
-````
-section {
-  float: left;
-  margin: 0 1.5%;
-  width: 63%;
-}
-aside {
-  float: right;
-  margin: 0 1.5%;
-  width: 30%;
-}
-
-````
-
-[示例](./Chapter-04-code/example6.html)
-
-
-有两列我们可以将一列向左浮动而另一列向右浮动，但是如果列数更多，我们必须改变我们的方法
-比方说，我们希望在`<header>`和`<footer>`元素之间有一行三列。
-
-如果我们删除`<aside>`元素并使用三个`<section>`元素，我们的HTML可能如下所示
-
-````
-<header>...</header>
-<section>...</section>
-<section>...</section>
-<section>...</section>
-<footer>...</footer>
-
-````
-
-要将这三个`<section>`元素放在一个三列的行中，而不是向左浮动一列，向右浮动一列，我们将所有三个`<section>`元素浮动到左侧。
-我们还需要调整`<section>`元素的宽度以考虑其他列，并使它们彼此相邻。
-````
-section {
-  float: left;
-  margin: 0 1.5%;
-  width: 30%;
-}
-
-````
-这里我们有三列，所有列都具有相等的宽度和边距值，并且全部浮动到左侧。
-
-[示例](./Chapter-04-code/example7.html)
-
-
-
-
-## bootstrap
-Bootstrap 是全球最受欢迎的前端组件库，用于开发响应式布局、移动设备优先的 WEB 项目。
-
-Bootstrap4 目前是 Bootstrap 的最新版本，是一套用于 HTML、CSS 和 JS 开发的开源工具集。利用我们提供的 Sass 变量和大量 mixin、响应式栅格系统、可扩展的预制组件、基于 jQuery 的强大的插件系统，能够快速为你的想法开发出原型或者构建整个 app 
-
-
-### [教程](http://www.runoob.com/bootstrap4/bootstrap4-tutorial.html)
-
-[网格系统](https://www.runoob.com/bootstrap4/bootstrap4-grid-basic.html)
-[表格](https://www.runoob.com/bootstrap4/bootstrap4-tables.html)
-[导航](https://www.runoob.com/bootstrap4/bootstrap4-navs.html)
-[导航栏](https://www.runoob.com/bootstrap4/bootstrap4-navbar.html)
-[表单](https://www.runoob.com/bootstrap4/bootstrap4-forms.html)
-[表单控件](https://www.runoob.com/bootstrap4/bootstrap4-forms-inputs.html)
-[输入框组](https://www.runoob.com/bootstrap4/bootstrap4-forms-input-group.html)
-[模态](https://www.runoob.com/bootstrap4/bootstrap4-modal.html)
-[一个网页](https://www.runoob.com/bootstrap4/bootstrap4-makeawebsite.html)
-
-### [boostrap-admin实例](https://startbootstrap.com/template-overviews/sb-admin/)
 
