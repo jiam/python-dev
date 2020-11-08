@@ -83,8 +83,7 @@ for i in range(1000):
 for thread in threads:
     thread.start()
 
-for thread in threads:
-    thread.join()
+
 ```
 
 使用with 加锁
@@ -107,8 +106,7 @@ for i in range(1000):
 for thread in threads:
     thread.start()
 
-for thread in threads:
-    thread.join()
+
 
 ```
 ### queue 模块
@@ -123,7 +121,7 @@ url = "https://www.baidu.com"
 
 q = queue.Queue()
 
-for i in range(100):
+for i in range(1000):
     q.put(i)
 
 
@@ -233,7 +231,7 @@ if __name__ == '__main__':
 ```
 pool.map
 
-```
+```python
 from multiprocessing import Pool
 import time
 def f(x):

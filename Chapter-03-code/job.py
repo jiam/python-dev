@@ -1,39 +1,45 @@
-import requests
-from bs4 import BeautifulSoup
-import queue
+import threading, queue
+import requests, time
+
+start = time.time()
+
+count = 100
+num = 2
+url = 'http://www.baidu.com'
+
+lock = threading.Lock()
+q = queue.Queue()
+threads = []
+result = {}
 
 
-def get_contest(url):
-    urls = []
-    r = requests.get(url)
-    bs = BeautifulSoup(r.content, 'html.parser')
-    for bd in bs.select('.main-bd'):
-        title = bd.select('h2 > a')[0].text
-        short_content = bd.select('.short-content')[0].text
-        print(title, short_content)
-    for a in bs.select('.paginator a'):
-        next_url = a['href']
-        urls.append(next_url)
-    return urls
+def get_content(url):
+    while True:
+        try:
+            q.get(block=False)
+        except queue.Empty:
+            break
+        r = requests.get(url)
+        with lock:
+            try:
+                result[r.status_code] = result.setdefault(r.status_code, 0) + 1
+            except :
+                result["error"] = result.setdefault("error", 0) + 1
 
 
-url_prefix = 'https://movie.douban.com'
-start_url = '/review/best'
-url_queue = queue.Queue()
-seen = set()
-seen.add(start_url)
-url_queue.put(start_url)
+for i in range(count):
+    q.put(i)
 
-while True:
-    if not url_queue.empty():
-        current_url = url_prefix + url_queue.get()
-        print(current_url)
-        for next_url in get_contest(current_url):
-            if next_url not in seen:
-                seen.add(next_url)
-                url_queue.put(next_url)
-    else:
-        break
+for i in range(num):
+    t = threading.Thread(target=get_content, args=(url,))
+    threads.append(t)
+    t.start()
 
+for t in threads:
+    t.join()
 
-
+end = time.time()
+t = end - start
+print("time %d" %  t)
+for item in result:
+    print("status_code[%s]: %d" % (item, result.get(item)))
