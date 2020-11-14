@@ -12,12 +12,13 @@ seen.add(start_page)
 url_queue.put(start_page)
 
 
-def sotre(url):
+def sotre(htmlcontent):
     pass
 
 def extract_urls(url):
     urls = []
     html = requests.get(url)
+    sotre(html.content)
     soup = BeautifulSoup(html.content, "html.parser")
     for e in soup.findAll('a'):
         url = e.attrs.get('href', '#')
@@ -30,7 +31,6 @@ def spider():
         try:
             current_url = url_queue.get()
             print(current_url)
-            sotre(current_url)
             for next_url in extract_urls(current_url):
                 if next_url not in seen and domain in next_url:
                     seen.add(next_url)
