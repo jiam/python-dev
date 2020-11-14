@@ -1,950 +1,758 @@
-# 第五天
+# 第五天 html
 
-## 基本语法
 
-### 语句
-JavaScript，每个语句以';'结束，语句块用{}。但是，JavaScript并不强制要求在每个语句的结尾加';'。
+## html 基础
 
-下面的一行代码就是一个完整的赋值语句
-`var x = 1;`
+HTML 是一种相当简单的、由不同元素组成的标记语言，它可用于表示文本片段，使文本在文档中具有不同的含义（段落、项目列表、表格），将文档结构化为逻辑块（头部、主体、导航菜单），并且可以将图片，影像等内容嵌入到页面中。
 
-下面的一行代码是字符串
-`'Hello, world'`
+HTML由一系列的元素组成, 可以使用它来封装，标记内容的不同部分
 
-下面的一行代码包含两个语句，每个语句用;表示语句结束：
-`var x = 1; var y = 2; // 不建议一行写多个语句!`
 
-### 语句块
-语句块是一组语句的集合，例如，下面的代码先做了一个判断，如果判断成立，将执行{...}中的所有语句：
-```
-if (2 > 1) {
-    x = 1;
-    y = 2;
-    z = 3;
-}
-```
-注意花括号{...}内的语句具有缩进，通常是4个空格。缩进不是JavaScript语法要求必须的，但缩进有助于我们理解代码的层次，所以编写代码时要遵守缩进规则。
+### html 元素
 
-{...}还可以嵌套，形成层级结构：
-```
-if (2 > 1) {
-    x = 1;
-    y = 2;
-    z = 3;
-    if (x < y) {
-        z = 4;
-    }
-    if (x > y) {
-        z = 5;
-    }
-}
-
-```
+![img](./Chapter-05-code/pic/grumpy-cat-small.png)
 
-### 注释
+1. 元素的构成
 
-以//开头直到行末的字符被视为行注释，注释是给开发人员看到，JavaScript引擎会自动忽略：
-```
-// 这是一行注释
-alert('hello'); 
-```
+* 开始标签 `<p>` 表示一个段落的开始
+* 结束标签 `</p>` 表示一个段落结束
+* 内容 开始标签和结束标签之间的部分
+* 元素  开始标签+内容+结束标签 
 
-另一种块注释是用/*...*/把多行字符包裹起来，把一大“块”视为一个注释：
-```
-/* 从这里开始是块注释
-仍然是注释
-仍然是注释
-注释结束 */
-```
+2. 嵌套
 
-### 大小写
-请注意，JavaScript与python一样区分大小写
+元素里可以嵌套另一个元素
 
+`<p>我的<strong>html</strong></p>`
 
-### hello world
+所有的元素都需要正确的打开和关闭
 
-`alert("hello world")`
+3. 块级元素和行内元素
 
-## 变量
+* 块级元素在页面中以块的形式展现 —— 相对与其前面的内容它会出现在新的一行，其后的内容也会被挤到下一行展现。块级元素通常用于展示页面上结构化的内容，例如段落、列表、导航菜单、页脚等等。一个以block形式展现的块级元素不会被嵌套进内联元素中，但可以嵌套在其它块级元素中
 
-变量在JavaScript中就是用一个变量名表示，变量名是大小写英文、数字、$和_的组合，且不能用数字开头。变量名也不能是JavaScript的关键字，如if、while等。申明一个变量用var语句，比如：
 
-```
-var a; // 申明了变量a，此时a的值为undefined
-var $b = 1; // 申明了变量$b，同时给$b赋值，此时$b的值为1
-var s_007 = '007'; // s_007是一个字符串
-var Answer = true; // Answer是一个布尔值true
-var t = null; // t的值是null
-```
 
-在JavaScript中，使用等号=对变量进行赋值。可以把任意数据类型赋值给变量，同一个变量可以反复赋值，而且可以是不同类型的变量，但是要注意只能用var申明一次，例如：
+* 行内(内联)元素不能通常出现在块级元素中,包裹文档内容的一小部分，而不是一整个段落或者一组内容。行内元素不会导致文本换行：它通常出现在一堆文字之间例如超链接元素`<a>`或者强调元素`<em>`
 
-```
-var a = 123; // a的值是整数123
-a = 'ABC'; // a变为字符串
+看下面例子
 ```
+<em>一</em><em>二</em><em>三</em>
 
-要显示变量的内容，可以用console.log(x)
+<p>四</p><p>五</p><p>六</p>
 ```
-var x = 100;
-console.log(x);
-```
 
-strict模式
+`<em>` 是一个行内元素，所以就像你在下方可以看到的，第一行代码中的三个元素都没有间隙的展示在了同一行。而`<p>`是一个块级元素，所以第二行代码中的每个元素分别都另起了新的一行展现，并且每个段落间都有空行
 
-JavaScript在设计之初，为了方便初学者学习，并不强制要求用var申明变量。这个设计错误带来了严重的后果：如果一个变量没有通过var申明就被使用，那么该变量就自动被申明为全局变量：
+块级元素与行内元素有几个关键区别：
++ 格式：
+默认情况下，块级元素会新起一行。
++ 内容模型：
+一般块级元素可以包含行内元素和其他块级元素。这种结构上的包含继承区别可以使块级元素创建比行内元素更”大型“的结构。
 
+4. 空元素
+不是所有元素都拥有开始标签，内容和结束标签. 一些元素只有一个标签，通常用来在此元素所在位置插入/嵌入一些东西 。例如：元素<img>是用来在元素<img>所在位置插入一张指定的图片。例子如下：
 ```
-i = 10; // i现在是全局变量
+<img src="https://www.python.org/static/img/python-logo.png">
 ```
-
-在同一个页面的不同的JavaScript文件中，恰好都使用了变量i，将造成变量i互相影响，产生难以调试的错误结果。
-
-使用var申明的变量则不是全局变量，它的范围被限制在该变量被申明的函数体内（函数的概念将稍后讲解），同名变量在不同的函数体内互不冲突。
 
-为了修补JavaScript这一严重设计缺陷，ECMA在后续规范中推出了strict模式，在strict模式下运行的JavaScript代码，强制通过var申明变量，未使用var申明变量就使用的，将导致运行错误。
+### 属性
+元素可以有属性
 
-启用strict模式的方法是在JavaScript代码的第一行写上：
-```
+![img](./Chapter-05-code/pic/grumpy-cat-attribute-small.png)
 
-'use strict';
-var b;
-b = 1;
+属性包含元素的额外信息，这些信息不会出现在实际的内容中。在上述例子中，这个class属性给元素赋了一个识别的名字，这个名字可以css所使用
 
-```
-[严格模式](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Strict_mode)
+一个属性必须包含如下内容：
 
-## 数据类型
+* 在元素和属性之间有个空格 (如果有一个或多个已存在的属性，就与前一个属性之间有一个空格)
+* 属性后面紧跟着一个=号
+* 有一个属性值,由一对引号""引起来
 
-javascript 的数据类型分两类，原始类型和对象类型。
-原始类型包括数字、字符串和布尔。
-javascript 还有两个特殊的原始值： null（空），undefined（未定义）。
-对象是属性的集合，每个属性由键/值对组成（值可以是原始类型也可以是对象）
+例子
 
-### 数字
-JavaScript不区分整数和浮点数，所有数字均用number表示：
 ```
-1   
-2.01
-0xff  //十六进制
-0o1   // 八进制
-1.2345e3 // 科学计数法
+<a href="https://github.com/jiam/python-dev" title="python-dev" target="_blank">教程</a>
 ```
 
-### 字符串
-字符串是以单引号'或双引号"括起来的任意文本，比如'abc'，"xyz"等等。
+* href: 这个属性声明超链接的web地址，当这个链接被点击浏览器会跳转至href声明的web地址
+* title: 标题title 属性为超链接声明额外的信息
+* target: 目标target 属性指定将用于打开链接的方式,target="_blank" 将在新标签页中打开链接
 
-```
-var a='abc'
-var b="abc"
-var c=`a
-b
-c
-`
-```
-把多个字符串加起来
+
+布尔属性
+
+有时你会看到没有值的属性，这些属性被称为布尔属性，他们只能有跟它的属性名一样的属性值。例如 disabled 属性，他们可以标记表单输入使之变为不可用(变灰色)，此时用户不能向他们输入任何数据
+布尔属性的值
 ```
-var name = '小明';
-var age = 20;
-var message = '你好, ' + name + ', 你今年' + age + '岁了!';
-console.log(message);
+<input type="text" disabled="disabled">
+<input type="text">
 ```
-如果有很多变量需要连接，用+号就比较麻烦。ES6新增了一种模板字符串，表示方法和上面的多行字符串一样，但是它会自动替换字符串中的变量：
+布尔属性的值可以没有
 ```
-var name = '小明';
-var age = 20;
-var message = `你好, ${name}, 你今年${age}岁了!`;
-console.log(message);
+<input type="text" disabled>
+<input type="text">
 ```
+常见bool属性
+checked, selected,readonly,hidden
 
-字符串常见的操作如下：
+### html文档结构
 ```
-var s = 'Hello, world!';
-s.length; // 13
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>我的测试页</title>
+  </head>
+  <body>
+    <p>这是我的一个页面</p>
+  </body>
+</html>
 ```
 
-要获取字符串某个指定位置的字符，与python相同：
-```
-var s = 'Hello, world!';
-
-s[0]; // 'H'
-s[6]; // ' '
-s[7]; // 'w'
-s[12]; // '!'
-s[13]; // undefined 超出范围的索引不会报错，但一律返回undefined
-```
+* `<!DOCTYPE html>`: 声明文档类型
+* `<html></html>: <html>`元素。这个元素包裹了整个完整的页面，是一个根元素。  
+* `<head></head>: <head>`元素. 这个元素是一个容器，它包含了所有你想包含在HTML页面中但不想在HTML页面中显示的内容。
+这些内容包括你想在搜索结果中出现的关键字和页面描述，CSS样式，字符集声明等等。
+* `<meta charset="utf-8">`: 这个元素设置文档使用utf-8字符集编码
 
-需要特别注意的是，字符串是不可变的，如果对字符串的某个索引赋值，不会有任何错误(与python不同，python直接报错)，但是，也没有任何效果：
-```
-var s = 'Test';
-s[0] = 'X';
-alert(s); // s仍然为'Test'
-```
+* `<title></title>`: 设置页面标题，出现在浏览器标签上，当你标记/收藏页面时它可用来描述页面。
+* `<body></body>: <body>`元素。 包含了访问页面时所有显示在页面上的内容，文本，图片，音频，游戏等等
 
+### HTML中的空白
 
+无论你用了多少空白(包括空白字符，包括换行), 当渲染这些代码的时候，HTML解释器会将连续出现的空白字符减少为一个单独的空格符
 
+```
+<p>Dogs are silly.</p>
 
+<p>Dogs        are
+         silly.</p>
 ```
+这面两个写法效果是相同的
 
+### html中的特殊字符
 
+常见特殊字符
+![img](./Chapter-05-code/pic/timg.jpg)
 
-### 布尔值
-布尔值和布尔代数的表示完全一致，一个布尔值只有true、false两种值，要么是true，要么是false，可以直接用true、false表示布尔值，也可以通过布尔运算计算出来：
+### HTML注释
+为了将一段HTML中的内容置为注释，你需要将其用特殊的记号`<!--和-->`包括起来， 比如：
 ```
-true; // 这是一个true值
-false; // 这是一个false值
-2 > 1; // 这是一个true值
-2 >= 3; // 这是一个false值
+<p>I'm not inside a comment</p>
+
+<!-- <p>I am!</p> -->
 ```
+
+### html 元数据
 
-### null和undefined
 
-null值表示一个空对象指针，指示变量未指向任何对象。
+![img](./Chapter-05-code/pic/meta.jpg)
 ```
-document.getElementById("container");
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="application-name" content="Python.org">
 ```
 
 
-undefined表示值未定义。声明了一个变量，但未对其初始化时，这个变量的值就是undefined。
-```
-var b;
-```
 
-### 对象
-JavaScript的对象是属性的无序集合，每个属性都是一个键/值对。
+### 在HTML中应用CSS和JavaScript
 
-JavaScript的对象用于描述现实世界中的某个对象。例如，为了描述“小明”这个淘气的小朋友，我们可以用若干键值对来描述他：
+你使用的所有网站都会使用 CSS 让网页更加炫酷, 使用JavaScript让网页有交互功能, 比如视频播放器，地图，游戏以及更多功能。
+这些应用在网页中很常见，它们分别使用 `<link>`元素以及` <script> `元素
 
 ```
-var xiaoming = {
-    name: '小明',
-    birth: 1990,
-    school: 'No.1 Middle School',
-    height: 1.70,
-    weight: 65,
-    score: null
-};
+<!-- 本地新闻 -->
+<script src="//www.163.com/special/00774J00/index_news_keys.js" charset="gbk"></script>
+<!-- 第三方合作新闻推荐 -->
+<link href="https://static.ws.126.net/f2e/www/index20170701/collect/head~DIhBY9NJYLhd.css" rel="stylesheet" />
 ```
-JavaScript用一个{...}表示一个对象，键值对以xxx: xxx形式申明，用,隔开。注意，最后一个键值对不需要在末尾加,，如果加了，有的浏览器（如低版本的IE）将报错。
 
-上述对象申明了一个name属性，值是'小明'，birth属性，值是1990，以及其他一些属性。最后，把这个对象赋值给变量xiaoming后，就可以通过变量xiaoming来获取小明的属性了：
 
-```
-xiaoming.name; // '小明'
-xiaoming.birth; // 1990
-```
+### HTML 文本格式元素
 
-访问属性是通过.操作符完成的，但这要求属性名必须是一个有效的变量名。如果属性名包含特殊字符，就必须用''括起来：
-```
-var xiaohong = {
-    name: '小红',
-    'middle-school': 'No.1 Middle School'
-};
+标题、段落
 ```
+<h1>The Crushing Bore</h1>
 
-xiaohong的属性名middle-school不是一个有效的变量，就需要用''括起来。访问这个属性也无法使用.操作符，必须用['xxx']来访问：
-```
-xiaohong['middle-school']; // 'No.1 Middle School'
-xiaohong['name']; // '小红'
-xiaohong.name; // '小红'
-```
+<p>By Chris Mills</p>
 
-也可以用xiaohong['name']来访问xiaohong的name属性，不过xiaohong.name的写法更简洁。我们在编写JavaScript代码的时候，属性名尽量使用标准的变量名，这样就可以直接通过object.prop的形式访问一个属性了。
+<h2>Chapter 1: The Dark Night</h2>
 
-实际上JavaScript对象的所有属性都是字符串，不过属性对应的值可以是任意数据类型。
-如果访问一个不存在的属性会返回什么呢？JavaScript规定，访问不存在的属性不报错，而是返回undefined：
+<p>It was a dark night. Somewhere, an owl hooted. The rain lashed down on the ...</p>
 
-```
-'use strict';
+<h2>Chapter 2: The eternal silence</h2>
 
-var xiaoming = {
-    name: '小明'
-};
+<p>Our protagonist could not so much as a whisper out of the shadowy figure ...</p>
 
-console.log(xiaoming.name);
-console.log(xiaoming.age); // undefined
+<h3>The specter speaks</h3>
 
+<p>Several more hours had passed, when all of a sudden the specter sat bolt upright and exclaimed, "Please have mercy on my soul!"</p>
 ```
-由于JavaScript的对象是动态类型，你可以自由地给一个对象添加或删除属性：
-```
-var xiaoming = {
-    name: '小明'
-};
-xiaoming.age; // undefined
-xiaoming.age = 18; // 新增一个age属性
-xiaoming.age; // 18
-delete xiaoming.age; // 删除age属性
-xiaoming.age; // undefined
-delete xiaoming['name']; // 删除name属性
-xiaoming.name; // undefined
-delete xiaoming.school; // 删除一个不存在的school属性也不会报错
-```
-如果我们要检测xiaoming是否拥有某一属性，可以用in操作符：
+
+无序列表
+
 ```
-var xiaoming = {
-    name: '小明',
-    birth: 1990,
-    school: 'No.1 Middle School',
-    height: 1.70,
-    weight: 65,
-    score: null
-};
-'name' in xiaoming; // true
-'grade' in xiaoming; // false
+<ul>
+  <li>牛奶</li>
+  <li>鸡蛋</li>
+  <li>面包</li>
+  <li>鹰嘴豆泥</li>
+</ul>
+
 ```
+有序列表
 
-不过要小心，如果in判断一个属性存在，这个属性不一定是xiaoming的，它可能是xiaoming继承得到的：
 ```
-'toString' in xiaoming; // true
+<ol>
+  <li>行驶到这条路的尽头</li>
+  <li>向右转</li>
+  <li>直行穿过第一个双环形交叉路</li>
+  <li>在第三个环形交叉路左转</li>
+  <li>学校就在你的右边，300米处</li>
+</ol>
 ```
-因为toString定义在object对象中，而所有对象最终都会在原型链上指向object，所以xiaoming也拥有toString属性。
 
-要判断一个属性是否是xiaoming自身拥有的，而不是继承得到的，可以用hasOwnProperty()方法：
+嵌套列表
 
+```
+<ol>
+  <li>Remove the skin from the garlic, and chop coarsely.</li>
+  <li>Remove all the seeds and stalk from the pepper, and chop coarsely.</li>
+  <li>Add all the ingredients into a food processor.</li>
+  <li>Process all the ingredients into a paste.
+    <ul>
+      <li>If you want a coarse "chunky" humous, process it for a short time.</li>
+      <li>If you want a smooth humous, process it for a longer time.</li>
+    </ul>
+  </li>
+</ol>
 ```
-var xiaoming = {
-    name: '小明'
-};
-xiaoming.hasOwnProperty('name'); // true
-xiaoming.hasOwnProperty('toString'); // false
+
+斜体字、粗体字、下划线
 ```
+<!-- scientific names -->
+<p>
+  The Ruby-throated Hummingbird (<i>Archilocus colubris</i>)
+  is the most common hummingbird in Eastern North America.
+</p>
 
+<!-- foreign words -->
+<p>
+  The menu was a sea of exotic words like <i lang="uk-latn">vatrushka</i>,
+  <i lang="id">nasi goreng</i> and <i lang="fr">soupe à l'oignon</i>.
+</p>
 
-### 数组
-JavaScript的数组可以包含任意数据类型（与python列表类似），并通过索引来访问每个元素。
+<!-- a known misspelling -->
+<p>
+  Someday I'll learn how to <u>spel</u> better.
+</p>
 
-要取得Array的长度，直接访问length属性：
-```
-var arr = [1, 2, 3.14, 'Hello', null, true];
-arr.length; // 6
+<!-- Highlight keywords in a set of instructions -->
+<ol>
+  <li>
+    <b>Slice</b> two pieces of bread off the loaf.
+  </li>
+  <li>
+    <b>Insert</b> a tomato slice and a leaf of
+    lettuce between the slices of bread.
+  </li>
+</ol>
 ```
 
-请注意，直接给数组的length赋一个新的值会导致Array大小的变化：
-```
-var arr = [1, 2, 3];
-arr.length; // 3
-arr.length = 6;
-arr; // arr变为[1, 2, 3, undefined, undefined, undefined]
-arr.length = 2;
-arr; // arr变为[1, 2]
+### 表格
+
 ```
+<table>
+<tr>
+<th>选择器</th>
+<th>例子</th>
+<th>例子描述</th>
+<th>CSS</th>
+</tr>
 
-数组可以通过索引把对应的元素修改为新的值，因此，对Array的索引进行赋值会直接修改这个Array：
+<tr>
+<td><a href="/cssref/selector_class.asp" title="CSS .class 选择器">.<i>class</i></a></td>
+<td>.intro</td>
+<td>选择 class=&quot;intro&quot; 的所有元素。</td>
+<td>1</td>
+</tr>
 
-```
-var arr = ['A', 'B', 'C'];
-arr[1] = 99;
-arr; // arr现在变为['A', 99, 'C']
+<tr>
+<td><a href="/cssref/selector_id.asp" title="CSS #id 选择器">#<i>id</i></a></td>
+<td>#firstname</td>
+<td>选择 id=&quot;firstname&quot; 的所有元素。</td>
+<td>1</td>
+</tr>
+</table>
 ```
 
-请注意，如果通过索引赋值时，索引超过了范围，同样会引起Array大小的变化：
-```
-var arr = [1, 2, 3];
-arr[5] = 'x';
-arr; // arr变为[1, 2, 3, undefined, undefined, 'x']
-```
+### 表单
 
-indexOf
-与String类似，Array也可以通过indexOf()来搜索一个指定的元素的位置：
+用户提交数据
 
-```
-var arr = [10, 20, '30', 'xyz'];
-arr.indexOf(10); // 元素10的索引为0
-arr.indexOf(20); // 元素20的索引为1
-arr.indexOf(30); // 元素30没有找到，返回-1
-arr.indexOf('30'); // 元素'30'的索引为2
 ```
-
-slice
-slice()就是对应String的substring()版本，它截取Array的部分元素，然后返回一个新的Array：
+<form action="http://foo.com" method="get">
+  <div>
+    <label for="say">What greeting do you want to say?</label>
+    <input name="say" id="say" value="Hi">
+  </div>
+  <div>
+    <label for="to">Who do you want to say it to?</label>
+    <input name="to" id="to" value="Mom">
+  </div>
+  <div>
+    <button>Send my greetings</button>
+  </div>
+</form>
 ```
-var arr = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
-arr.slice(0, 3); // 从索引0开始，到索引3结束，但不包括索引3: ['A', 'B', 'C']
-arr.slice(3); // 从索引3开始到结束: ['D', 'E', 'F', 'G']
+* action 属性: 数据要提交到额url，在本例中，数据被发送到 —— http://foo.com
+* method属性:  提交数据使用的http方法 ，本例get
 ```
+GET /?say=Hi&to=Mom HTTP/1.1
+Host: foo.com
 
-如果不给slice()传递任何参数，它就会从头到尾截取所有元素。利用这一点，我们可以很容易地复制一个数组:
-```
-var arr = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
-var aCopy = arr.slice();
-aCopy; // ['A', 'B', 'C', 'D', 'E', 'F', 'G']
-aCopy === arr; // false
-```
+POST / HTTP/1.1
+Host: foo.com
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 13
 
-push和pop
-push()向Array的末尾添加若干元素，pop()则把Array的最后一个元素删除掉：
+say=Hi&to=Mom
 ```
-var arr = [1, 2];
-arr.push('A', 'B'); // 返回Array新的长度: 4
-arr; // [1, 2, 'A', 'B']
-arr.pop(); // pop()返回'B'
-arr; // [1, 2, 'A']
-arr.pop(); arr.pop(); arr.pop(); // 连续pop 3次
-arr; // []
-arr.pop(); // 空数组继续pop不会报错，而是返回undefined
-arr; // []
-```
 
-unshift和shift
-如果要往Array的头部添加若干元素，使用unshift()方法，shift()方法则把Array的第一个元素删掉：
+发送文件
 ```
-var arr = [1, 2];
-arr.unshift('A', 'B'); // 返回Array新的长度: 4
-arr; // ['A', 'B', 1, 2]
-arr.shift(); // 'A'
-arr; // ['B', 1, 2]
-arr.shift(); arr.shift(); arr.shift(); // 连续shift 3次
-arr; // []
-arr.shift(); // 空数组继续shift不会报错，而是返回undefined
-arr; // []
+<form method="post" enctype="multipart/form-data">
+  <div>
+    <label for="file">Choose a file</label>
+    <input type="file" id="file" name="myFile">
+  </div>
+  <div>
+    <button>Send the file</button>
+  </div>
+</form>
 ```
+* enctype 该属性允许指定在提交表单时所生成的请求中的Content-Type的HTTP数据头的值，默认值application/x-www-form-urlencoded。
+意思是为发送的数据指定编码格式
 
-sort
-sort()可以对当前Array进行排序，它会直接修改当前Array的元素位置，直接调用时，按照默认顺序排序：
-···
-var arr = ['B', 'C', 'A'];
-arr.sort();
-arr; // ['A', 'B', 'C']
-···
+校验数据
 
-reverse
-reverse()把整个Array的元素给掉个个，也就是反转：
+强制必填
 ```
-var arr = ['one', 'two', 'three'];
-arr.reverse(); 
-arr; // ['three', 'two', 'one']
+<form>
+  <label for="choose">Would you prefer a banana or cherry?</label>
+  <input id="choose" name="i_like" required>
+  <button>Submit</button>
+</form
 ```
 
-splice
-splice()方法是修改Array的“万能方法”，它可以从指定的索引开始删除若干元素，然后再从该位置添加若干元素：
-```
-var arr = ['Microsoft', 'Apple', 'Yahoo', 'AOL', 'Excite', 'Oracle'];
-// 从索引2开始删除3个元素,然后再添加两个元素:
-arr.splice(2, 3, 'Google', 'Facebook'); // 返回删除的元素 ['Yahoo', 'AOL', 'Excite']
-arr; // ['Microsoft', 'Apple', 'Google', 'Facebook', 'Oracle']
-// 只删除,不添加:
-arr.splice(2, 2); // ['Google', 'Facebook']
-arr; // ['Microsoft', 'Apple', 'Oracle']
-// 只添加,不删除:
-arr.splice(2, 0, 'Google', 'Facebook'); // 返回[],因为没有删除任何元素
-arr; // ['Microsoft', 'Apple', 'Google', 'Facebook', 'Oracle']
-```
+required 属性 必填
 
-concat
-concat()方法把当前的Array和另一个Array连接起来，并返回一个新的Array：
+限制长度
 ```
-var arr = ['A', 'B', 'C'];
-var added = arr.concat([1, 2, 3]);
-added; // ['A', 'B', 'C', 1, 2, 3]
-arr; // ['A', 'B', 'C']
+<form>
+  <div>
+    <label for="choose">Would you prefer a banana or a cherry?</label>
+    <input id="choose" name="i_like" required minlength="6" maxlength="6">
+  </div>
+  <div>
+    <label for="number">How many would you like?</label>
+    <input type="number" id="number" name="amount" value="1" min="1" max="10">
+  </div>
+  <div>
+    <button>Submit</button>
+  </div>
+</form>
 ```
 
-请注意，concat()方法并没有修改当前Array，而是返回了一个新的Array。
+### 表单组件
 
-实际上，concat()方法可以接收任意个元素和Array，并且自动把Array拆开，然后全部添加到新的Array里：
-
++ 文本输入
 ```
-var arr = ['A', 'B', 'C'];
-arr.concat(1, 2, [3, 4]); // ['A', 'B', 'C', 1, 2, 3, 4]
+<input type="text" id="comment" name="comment" value="I'm a text field">
 ```
 
-join
-join()方法是一个非常实用的方法，它把当前Array的每个元素都用指定的字符串连接起来，然后返回连接后的字符串：
++ E-mail 地址
 ```
-var arr = ['A', 'B', 'C', 1, 2, 3];
-arr.join('-'); // 'A-B-C-1-2-3'
+<input type="email" id="email" name="email" multiple>
 ```
+通过包括multiple属性，可以让用户将多个电子邮件地址输入相同的输入(以逗号分隔)
 
-## 条件判断
-JavaScript使用if () { ... } else { ... }来进行条件判断。例如，根据年龄显示不同内容，可以用if语句实现如下
++ 密码
 ```
-var age = 20;
-if (age >= 18) { // 如果age >= 18为true，则执行if语句块
-    alert('adult');
-} else { // 否则执行else语句块
-    alert('teenager');
-}
-
+<input type="password" id="pwd" name="pwd">
 ```
 
-其中else语句是可选的。如果语句块只包含一条语句，那么可以省略{}：
++ 搜索
 ```
-var age = 20;
-if (age >= 18)
-    alert('adult');
-else
-    alert('teenager');
+<input type="search" id="search" name="search">
 ```
-
-省略{}的危险之处在于，如果后来想添加一些语句，却忘了写{}，就改变了if...else...的语义，例如：
++ 多行文本
 ```
-var age = 20;
-if (age >= 18)
-    alert('adult');
-else
-    console.log('age < 18'); // 添加一行日志
-    alert('teenager'); // <- 这行语句已经不在else的控制范围了
+<textarea cols="30" rows="10"></textarea>
 ```
 
-多行条件判断
-如果还要更细致地判断条件，可以使用多个if...else...的组合：
++ 下拉选择框
 ```
-var age = 3;
-if (age >= 18) {
-    alert('adult');
-} else if (age >= 6) {
-    alert('teenager');
-} else {
-    alert('kid');
-}
+<select id="simple" name="simple">
+  <option>Banana</option>
+  <option>Cherry</option>
+  <option>Lemon</option>
+</select>
 ```
 
-## 循环
-JavaScript的循环有两种，一种是for循环，通过初始条件、结束条件和递增条件来循环执行语句块：
++ 多选框
 ```
-var x = 0;
-var i;
-for (i=1; i<=10000; i++) {
-    x = x + i;
-}
-x; // 50005000
-
+<select multiple id="multi" name="multi">
+  <option>Banana</option>
+  <option>Cherry</option>
+  <option>Lemon</option>
+</select>
 ```
-
-
-让我们来分析一下for循环的控制条件：
-
-i=1 这是初始条件，将变量i置为1；
-i<=10000 这是判断条件，满足时就继续循环，不满足就退出循环；
-i++ 这是每次循环后的递增条件，由于每次循环后变量i都会加1，因此它终将在若干次循环后不满足判断条件i<=10000而退出循环。
-
 
-for循环最常用的地方是利用索引来遍历数组：
++ 复选框
 ```
-var arr = ['Apple', 'Google', 'Microsoft'];
-var i, x;
-for (i=0; i<arr.length; i++) {
-    x = arr[i];
-    console.log(x);
-}
+<input type="checkbox" id="carrots1" name="carrots1" value="carrots1">
+<input type="checkbox" id="carrots2" name="carrots2" value="carrots2">
 ```
-
-for循环的3个条件都是可以省略的，如果没有退出循环的判断条件，就必须使用break语句退出循环，否则就是死循环：
++ 单选按钮
 ```
-var x = 0;
-for (;;) { // 将无限循环下去
-    if (x > 100) {
-        break; // 通过if判断来退出循环
-    }
-    x ++;
-}
+<input type="radio"  id="soup1" name="meal" value=1>
+<input type="radio"  id="soup2" name="meal" value=2>
 ```
-
-for ... in
-for循环的一个变体是for ... in循环，它可以把一个对象的所有属性依次循环出来：
++ 按钮
 
+提交
 ```
-var o = {
-    name: 'Jack',
-    age: 20,
-    city: 'Beijing'
-};
-for (var key in o) {
-    console.log(key); // 'name', 'age', 'city'
-}
-```
-
-while
-for循环在已知循环的初始和结束条件时非常有用。而上述忽略了条件的for循环容易让人看不清循环的逻辑，此时用while循环更佳。
-
-while循环只有一个判断条件，条件满足，就不断循环，条件不满足时则退出循环。比如我们要计算100以内所有奇数之和，可以用while循环实现：
+<button type="submit">
+    This a <br><strong>submit button</strong>
+</button>
 
+<input type="submit" value="This is a submit button">
 ```
-var x = 0;
-var n = 99;
-while (n > 0) {
-    x = x + n;
-    n = n - 2;
-}
-x; // 2500
-```
 
-在循环内部变量n不断自减，直到变为-1时，不再满足while条件，循环退出。
-
-do ... while
-最后一种循环是do { ... } while()循环，它和while循环的唯一区别在于，不是在每次循环开始的时候判断条件，而是在每次循环完成的时候判断条件：
-```
-var n = 0;
-do {
-    n = n + 1;
-} while (n < 100);
-n; // 100
+重置
 ```
-用do { ... } while()循环要小心，循环体会至少执行1次，而for和while循环则可能一次都不执行。
+<button type="reset">
+    This a <br><strong>reset button</strong>
+</button>
 
-
-## 函数
-
-定义函数
-在JavaScript中，定义函数的方式如下：
-```
-function abs(x) {
-    if (x >= 0) {
-        return x;
-    } else {
-        return -x;
-    }
-}
+<input type="reset" value="This is a reset button">
 ```
 
-上述abs()函数的定义如下：
+## css
+CSS 指层叠样式表 (Cascading Style Sheets),它允许我们将布局和设计添加到html页面，
 
-+ function指出这是一个函数定义；
-+ abs是函数的名称；
-+ (x)括号内列出函数的参数，多个参数以,分隔；
-+ { ... }之间的代码是函数体，可以包含若干语句，甚至可以没有任何语句。
-请注意，函数体内部的语句在执行时，一旦执行到return时，函数就执行完毕，并将结果返回。因此，函数内部通过条件判断和循环可以实现非常复杂的逻辑。
+### html中使用css
 
-如果没有return语句，函数执行完毕后也会返回结果，只是结果为undefined。
++ 外部样式表(External style sheet)
++ 内部样式表(Internal style sheet)
++ 行内样式(Inline style)
 
-由于JavaScript的函数也是一个对象，上述定义的abs()函数实际上是一个函数对象，而函数名abs可以视为指向该函数的变量。
+#### 外部样式表
 
-因此，第二种定义函数的方式如下：
 
-```
-var abs = function (x) {
-    if (x >= 0) {
-        return x;
-    } else {
-        return -x;
-    }
-};
-```
+单独使用一个css文件来保存样式，独立html文件，通过在`<head>` 元素中定义`<link>`元素来引用css文件
+这样一个css文件可以被多个需要的html文件使用。
 
-在这种方式下，function (x) { ... }是一个匿名函数，它没有函数名。但是，这个匿名函数赋值给了变量abs，所以，通过变量abs就可以调用该函数。
+`<link>` 链接html文件外的资源
++ rel属性 指定link的文件类型
++ href属性 用于标识CSS文件的位置。
 
-上述两种定义完全等价，注意第二种方式按照完整语法需要在函数体末尾加一个;，表示赋值语句结束。
-
-调用函数
-调用函数时，按顺序传入参数即可：
 ```
-abs(10); // 返回10
-abs(-9); // 返回9
-```
+<head>
+  <link rel="stylesheet" href="main.css">
+</head>
 
-由于JavaScript允许传入任意个参数而不影响调用，因此传入的参数比定义的参数多也没有问题，虽然函数内部并不需要这些参数：
-```
-abs(10, 'blablabla'); // 返回10
-abs(-9, 'haha', 'hehe', null); // 返回9
 ```
 
-传入的参数比定义的少也没有问题：
-```
-abs(); // 返回NaN
-```
+为了CSS正确呈现，href属性值的路径必须直接关联到我们的CSS文件保存的位置，
+在前面的示例中，main.css文件存储在与HTML文件相同的位置。
+
+如果我们的CSS文件位于子目录或子文件夹内，则href属性值需要相应地与此路径相关联。
+例如，如果我们的main.css文件存储在名为stylesheets的子目录中，那么href属性值将是stylesheets/main.css
 
-此时abs()函数的参数x将收x到undefined，计算结果为NaN。
+#### 内部样式表（内联样式表）
+当单个文档需要特殊的样式时，就应该使用内部样式表。你可以使用` <style>` 标签在文档头部定义内部样式表
 
-要避免收到undefined，可以对参数进行检查：
 ```
-function abs(x) {
-    if (typeof x !== 'number') {
-        throw 'Not a number';
-    }
-    if (x >= 0) {
-        return x;
-    } else {
-        return -x;
-    }
-}
+<head>
+<style>
+hr {border: 5px solid red;}
+p {margin-left:20px;}
+</style>
+</head>
+<hr>
+<p>内部样式表</p>
 ```
 
-arguments
-JavaScript还有一个免费赠送的关键字arguments，它只在函数内部起作用，并且永远指向当前函数的调用者传入的所有参数。arguments类似Array但它不是一个Array：
+#### 行内样式表
 ```
-
-function foo(x) {
-    console.log('x = ' + x); // 10
-    for (var i=0; i<arguments.length; i++) {
-        console.log('arg ' + i + ' = ' + arguments[i]); // 10, 20, 30
-    }
-}
-foo(10, 20, 30);
+<p style="color:sienna;margin-left:20px">这是一个段落。</p>`
 ```
 
-## 变量作用域
-在JavaScript中，用var申明的变量实际上是有作用域的。
+### 选择器
+当元素被添加到网页中时，可以使用CSS进行样式化。选择器用来定位HTML中的哪些元素应用样式（例如颜色，大小和位置）
+选择器可以包含不同限定符（元素类型，class，id）的组合，以选择独特的元素。例如，我们可能希望选择页面上的每个段落，或者我们可能只想在页面上选择一个特定的段落。
+选择器通常以属性值为目标，例如id或class值，或者定位元素的类型，例如`<h1>`或`<p>`
 
-如果一个变量在函数体内部申明，则该变量的作用域为整个函数体，在函数体外不可引用该变量：
-```
+在CSS中，选择器后跟大括号{}，其中包含要应用于所选元素的样式。下面的选择器是针对所有的`<p>`元素
 
-function foo() {
-    var x = 1;
-    x = x + 1;
+```
+p {
+  color: orange;
+  font-size: 16px;
 }
 
-x = x + 2; // ReferenceError! 无法在函数体外引用变量x
-```
-如果两个不同的函数各自申明了同一个变量，那么该变量只在各自的函数体内起作用。换句话说，不同函数内部的同名变量互相独立，互不影响：
-
 ```
 
-function foo() {
-    var x = 1;
-    x = x + 1;
-    console.log(x)
+在CSS中，我们的规则集以选择器开头，后面紧跟着大括号。在这些大括号内是由属性和值对组成的声明，每个声明都以一个属性开头，后面跟着冒号，属性值，最后是分号。
+![img](./Chapter-05-code/css-syntax-outline.png)
+
+**使用选择器**
+
+如前所述，选择器表示对哪些HTML元素进行样式化。充分了解如何使用选择器以及如何利用选择器非常重要。
+第一步是熟悉不同类型的选择器。我们将从最常见的选择器开始：类型，类和ID选择器。
+
+元素类型选择器
+
+类型选择器按元素类型定位元素。例如，如果我们希望定位所有的div元素，我们将使用div的类型选择器
+以下代码显示了除法元素的类型选择器以及它选择的相应HTML
+
+````
+# css
+div { ... }
+
+# html
+<div>...</div>          
+<div>...</div>
+````
+
+元素类属性选择器
+
+类选择器允许我们根据元素的类属性值选择一个元素。类选择器比类型选择器更具体，因为它们选择一组特定的元素而不是一种类型的所有元素。类选择器允许我们通过跨多个元素使用相同的类属性值，一次将相同的样式应用于不同的元素。
+在CSS中，类由前导点表示，后跟类属性值。下面类选择器将选择包含awesome类属性值的任何元素，包括分割元素和段落元素
+
+````
+# css
+.red { ... }
+# html
+<div class="red">...</div>
+<p class="red">...</p>
+````
+ID 选择器
+
+ID选择器比类选择器更精确，因为它们一次只能定位一个独特的元素。就像类选择器使用元素的类属性值作为选择器一样，ID选择器使用元素的id属性值作为选择器。无论它们出现在哪种类型的元素上，每个页面使用的id属性值必须唯一。如果使用它们应该保留用于重要元素。
+在CSS中，ID选择符由前导散列符号＃表示，后跟id属性值。这里ID选择器将只选择包含shayhowe的id属性值的元素。
+
+````
+# css
+#name { ... }
+<div id="name">...</div>
+```
+分组选择器
+假设希望 `<h2>` 元素和 `<p>`都是灰色。为达到这个目的，最容易的做法是使用以下声明
+```
+h2, p {color:gray;}
+```
+将 `<h2>` 和 `<p>` 选择器放在规则左边，然后用逗号分隔，就定义了一个规则。其右边的样式（color:gray;）将应用到这两个选择器所引用的元素
+。逗号告诉浏览器，规则中包含两个不同的选择器。如果没有这个逗号，那么规则的含义将完全不同
+
+[示例](./Chapter-05-code/css-example11.html)
+
+[示例](./Chapter-05-code/css-example12.html)
+
+通配符选择器
+通配选择器，显示为一个星号（*）。该选择器可以与任何元素匹配，就像是一个通配符。例如，下面的规则可以使文档中的每个元素都为红色：
+
+[示例](./Chapter-05-code/css-example13.html)
+
+后代选择器
+
+后代选择器（descendant selector）又称为包含选择器。后代选择器可以选择作为某元素后代的元素
+我们可以定义后代选择器来创建一些规则，使这些规则在某些文档结构中起作用，而在另外一些结构中不起作用。
+
+举例来说，如果您希望只对 h1 元素中的 em 元素应用样式，可以这样写
+
+[示例](./Chapter-05-code/css-example14.html)
+
+[示例](./Chapter-05-code/css-example15.html)
+
+子元素选择器
+
+如果不希望选择任意的后代元素，而是希望缩小范围，只选择某个元素的子元素，请使用子元素选择器（Child selector）。
+例如，如果希望选择只作为 h1 元素子元素的 strong 元素，可以这样写：
+[示例](./Chapter-05-code/css-example16.html)
+
+
+### Box Model 盒子模型
+
+#### 如何显示元素
+
+如何显示元素，由display属性决定。每个元素都有一个默认的display属性值;但是，与所有其属性的值一样，该值可能会被覆盖。最常见的是block, inline, inline-block, 和none
+
+每个元素都有默认的display值，根据display的值可分为 块（block）元素，行内（inline）元素和 内嵌（inline-block）元素
+
+block元素独占一行，并且可以设置width,height，margin，padding属性。
+
+inline元素不会独占一行，多个相邻的行内元素会排列在同一行里，直到一行排列不下，才会新换一行，其宽度随元素的内容而变化，
+inline元素设置width,height属性无效
+
+inline-block 元素呈现为inline对象，让block元素不再独占一行，多个block元素可以同排一行，且元素具有block的属性，
+可设置width、height是block和inline元素的综合体
+
+none 使元素不显示
+
+
+我们可以通过在CSS中设置显示display的值来更改元素的显示属性值。
+
+[示例](./Chapter-05-code/example1.html)
+
+#### 什么是Box Model(盒子模型)
+
+根据盒子模型概念，页面上的每个元素都是一个矩形框，并且可以具有width(宽度)，height(高度)，padding(填充)，border(边框)和margin(边距)。
+*页面上的每个元素都是一个矩形框* 每个页面上的每个元素都符合盒子模型
+
+每个元素都是一个矩形框，并且有width、height、padding、border、margin几个属性决定了该框的大小.
+
+````
+div {
+  border: 6px solid #949599;
+  height: 100px;
+  margin: 20px;
+  padding: 20px;
+  width: 400px;
 }
 
-function bar() {
-    var x = 'A';
-    x = x + 'B';
-    console.log(x)
-}
-```
-在函数外声明的变量为全局变量,可以被函数访问
-```
-var a = 2
+````
 
-function t(){
-    console.log(a)
-    var a = 3 // 注意 有没有var的区别
-    console.log(a)
-}
+#### Width & Height
 
-t()
-console.log(a)
-```
-变量提升
-JavaScript的函数定义有个特点，它会先扫描整个函数体的语句，把所有申明的变量“提升”到函数顶部：
-```
-function foo() {
-    var x = 'Hello, ' + y;
-    console.log(x);
-    var y = 'Bob';
+元素宽度
+
+````
+div {
+  width: 400px;
+}
+````
+元素高度
+````
+div {
+  height: 100px;
 }
 
-foo();
-```
+````
+Margin(边距) & Padding(填充)
 
-## 方法
-
-在一个对象中绑定函数，称为这个对象的方法。
-
-在JavaScript中，对象的定义是这样的：
-```
-var xiaoming = {
-    name: '小明',
-    birth: 1990
-};
-```
-
-但是，如果我们给xiaoming绑定一个函数，就可以做更多的事情。比如，写个age()方法，返回xiaoming的年龄：
-```
-var xiaoming = {
-    name: '小明',
-    birth: 1990,
-    age: function () {
-        var y = new Date().getFullYear();
-        return y - this.birth;
-    }
-};
-
-xiaoming.age; // function xiaoming.age()
-xiaoming.age(); // 今年调用是29,明年调用就变成30了
-```
-
-绑定到对象上的函数称为方法，和普通函数也没啥区别，但是它在内部使用了一个this关键字，这个东东是什么？
-
-在一个方法内部，this是一个特殊变量，它始终指向当前对象，也就是xiaoming这个变量。所以，this.birth可以拿到xiaoming的birth属性。
-
-```
-function getAge() {
-    var y = new Date().getFullYear();
-    return y - this.birth;
+根据元素的不同，浏览器可以将默认边距和填充应用于元素，以帮助提高易读性和清晰度。
+margin属性允许我们设置元素周围的空间量，元素的边距（margin）落在边框（border）之外，并且颜色完全透明。
+边距可用于帮助将元素定位在页面上的特定位置，与所有其他元素保持安全距离。
+````
+div {
+  margin: 20px;
 }
 
-var xiaoming = {
-    name: '小明',
-    birth: 1990,
-    age: getAge
-};
-xiaoming.age(); // 25, 正常结果
-getAge(); // NaN
-```
-单独调用函数getAge()怎么返回了NaN？请注意，我们已经进入到了JavaScript的一个大坑里。
+````
 
-JavaScript的函数内部如果调用了this，那么这个this到底指向谁？
+填充（padding）属性与边距（margin）属性非常相似;但是，如果元素具有边框（border），则它落在元素的边框（border）内。
 
-答案是，视情况而定！
 
-如果以对象的方法形式调用，比如xiaoming.age()，该函数的this指向被调用的对象，也就是xiaoming，这是符合我们预期的。
 
-如果单独调用函数，比如getAge()，此时，该函数的this指向全局对象
+#### 设置magrin和padding
 
-```
-function getAge() {
-    var y = new Date().getFullYear();
-    return y - this.birth;
+````
+div {
+  margin: 20px;
+}
+````
+以上方式设置元素的4个方向margin值均为20px
+
+如果上下和左右的值不同,设置方式如下
+````
+div {
+  margin: 10px 20px;
 }
 
-var xiaoming = {
-    name: '小明',
-    birth: 1990,
-    //age: getAge
-};
+````
 
-//xiaoming.age(); // 29
-getAge.apply(xiaoming); // 29, this指向xiaoming, 参数为空
-getAge.call(xiaoming);
-```
-apply,call将函数绑定对象
-区别是：
+10px 为上下的值，20px为左右的值
 
-apply()把参数打包成Array再传入；
+如果上下左右各不同。设置方式如下
+````
+div {
+  margin: 10px 20px 0 15px;
+}
 
-call()把参数按顺序传入。
-```
-Math.max.apply(null, [3, 5, 4]); // 5
-Math.max.call(null, 3, 5, 4); // 5
-```
+````
 
-## 内置对象
-在JavaScript的世界里，一切都是对象。
+上（top） 10px，右（right）20px，下（bottom）0,左（left）15px  方向为顺时针
 
-但是某些对象还是和其他对象不太一样。为了区分对象的类型，我们用typeof操作符获取对象的类型，它总是返回一个字符串：
+也可以单独设置某个方向的值，如：
+````
+div {
+  margin-top: 10px;
+  padding-left: 6px;
+}
 
-```
-typeof 123; // 'number'
-typeof NaN; // 'number'
-typeof 'str'; // 'string'
-typeof true; // 'boolean'
-typeof undefined; // 'undefined'
-typeof Math.abs; // 'function'
-typeof null; // 'object'
-typeof []; // 'object'
-typeof {}; // 'object'
-```
-可见，number、string、boolean、function和undefined有别于其他类型。特别注意null的类型是object，Array的类型也是object，如果我们用typeof将无法区分出null、Array和通常意义上的object——{}。
+````
 
-### 包装对象
-除了这些类型外，JavaScript还提供了包装对象，熟悉Java的小伙伴肯定很清楚int和Integer这种暧昧关系。
+边距（magin）和填充（padding）是完全透明的，不接受任何颜色值。但是，它们显示相对元素的背景颜色
+对于边距，我们看到父元素的背景颜色，对于填充，我们看到应用填充的元素的背景颜色
 
-number、boolean和string都有包装对象。没错，在JavaScript中，字符串也区分string类型和它的包装类型。包装对象用new创建：
-```
-var n = new Number(123); // 123,生成了新的包装类型
-var b = new Boolean(true); // true,生成了新的包装类型
-var s = new String('str'); // 'str',生成了新的包装类型
+#### Borders
 
-```
+边框（border）位于填充（padding）和边距（margin）之间，提供围绕元素的轮廓。
+边框（border）属性需要三个值：宽度（width），样式（style）和颜色（color）。
+````
+div {
+  border: 6px solid #949599;
+}
 
-虽然包装对象看上去和原来的值一模一样，显示出来也是一模一样，但他们的类型已经变为object了！所以，包装对象和原始值用===比较会返回false：
-```
-typeof new Number(123); // 'object'
-new Number(123) === 123; // false
+````
 
-typeof new Boolean(true); // 'object'
-new Boolean(true) === true; // false
+边框（border）的style常见的有solid, double, dashed, dotted, 和 none
 
-typeof new String('str'); // 'object'
-new String('str') === 'str'; // false
-```
-
-### Date
-在JavaScript中，Date对象用来表示日期和时间。
-
-要获取系统当前时间，用：
-```
-var now = new Date();
-now; // Wed Jun 24 2015 19:49:22 GMT+0800 (CST)
-now.getFullYear(); // 2015, 年份
-now.getMonth(); // 5, 月份，注意月份范围是0~11，5表示六月
-now.getDate(); // 24, 表示24号
-now.getDay(); // 3, 表示星期三
-now.getHours(); // 19, 24小时制
-now.getMinutes(); // 49, 分钟
-now.getSeconds(); // 22, 秒
-now.getMilliseconds(); // 875, 毫秒数
-now.getTime(); // 1435146562875, 以number形式表示的时间戳
-
-```
-注意，当前时间是浏览器从本机操作系统获取的时间，所以不一定准确，因为用户可以把当前时间设定为任何值。
-
-如果要创建一个指定日期和时间的Date对象，可以用：
-```
-var d = new Date(2015, 5, 19, 20, 15, 30, 123);
-d; // Fri Jun 19 2015 20:15:30 GMT+0800 (CST)
-```
-
-你可能观察到了一个非常非常坑爹的地方，就是JavaScript的月份范围用整数表示是0~11，0表示一月，1表示二月……，所以要表示6月，我们传入的是5！
-
-第二种创建一个指定日期和时间的方法是解析一个符合ISO 8601格式的字符串：
-```
-var d = Date.parse('2015-06-24T19:49:22.875+08:00');
-d; // 1435146562875
-```
-但它返回的不是Date对象，而是一个时间戳。不过有时间戳就可以很容易地把它转换为一个Date：
-```
-var d = new Date(1435146562875);
-d; // Wed Jun 24 2015 19:49:22 GMT+0800 (CST)
-d.getMonth(); // 5
-```
-
-### json
-
-JSON是JavaScript Object Notation的缩写，它是一种数据交换格式。
-
-在JSON出现之前，大家一直用XML来传递数据。因为XML是一种纯文本格式，所以它适合在网络上交换数据。XML本身不算复杂，但是，加上DTD、XSD、XPath、XSLT等一大堆复杂的规范以后，任何正常的软件开发人员碰到XML都会感觉头大了，最后大家发现，即使你努力钻研几个月，也未必搞得清楚XML的规范。
+[示例](./Chapter-05-code/example3.html)
 
 
-终于，在2002年的一天，道格拉斯·克罗克福特（Douglas Crockford）同学为了拯救深陷水深火热同时又被某几个巨型软件企业长期愚弄的软件工程师，发明了JSON这种超轻量级的数据交换格式。
+单独设置border的各个边，border-top, border-right, border-bottom, 和 border-left
+````
+div {
+  border-bottom: 6px solid #949599;
+}
 
-道格拉斯同学长期担任雅虎的高级架构师，自然钟情于JavaScript。他设计的JSON实际上是JavaScript的一个子集。在JSON中，一共就这么几种数据类型：
+````
 
-+ number：和JavaScript的number完全一致；
-+ boolean：就是JavaScript的true或false；
-+ string：就是JavaScript的string；
-+ null：就是JavaScript的null；
-+ array：就是JavaScript的Array表示方式——[]；
-+ object：就是JavaScript的{ ... }表示方式。
+另外，可以将各个边界侧的样式控制在更精细的水平。例如，如果我们只希望更改底部边框的宽度，我们可以使用以下代码
+````
+div {
+  border-bottom-width: 12px;
+}
 
+````
+可选top, right, bottom, 和left
 
+border-radius属性，使我们能够对元素的角进行圆角处理。border-radius属性接受长度单位，包括百分比和像素，用于标识元素的角的半径
+````
+div {
+  border-radius: 5px;
+}
 
-以及上面的任意组合。
+````
 
-并且，JSON还定死了字符集必须是UTF-8，表示多语言就没有问题了。为了统一解析，JSON的字符串规定必须用双引号""，Object的键也必须用双引号""。
+[示例](./Chapter-05-code/example4.html)
 
-对象转json
+### [教程](http://www.runoob.com/bootstrap4/bootstrap4-tutorial.html)
 
-```
-var xiaoming = {
-    name: '小明',
-    age: 14,
-    gender: true,
-    height: 1.65,
-    grade: null,
-    'middle-school': '\"W3C\" Middle School',
-    skills: ['JavaScript', 'Java', 'Python', 'Lisp']
-};
+[网格系统](https://www.runoob.com/bootstrap4/bootstrap4-grid-basic.html)
+[表格](https://www.runoob.com/bootstrap4/bootstrap4-tables.html)
+[导航](https://www.runoob.com/bootstrap4/bootstrap4-navs.html)
+[导航栏](https://www.runoob.com/bootstrap4/bootstrap4-navbar.html)
+[表单](https://www.runoob.com/bootstrap4/bootstrap4-forms.html)
+[表单控件](https://www.runoob.com/bootstrap4/bootstrap4-forms-inputs.html)
+[输入框组](https://www.runoob.com/bootstrap4/bootstrap4-forms-input-group.html)
+[模态](https://www.runoob.com/bootstrap4/bootstrap4-modal.html)
+[一个网页](https://www.runoob.com/bootstrap4/bootstrap4-makeawebsite.html)
 
-var s = JSON.stringify(xiaoming);
-console.log(s);
-```
-要输出得好看一些，可以加上参数，按缩进输出：
-```
-JSON.stringify(xiaoming, null, '  ');
-```
-
-第二个参数用于控制如何筛选对象的键值，如果我们只想输出指定的属性，可以传入数组：
-```
-JSON.stringify(xiaoming, ['name', 'skills'], '  ');
-```
-拿到一个JSON格式的字符串，我们直接用JSON.parse()把它变成一个JavaScript对象：
-
-```
-JSON.parse('[1,2,3,true]'); // [1, 2, 3, true]
-JSON.parse('{"name":"小明","age":14}'); // Object {name: '小明', age: 14}
-JSON.parse('true'); // true
-JSON.parse('123.45'); // 123.45
-
-```
+### [boostrap-admin实例](https://startbootstrap.com/template-overviews/sb-admin/)
 

@@ -191,12 +191,13 @@ print(urlencode(data))
 ```
 对字符进行编码
 ```
-from urllib.parse import quota
+from urllib.parse import quote
 print(quote('中国'))
 ```
 
 
 http封装
+
 ![img](./Chapter-03-code/pics/3-9.jpg)
 
 ### HTTP协议
@@ -213,7 +214,7 @@ http请求方法
 报文
 
 ![img](./Chapter-03-code/pics/143006_LICd_1469576.jpg)
-+ start line 其实行
++ start line 起始行
 + header     头部
 + body       报文实体 
 
@@ -331,7 +332,7 @@ python 有各种与web交互的模块
 
 ### Request模块
 
-[requests](http://docs.python-requests.org/zh_CN/latest/user/quickstart.html)
+[requests](https://requests.readthedocs.io/zh_CN/latest/)
 文档
 
 get 请求
