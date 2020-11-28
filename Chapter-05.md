@@ -503,7 +503,6 @@ p {
   color: orange;
   font-size: 16px;
 }
-
 ```
 
 在CSS中，我们的规则集以选择器开头，后面紧跟着大括号。在这些大括号内是由属性和值对组成的声明，每个声明都以一个属性开头，后面跟着冒号，属性值，最后是分号。
@@ -533,19 +532,21 @@ div { ... }
 类选择器允许我们根据元素的类属性值选择一个元素。类选择器比类型选择器更具体，因为它们选择一组特定的元素而不是一种类型的所有元素。类选择器允许我们通过跨多个元素使用相同的类属性值，一次将相同的样式应用于不同的元素。
 在CSS中，类由前导点表示，后跟类属性值。下面类选择器将选择包含awesome类属性值的任何元素，包括分割元素和段落元素
 
-````
+```
 # css
 .red { ... }
 # html
 <div class="red">...</div>
 <p class="red">...</p>
-````
+```
+
+
 ID 选择器
 
 ID选择器比类选择器更精确，因为它们一次只能定位一个独特的元素。就像类选择器使用元素的类属性值作为选择器一样，ID选择器使用元素的id属性值作为选择器。无论它们出现在哪种类型的元素上，每个页面使用的id属性值必须唯一。如果使用它们应该保留用于重要元素。
 在CSS中，ID选择符由前导散列符号＃表示，后跟id属性值。这里ID选择器将只选择包含shayhowe的id属性值的元素。
 
-````
+```
 # css
 #name { ... }
 <div id="name">...</div>
@@ -744,15 +745,22 @@ div {
 
 ### [教程](http://www.runoob.com/bootstrap4/bootstrap4-tutorial.html)
 
-[网格系统](https://www.runoob.com/bootstrap4/bootstrap4-grid-basic.html)
-[表格](https://www.runoob.com/bootstrap4/bootstrap4-tables.html)
-[导航](https://www.runoob.com/bootstrap4/bootstrap4-navs.html)
-[导航栏](https://www.runoob.com/bootstrap4/bootstrap4-navbar.html)
-[表单](https://www.runoob.com/bootstrap4/bootstrap4-forms.html)
-[表单控件](https://www.runoob.com/bootstrap4/bootstrap4-forms-inputs.html)
-[输入框组](https://www.runoob.com/bootstrap4/bootstrap4-forms-input-group.html)
-[模态](https://www.runoob.com/bootstrap4/bootstrap4-modal.html)
-[一个网页](https://www.runoob.com/bootstrap4/bootstrap4-makeawebsite.html)
++ [网格系统](https://www.runoob.com/bootstrap4/bootstrap4-grid-basic.html)
+
++ [表格](https://www.runoob.com/bootstrap4/bootstrap4-tables.html)
+
++ [导航](https://www.runoob.com/bootstrap4/bootstrap4-navs.html)
+
++ [导航栏](https://www.runoob.com/bootstrap4/bootstrap4-navbar.html)
+
++ [表单](https://www.runoob.com/bootstrap4/bootstrap4-forms.html)
++ [表单控件](https://www.runoob.com/bootstrap4/bootstrap4-forms-inputs.html)
+
++ [输入框组](https://www.runoob.com/bootstrap4/bootstrap4-forms-input-group.html)
+
++ [模态](https://www.runoob.com/bootstrap4/bootstrap4-modal.html)
+
++ [一个网页](https://www.runoob.com/bootstrap4/bootstrap4-makeawebsite.html)
 
 ### [boostrap-admin实例](https://startbootstrap.com/template-overviews/sb-admin/)
 
