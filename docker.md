@@ -82,10 +82,14 @@ Status: Downloaded newer image for nginx:latest
 docker.io/library/nginx:latest
 
 ```
-`docker pull nginx` 其实就是`docker.io/library/nginx:latest`
-docker.io 为镜像仓库地址，
-library/nginx 为仓库名
-latest 为版本号
+`docker pull nginx`
+ 其实就是
+ 
+ `docker.io/library/nginx:latest`
+
++ docker.io 为镜像仓库地址，
++ library/nginx 为仓库名
++ latest 为版本号
 
 ### 列出本地镜像
 
@@ -115,11 +119,14 @@ Deleted: sha256:f5600c6330da7bb112776ba067a32a9c20842d6ecc8ee3289f1a713b644092f8
 ### 使用dockerfile构建镜像
 
 以springboot的helloword (git clone https://github.com/goxr3plus/Simplest-Spring-Boot-Hello-World.git)
+
 使用`mvn package`进行构建生成包example.smallest-0.0.1-SNAPSHOT.war
+
 安装lrzsz包，用来上传文件到centos
 `yum install lrzsz`
 
 使用jdk镜像`https://hub.docker.com/r/adoptopenjdk/openjdk11/`
+
 `docker pull adoptopenjdk/openjdk11`
 
 创建Dockerfile文件
@@ -153,39 +160,47 @@ Successfully built d8af82f05d1b
 可以通过导出、导入将一个镜像从一台机器拷贝到另一台机器，在没有registry（镜像仓库服务）情况下
 
 导出
+
 `docker save 镜像名 -o  文件名`
 
 导入
+
 `docker load -i 文件名`
 
 ### 运行容器
 
 创建并启动容器
+
 `docker run helloword:1.0`
 
 查看运行中的容器
+
 `docker ps`
 
 停止容器
+
 `docker stop 容器id/容器name`
 
 后台运行容器
+
 `docker run -d helloword:1.0`
 
 给容器指定名称
+
 `docker run --name=helloword  -d helloword:1.0`
 
 修改容器名称
+
 `docker rename oldname newname`
 
 启动容器
+
 `docker start 容器id/容器name`
 
 查看所有容器
+
 `docker ps -a`
 
-给容器指定名称
-``
 
 ### 查看容器ip
 
@@ -230,7 +245,9 @@ Successfully built d8af82f05d1b
 
 ```
 使用curl 访问程序
+
 `curl 172.17.10.2:8080`
+
 输出hellow world
 
 ### 进入容器
@@ -257,15 +274,21 @@ root        56  0.0  0.1   8876  1592 pts/0    R+   13:14   0:00 ps aux
 
 ### 从网络访问容器
 docker run指定容器映射到主机的端口
+
 `docker run --name=helloword -p80:8080 -d  helloword:1.0`
+
 将容器的8080端口映射到主机
+
 启动后在浏览器输入http://主机ip 就可以访问到helloword
+
+
 
 
 ## 实战使用docker运行一个blog
 git地址https://github.com/byteblogs168/plumemo
 
 在root下创建blog目录，将plumemo-v1.2.0.jar上传到blog目录里
+
 在blog目录里创建Dockerfile
 
 ```
@@ -275,18 +298,23 @@ CMD java -jar /opt/plumemo-v1.2.0.jar
 ```
 
 构建镜像并打标签
+
 `docker build . -t plumemo:v1.2.0`
 
 拉取mysql镜像
+
 `docker pull mysql/mysql-server`
 
 启动mysql
+
 `docker run --name=mysql -p3306:3306  -d mysql/mysql-server:5.6`
 
 查看mysql密码
+
 `docker logs mysql 2>&1 | grep GENERATED`
 
 访问mysql
+
 `docker exec -it mysql mysql -uroot -p`
 
 修改rmysql root密码
@@ -317,12 +345,15 @@ flush privileges;
 ```
 
 创建blog-ui目录
+
 将dist.tar.gz上传到blog-ui目录
+
 执行解压命令
 
 `tar zxvf dist.tar.gz`
 
 拉取nodejs镜像
+
 `docker pull  node:10.23.0`
 
 创建Dockerfile文件
@@ -360,9 +391,11 @@ server {
 }
 ```
 构建编译
+
 `docker build . -t ui:1.2.0`
 
 运行ui
+
 `docker run -d -p 80:80 --add-host=blog-api:172.17.0.3 ui:1.20`
 
 ![img](./docker/login.jpg)
