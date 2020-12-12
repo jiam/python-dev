@@ -222,9 +222,6 @@ fi
 ```shell
 #!/bin/bash
 
-# Filename: test5-2.sh
-# Author: huoty <sudohuoty@163.com>
-# Script starts from here:
 
 if test -f "$1"
 then echo "$1 is an ordinary file"
@@ -251,9 +248,6 @@ fi
 ```shell
 #!/bin/bash
 
-# Filename: test5-3.sh
-# Author: huoty <sudohuoty@163.com>
-# Script starts from here:
 
 echo "key in a number(1-10):"
 read a
@@ -364,9 +358,6 @@ file1 -ot file2 : file1 比file2 旧时返回真
 ```shell
 #!/bin/bash
 
-# Filename: test5-4.sh
-# Author: huoty <sudohuoty@163.com>
-# Script starts from here:
 
 s1=1
 s2=test5-4.sh
@@ -415,16 +406,13 @@ esac
 ```shell
 #!/bin/bash
 
-# Filename: test5-5.sh
-# Author: huoty <sudohuoty@163.com>
-# Script starts from here:
 
 case $1 in
     file) 
         echo "it is a file";;
-    dir|path)
+    path)
         echo "current directory is `pwd`";;
-    [Dd]ate)
+    date)
         echo "the date is `date`";;
     *)
         echo "it is not a filename";;
@@ -432,12 +420,9 @@ esac
 ```
 
 **使用 case 时应注意以下几点：**
-+ 每个正则表达式后面可以有一条或多条命令，其最后一条命令必须以两个分号（;;）结束。
-+ 正则表达式中可以使用通配符。
-+ 如果一个正则表达式是由多个模式组成，那么各模式之间应以 `“|”` 隔开。表示各模式是“或”的关系，即只要给定字符串与其中一个模式相匹配，就会执行其后的命令表。
-+ 各正则表达式是唯一的，不应重复出现。
++ 必须以两个分号（;;）结束。
 + case 语句以关键字 case 开头，以关键字 esac 结束。
-+ case 的退出（返回）值是整个结构中最后执行的那个命令的退出值。若没有执行任何命令则退出值为零
+
 
 ### for 语句
 
@@ -681,12 +666,12 @@ testfile /home/huoty/.vimrc
 
 （2）在脚本开头提供参数：
 
-> #！/bin/bash -x
+> #!/bin/bash -x
 
 （3）在脚本中用set命令启用或禁用参数
 
 ```shell
-#！/bin/bash 
+#!/bin/bash 
 
 if [ -z "$1" ]; then
   set -x
@@ -720,12 +705,269 @@ url="http://kuanghy.github.io/"
 ```shell
 #!/bin/bash
 
-# Filename: 
-# Author: huoty <sudohuoty@163.com>
-# Script starts from here:
-
 . ./subscript.sh
 echo $url
 ```
 
-被包含脚本不需要有执行权限，只保持主脚本有执行权限即可。其实这种文件包含的内容在之前的内容中我们已经提到过，只不过不是用来解决文件包含的问题。之前我们谈到过，Shell 在执行脚本时是另外开启一个子进程来执行的，所以想要让脚本的内容在当前 shell 中执行，则需要用 “.” 或 “source” 来执行脚本。其实这这两者的含义是一样的，所谓的让脚本内容在当前 shell 执行，也就是将脚本文件的内容包含到当前 shell 来执行，其实质都是文件包含。
+
+实战: 
+编写一个plumemo程序的控制脚本，实现启动，停止，查看状态功能
+
+
+```shell
+#!/usr/bin/bash
+function help(){
+    echo "用法："
+    echo sh $0 start
+    echo sh $0 status
+    echo sh $0 stop
+}
+function start(){
+    if [ -f plumemo-v1.2.0.jar ]
+    then
+        nohup java -jar plumemo-v1.2.0.jar >/var/log/plumemo.log 2>&1 &
+        echo "启动成功日志文件/var/log/plumemo.log"
+    else
+        echo "plumemo-v1.2.0.jar 不存在"
+    fi
+
+}
+function status(){
+    if  ps aux | grep plumemo-v1.2.0.jar |grep -vq grep
+    then
+        echo "plumemo已启动"
+    else
+        echo "plumemo未运行"
+    fi
+}
+
+
+function stop(){
+    pid=`ps aux | grep plumemo-v1.2.0.jar |grep -v grep | awk '{print $2}'`
+    if  [ -n "$pid" ]
+    then
+        kill -9  $pid
+        echo "plumemo停止成功"
+    else
+        echo "plumemo未运行"
+    fi
+
+}
+case "$1" in
+start) start;;
+status) status;;
+stop) stop;;
+*) help;;
+esac
+```
+
+常用shell命令
+1. 统计网络连接状态
+`yum install net-tools`
+方法一：
+`netstat  -an | grep tcp | awk '{ print $NF}' | sort -n | uniq  -c`
+方法二；
+`netstat -an | awk '/^tcp/ {++state[$NF]} END {for(k in state) print k,state[k]}'`
+
+2. 统计目录大小
+
+`du -sh ./*`
+
+3. 找出大于1G的文件
+`find /  -size +1G`
+
+4. 查找Dockerfile
+`find / -name "Dockerfile"`
+
+5. 查看日志
+ `tail -n -f 日志`
+
+6. 从文件中过滤关键字
+`grep keyword  文件`
+
+`grep keyword -r 目录`
+
+7. 字符串替换
+`echo "abc123" | sed 's/123/abd/g'`
+
+8. 打印列
+`ps aux | awk '{print $2}'`
+
+9. 查看网卡配置
+`ip addr`
+`ifconfig`
+
+10. 查看进程信息
+`ps aux`
+`top`
+
+11. 查看磁盘分区
+`df -h`
+
+12. 查看内存
+`free -h`
+
+12. 后台启动进程
+`nohup 进程名称参数  >日志文件 2>&1 &`
+
+## redis
+Redis 是一个高性能的key-value数据库。
+Redis 以下三个特点：
+
++ Redis支持数据的持久化，可以将内存中的数据保存在磁盘中，重启的时候可以再次加载进行使用。
++ Redis不仅仅支持简单的key-value类型的数据，同时还提供list，set，hash等数据结构的存储。
++ Redis支持数据的备份，即master-slave模式的数据备份。
+
+### redis数据结构
+
++ STRING：字符串、整数或浮点数
++ LIST：列表，可存储多个相同的字符串
++ SET：集合，存储不同元素，无序排列
++ HASH：散列表，存储键值对之间的映射，无序排列
+
+
+### 安装redis
+1. `docker pull redis`
+2. `docker run -d --name=redis --network=host redis`
+3. `docker exec -it redis /bin/bash` 
+4. redis-cli redis的客户端命令
+
+`redis-cli`
+
+```
+127.0.0.1:6379> info
+# Server
+redis_version:6.0.9
+redis_git_sha1:00000000
+redis_git_dirty:0
+redis_build_id:11509227cb1fdf31
+redis_mode:standalone
+os:Linux 3.10.0-1160.el7.x86_64 x86_64
+arch_bits:64
+multiplexing_api:epoll
+atomicvar_api:atomic-builtin
+gcc_version:8.3.0
+
+```
+
+### redis 字符串
+Redis 字符串数据类型的相关命令用于管理 redis 字符串值
+```
+127.0.0.1:6379> set name jiaminqiang
+OK
+127.0.0.1:6379> get name
+"jiaminqiang"
+127.0.0.1:6379> set name 贾敏强
+OK
+127.0.0.1:6379> get name
+"\xe8\xb4\xbe\xe6\x95\x8f\xe5\xbc\xba"
+
+```
+
+### redis hash
+Redis hash 是一个 string 类型的 field（字段） 和 value（值） 的映射表，hash 特别适合用于存储对象。
+
+```shell
+127.0.0.1:6379> HMSET student name jia age 18
+OK
+127.0.0.1:6379> hgetall student
+1) "name"
+2) "jia"
+3) "age"
+4) "18"
+127.0.0.1:6379> hget student name
+"jia"
+127.0.0.1:6379> hget student age
+"18"
+```
+
+### redis list
+Redis列表是简单的字符串列表，按照插入顺序排序。
+```
+127.0.0.1:6379> lpush names jia
+(integer) 1
+127.0.0.1:6379> lpush names li
+(integer) 2
+127.0.0.1:6379> lpush names wang
+(integer) 3
+127.0.0.1:6379> llen names
+(integer) 3
+127.0.0.1:6379> lrange 0 2
+(error) ERR wrong number of arguments for 'lrange' command
+127.0.0.1:6379> lrange names 0 2
+1) "wang"
+2) "li"
+3) "jia"
+127.0.0.1:6379> lpop names
+"wang"
+127.0.0.1:6379> lrange names 0 2
+1) "li"
+2) "jia"
+127.0.0.1:6379> llen names
+(integer) 2
+127.0.0.1:6379> rpop names
+"jia"
+127.0.0.1:6379> lrange names 0 2
+1) "li"
+127.0.0.1:6379> rpush names zhang
+(integer) 2
+127.0.0.1:6379> lrange names 0 2
+1) "li"
+2) "zhang"
+```
+
+### redis set
+Redis 的 Set 是 String 类型的无序集合。集合成员是唯一的，这就意味着集合中不能出现重复的数据。
+```
+127.0.0.1:6379> sadd numbers 1
+(integer) 1
+127.0.0.1:6379> sadd numbers 2
+(integer) 1
+127.0.0.1:6379> sadd numbers 3
+(integer) 1
+127.0.0.1:6379> smembers numbers
+1) "1"
+2) "2"
+3) "3"
+127.0.0.1:6379> sadd numbers 3
+(integer) 0
+127.0.0.1:6379> smembers numbers
+1) "1"
+2) "2"
+3) "3"
+
+127.0.0.1:6379> spop numbers 1
+1) "1"
+127.0.0.1:6379> smembers numbers
+1) "2"
+2) "3"
+127.0.0.1:6379> spop numbers 3
+1) "2"
+2) "3"
+```
+
+### 通用命令
+1. 查看key类型
+` type student`
+2. 删除key
+`type student`
+3. 判断key是否存在
+```
+127.0.0.1:6379> set name jia
+OK
+127.0.0.1:6379> exists name
+(integer) 1
+127.0.0.1:6379> del name
+(integer) 1
+127.0.0.1:6379> exists name
+(integer) 0
+```
+4. 列出所有key
+```
+127.0.0.1:6379> keys *
+1) "names"
+```
+
+
+
+

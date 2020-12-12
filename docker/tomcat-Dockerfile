@@ -1,0 +1,5 @@
+FROM centos:centos7
+COPY jdk1.8.0_11 /opt/jdk
+COPY apache-tomcat-8.5.43 /opt/tomcat
+ENV JAVA_HOME=/opt/jdk PATH=$JAVA_HOME/bin:$PATH
+CMD /opt/tomcat/bin/catalina.sh run

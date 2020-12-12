@@ -303,7 +303,7 @@ CMD java -jar /opt/plumemo-v1.2.0.jar
 
 拉取mysql镜像
 
-`docker pull mysql/mysql-server`
+`docker pull mysql/mysql-server:5.6`
 
 启动mysql
 
