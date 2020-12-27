@@ -187,6 +187,13 @@ sonar.java.binaries=target
                 <sonar.host.url>
                   http://localhost:9000
                 </sonar.host.url>
+                <sonar.login>
+                xxx
+                </sonar.login>
+                 <sonar.password>
+                xxx
+                </sonar.password>
+
             </properties>
         </profile>
 
