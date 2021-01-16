@@ -454,6 +454,16 @@ for (;;) { // 将无限循环下去
 }
 ```
 
+continue 语句跳过后面语句，直接进入下一次循环
+```
+for(i=1;i<=6;i++){
+    if (i==2){
+        continue
+    }
+    console.log(i)
+}
+```
+
 for ... in
 for循环的一个变体是for ... in循环，它可以把一个对象的所有属性依次循环出来(注意只能遍历对象属性，不能遍历数组)：
 
@@ -730,7 +740,7 @@ p.innerHTML = 'ABC <span style="color:red">RED</span> XYZ';
 </script>
 ```
 
-第二种是修改innerText，这样可以设置文本，防止出现`<script>`标签：
+第二种是修改innerText，这样可以设置文本，防止出现解析html元素：
 ```
 <p id="p-id">innerhtml</p>
 
@@ -739,7 +749,7 @@ p.innerHTML = 'ABC <span style="color:red">RED</span> XYZ';
 var p = document.getElementById('p-id');
 // 设置文本:
 p.innerText = '<p>dd</p>';
-// HTML被自动编码，无法设置一个<script>节点:
+// HTML被自动编码，无法设置一个子节点:
 
 </script>
 ```

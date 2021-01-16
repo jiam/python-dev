@@ -281,7 +281,7 @@ Django 模板标签放在 {% 和 %} 之间。因此，区块以 {% block %} 开�
 ```
 {% for question in latest_question_list %}
         <li><a href="{% url 'detail' question.id %}">{{ question.question_text }}</a></li>
-    {% endfor %}
+{% endfor %}
 ```
 
 2. if，elif和else标签
@@ -453,7 +453,7 @@ Running migrations:
 
 ### 在admin注册模型
 
-编辑文件login/admin.phy
+编辑文件login/admin.py
 ```
 from django.contrib import admin
 

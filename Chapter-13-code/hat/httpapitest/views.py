@@ -1,7 +1,7 @@
 import json
 from django.shortcuts import render,reverse,redirect
 from django.http import HttpResponse,JsonResponse
-from httpapitest.models import Project,Module,DebugTalk,TestConfig, TestCase, TestReports, Env, TestSuite,UserInfo
+from .models import Project,Module,DebugTalk,TestConfig, TestCase, TestReports, Env, TestSuite,UserInfo
 from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator
 from .utils import config_logic, case_logic, get_time_stamp,timestamp_to_datetime
