@@ -48,12 +48,25 @@
 * jquery
 
 
-## 7-9天 django基础
-* 网站架构
-* 数据库和模型
-* djangoadmin 管理站点
-* 视图和模板
-* 认证与授权
+## django基础
+
+### 第七天
+* django框架介绍
+* 创建django项目
+* django视图
+* django模型
+
+### 第八天
+* django模板
+* djanog静态文件
+* django单元测试
+
+### 第九天
+* django session
+* 注册功能
+* 登录功能
+* 实现一个登录app
+
 
 ## 10-13天 实战： 自动化接口测试平台
 * 项目管理
@@ -64,13 +77,52 @@
 * 认证授权
 * 异步任务
 * 定时任务
+### 第十天
+平台架构介绍
+数据库设计
+业务流程图
+httprunner 接口测试工具
+redis 内存数据库
+celery 分布式任务
+
+### 第十一天
+* 新建项目
+* 修改项目
+* 删除项目
+* 添加模块
+* 修改模块
+* 删除模块
+
+### 第十二天
+* 新增用例
+* 修改用例
+* 删除用例
+* 用例依赖
+* 同步运行用例
+
+### 第十三天
+* 批量运行用例
+* 异步运行用例
+* 定时任务
+* 注册、登录、授权
+
 
 ## 14-16 cicd
+自动化的构建，编译，代码质量检查，服务部署，加快代码的发布速度，提高交付效率和质量
+
+第十四天
 * nginx、redis、mysql，linux环境部署
 * django 项目线上部署
-* sonar质量平台
-* Jenkins 部署java项目
+
+第十五天
+* docker技术
+* sonar质量平台部署
+* sonar 检查python代码质量
+* sonar 检查java代码质量
+
+第十六天
+* jenkins部署
+* sonar集成jenkins
 * Jenkins 部署django项目
-* docker 技术
-* jenkins docker部署
-* jenkins httpapi 详解
+* jenkins 部署容器化服务
+* jenkins httpapi 
