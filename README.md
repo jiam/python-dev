@@ -24,14 +24,14 @@
 * 练习实现http一个压力测试脚本2
 
 ## 前端
-### 第四天 web基础知识
+### 第四天 web网络协议
 * tcp/ip协议栈
 * http协议
 * dns
 * 网页的基础知识
 * python与web交互
 
-### 第五天
+### 第五天 静态页面
 * html
 * css
 * bootstrap
@@ -48,34 +48,27 @@
 * jquery
 
 
-## 7-9天
-django基础
+## 7-9天 django基础
 * 网站架构
 * 数据库和模型
 * djangoadmin 管理站点
 * 视图和模板
 * 认证与授权
 
-## 10-13天
-
-mysql redis celery
-实战： 自动化接口测试平台
-
+## 10-13天 实战： 自动化接口测试平台
 * 项目管理
 * 模块管理
 * 用例管理
 * 接口测试
-* 压力测试
 * 测试报告
-* 用户管理
 * 认证授权
-* dashboard
+* 异步任务
+* 定时任务
 
-## 14-16
-cicd
+## 14-16 cicd
 * nginx、redis、mysql，linux环境部署
 * django 项目线上部署
-* gitlab,jenkins,nexus
+* sonar质量平台
 * Jenkins 部署java项目
 * Jenkins 部署django项目
 * docker 技术

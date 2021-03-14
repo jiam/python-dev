@@ -164,21 +164,7 @@ def case_search_ajax(request):
         else:
             return HttpResponse('')
 
-@csrf_exempt
-def config_search_ajax(request):
-    if request.is_ajax():
-        data = json.loads(request.body.decode('utf-8'))
-        if 'case' in data.keys():
-            project = data["case"]["name"]["project"]
-            module = data["case"]["name"]["module"]
-        if   project != "请选择" and module != "请选择":
-            m = Module.objects.get(id=module)
-            configs = TestConfig.objects.filter(belong_project=project, belong_module=m)
-            config_list = ['%d^=%s' % (c.id, c.name) for c in configs ]
-            config_string = 'replaceFlag'.join(config_list)
-            return HttpResponse(config_string)
-        else:
-            return HttpResponse('')
+
 
 def case_list(request):
     pass
@@ -654,79 +640,7 @@ script 部分
 
 
 
-## celery
 
-Celery 是一个简单、灵活且可靠的，处理大量消息的分布式系统，并且提供维护这样一个系统的必需工具。是一个专注于实时处理的任务队列，同时也支持任务调度。
-
-
-任务队列用作跨线程或机器分配工作的机制。 任务队列的输入是为一个任务。任务队列通过消息系统borker实现。客户端往broker中加任务，worker进程不断监视broker中的任务队列以执行新的任务
-
-
-支持的常见broker
-+ redis
-+ rabbitmq
-+ zookeeper
-
-安装支持redis的celery
-```
-pip install celery -i https://pypi.douban.com/simple/
-pip install redis -i https://pypi.douban.com/simple/
-pip install  eventlet -i https://pypi.douban.com/simple/
-```
-
-
-编写tasks.py
-```
-from celery import Celery
-
-app = Celery('tasks', broker='redis://127.0.0.1:6379/0')
-
-@app.task
-def add(x, y):
-    return x + y
-```
-
-
-client.py
-```
-from tasks import add
-add.delay(2,3) 
-```
-
-启动 redis
-执行client.py 生成一个要执行的任务
-`python client.py`
-查看redis key
-```
-127.0.0.1:6379> keys *
-1) "celery"
-2) "_kombu.binding.celery"
-```
-查看key类型
-```
-127.0.0.1:6379> type celery
-list
-127.0.0.1:6379> type "_kombu.binding.celery"
-set
-```
-查看key 的value
-```
-127.0.0.1:6379> lrange celery 0 -1
-1) "{\"body\": \"W1syLCAzXSwge30sIHsiY2FsbGJhY2tzIjogbnVsbCwgImVycmJhY2tzIjogbnVsbCwgImNoYWluIjogbnVsbCwgImNob3JkIjogbnVsbH1d\", \"content-encoding\": \"utf-8\", \"content-type\": \"application/json\", \"headers\": {\"lang\": \"py\", \"task\": \"tasks.add\", \"id\": \"d0ac9482-bb5f-4b4d-8b70-625cd88aad0d\", \"shadow\": null, \"eta\": null, \"expires\": null, \"group\": null, \"retries\": 0, \"timelimit\": [null, null], \"root_id\": \"d0ac9482-bb5f-4b4d-8b70-625cd88aad0d\", \"parent_id\": null, \"argsrepr\": \"(2, 3)\", \"kwargsrepr\": \"{}\", \"origin\": \"gen15684@LAPTOP-PHMJ1QN6\"}, \"properties\": {\"correlation_id\": \"d0ac9482-bb5f-4b4d-8b70-625cd88aad0d\", \"reply_to\": \"7d107092-94b4-35c8-bb26-20063dc7944d\", \"delivery_mode\": 2, \"delivery_info\": {\"exchange\": \"\", \"routing_key\": \"celery\"}, \"priority\": 0, \"body_encoding\": \"base64\", \"delivery_tag\": \"3526616e-1efc-4eae-867d-1715c8751531\"}}"
-
-127.0.0.1:6379> smembers "_kombu.binding.celery"
-1) "celery\x06\x16\x06\x16celery"
-```
-
-
-celery 为一个任务队列列表 等待执行的任务都在这个列表里
-_kombu.binding.celery 默认的任务队列名称默认为 celery
-
-
-
-启动worker
-
-`celery -A tasks worker --loglevel=info  -P eventlet`
 
 
 

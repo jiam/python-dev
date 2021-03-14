@@ -419,7 +419,7 @@ Django的form表单功能，帮你自动生成了下面部分的代码
 
 修改login/forms.py 添加attrs属性
 ```
-rom django import forms
+from django import forms
 
 
 class UserForm(forms.Form):
