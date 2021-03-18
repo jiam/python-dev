@@ -307,64 +307,7 @@ cat  ~/.ssh/id_rsa.pub
 #### 9. 推送到远程
 右键->git->Repository->push
 
-## 三、 回顾python基础
-编写一个通讯录程序，实现增删改查功能
-#### 1.设计数据结构
-一条记录： 姓名，电话， id
 
-一个通讯录：列表，里面元素为记录
-
-#### 2. 函数设计
-* 增加 add_record
-* 查询 query_record
-* 修改 change_record
-* 删除 delete_record
-
-#### 3. 菜单设计
-* main函数
-* while 循环
-* 选择相应功能
-示例
-````
-
-        通讯录
-        1. 添加
-        2. 查找
-        3. 删除
-        4. 修改
-        5. 退出
-        
-请选择操作:1
-请输入姓名:jia
-请输入电话:123
-添加成功
-
-        通讯录
-        1. 添加
-        2. 查找
-        3. 删除
-        4. 修改
-        5. 退出
-        
-请选择操作:
-````
-
-
-## 四、使用面向对象实现该通讯录
-#### 1.设计数据结构
-* 记录类 Record
-* 通讯录类 PhoneBook
-
-#### 2. 类方法设计
-* Record __init__、 set_number
-* PhoneBook __init__、add_record、query_record、change_record、delete_record
-#### 3. 菜单设计不变
-
-
-
-## 六、 练习
-#### 1. 使用json将通讯录（函数）序列化
-#### 2. 使用pickle将通讯录（面向对象）序列化
 
 
 
