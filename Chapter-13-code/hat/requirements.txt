@@ -1,4 +1,4 @@
-Django==2.2.2
+Django==2.2.18
 celery==4.3.0
 django-celery-beat==1.5.0
 mysqlclient==1.4.2.post1
